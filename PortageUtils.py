@@ -3,7 +3,8 @@ import portage
 import os
 
 class InstallException(Exception):
-    pass
+    def __init__(self, command):
+        self.command = command
 
 def available_packages(pattern):
     """Returns a list of packages matching the given pattern.
@@ -53,7 +54,7 @@ def install_package(package, env={}, root='/', pkgdir='usr/portage/packages'):
     so = cmd.getstatusoutput(cl)
     if so[0] != 0:
         # In case of error, print the whole emerge command
-        raise InstallException("Compilation '%s' failed" % cl)
+        raise InstallException(cl)
     
     # Unpack the archive onto the given root directory
     archive = pkgdir + pkg + '.tbz2'
