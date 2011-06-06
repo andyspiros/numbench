@@ -23,8 +23,8 @@ class Module:
               'syr2', 'ger', 'rot', 'matrix_matrix', 'aat',
               'trisolve_vector', 'trisolve_matrix', 'trmm')]
         
-        # Create dir. If alls results already exist use them, otherwise
-        # remove old results 
+        # Create dir. If all results already exist use them, otherwise
+        # remove old results
         runtests = False
         if os.path.exists(testdir):
              runtests = all([os.path.exists(i) for i in files])

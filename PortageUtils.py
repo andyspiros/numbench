@@ -14,7 +14,7 @@ def available_packages(pattern):
     every matching pattern in the portage tree and installed overlays.
     """
     return [portage.catpkgsplit(l) \
-      for l in cmd.getoutput('equery -q list -p -e ' + pattern).split()]
+      for l in cmd.getoutput('equery -q list -po ' + pattern).split()]
 
 
 def install_package(package, env={}, root='/', pkgdir='usr/portage/packages'):

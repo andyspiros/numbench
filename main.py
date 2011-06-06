@@ -1,4 +1,4 @@
-import os, sys
+import os, sys, shlex
 import commands as cmd
 from PortageUtils import *
   
@@ -37,6 +37,22 @@ def print_usage():
     print "Usage: benchmarks [blas|cblas|lapack]"
     
     
+def tests_from_input(input):
+    tests = {}
+    for line in input.split('\n'):
+        line = line.strip()
+        spl = shlex.split(line)
+        if len(spl) < 2:
+            continue
+        package = available_packages(spl[1])
+        env = {}
+        for var in spl[2:]:
+            s = var.split('=')
+            env[s[0]] = s[1]
+        tests[spl[0]] = {'package' : package , 'env' : env}
+    return tests
+    
+    
 # Import the desired module or print help and exit
 try:
     tmp = __import__(sys.argv[1], fromlist = ['Module'])
@@ -61,27 +77,45 @@ used at compile-time as dictionary (it can just be a void one).
 After the tests every successful tested item will contain the item "result",
 which can contain any type of data and will be used for the final report.
 """
-tests = {
-    "abcde" : {
-        "package" : ('sci-libs', 'blas-reference', '3.3.1', 'r1'),
-        "env" : {'FC' : 'gfortran'}
-    },
-         
-    "fghij" : {
-        "package" : ('dev-cpp', 'eigen', '3.0.0', 'r1'),
-        "env" : {'CXX' : 'gcc', 'CXXFLAGS' : '-O2'}
-    },
-         
+#tests = {
+#    "abcde" : {
+#        "package" : ('sci-libs', 'blas-reference', '3.3.1', 'r1'),
+#        "env" : {'FC' : 'gfortran'}
+#    },
+#         
+#    "fghij" : {
+#        "package" : ('dev-cpp', 'eigen', '3.0.0', 'r1'),
+#        "env" : {'CXX' : 'gcc', 'CXXFLAGS' : '-O2'}
+#    },
+#         
 #    "klmno" : {
 #        "package" : ('dev-cpp', 'eigen', '3.0.0', 'r1'),
 #        "env" : {'CXX' : 'icc', 'CXXFLAGS' : '-O3'}
 #    },
+#
+#    "pqrst" : {
+#        "package" : ('sci-libs', 'blas-reference', '3.3.1', 'r1'),
+#        "env" : {'FC' : 'ifort'}
+#    }
+#}
 
-    "pqrst" : {
-        "package" : ('sci-libs', 'blas-reference', '3.3.1', 'r1'),
-        "env" : {'FC' : 'ifort'}
-    }
-}
+
+"""
+The test variable is generated from a string which can be read from input.
+Here is an example of the parsed input.
+Every line contains a configuration and will be an entry in the tests
+dictionary; the line has to contain:
+- an identification string
+- a package description, which can, but does not must to, contain a version
+- a list of environment variables separated by means of spaces 
+"""
+input = '''
+abcde blas-reference-3.3.1-r1 FC=gfortran
+fghij dev-cpp/eigen-3.0.0-r1 CXX=gcc CXXFLAGS='-O2'
+klmno dev-cpp/eigen-3.0.0-r1 CXX=icc CXXFLAGS='-O3'
+pqrst sci-libs/blas-reference-3.3.1-r1 FC=ifort
+'''
+tests = tests_from_input(input)
 
 for tn,(name,test) in enumerate(tests.items(),1):
     Print("BEGIN TEST %i" % tn)
@@ -93,14 +127,17 @@ for tn,(name,test) in enumerate(tests.items(),1):
     Print.down()
     package = "%s/%s-%s-%s" % test['package']
     Print("Emerging package %s" % package)
-    try:
-        install_package( \
-          test['package'], env=test['env'], root=root, pkgdir=pkgdir)
-    except InstallException as e:
-        Print("Package %s failed to emerge: %s" % (package, e.command))
-        Print.up()
-        print
-        continue
+    if os.exists(pkgdir+package+".tbz2"):
+        Print("Package already emerged - skipping")
+    else:
+        try:
+            install_package( \
+              test['package'], env=test['env'], root=root, pkgdir=pkgdir)
+        except InstallException as e:
+            Print("Package %s failed to emerge: %s" % (package, e.command))
+            Print.up()
+            print
+            continue
     Print("Package emerged")
     
     # Find implementations
