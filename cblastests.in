@@ -1,0 +1,2 @@
+gsl-gcc gsl-1.15-r1 CC=gcc CFLAGS=-O2
+gsl-icc gsl-1.15-r1 CC=gcc CFLAGS=-O3
