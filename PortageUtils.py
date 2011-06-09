@@ -56,13 +56,6 @@ def install_package(package, env={}, root='/', pkgdir='usr/portage/packages'):
         # In case of error, print the whole emerge command
         raise InstallException(cl)
     
-    # Unpack the archive onto the given root directory
-    archive = pkgdir + pkg + '.tbz2'
-    os.path.exists(root) or os.makedirs(root)
-    so = cmd.getstatusoutput("tar xjf " + archive + " -C " + root);
-    if so[0] != 0:
-        raise InstallException(so[1])
-    
 if __name__ == '__main__':
     # Just a test
     print available_packages('blas-reference')

@@ -46,10 +46,6 @@ public :
     BLAS_FUNC(gemm)(&notrans,&notrans,&N,&N,&N,&fone,A,&N,B,&N,&fzero,X,&N);
   }
 
-//   static inline void ata_product(gene_matrix & A, gene_matrix & X, int N){
-//     ssyrk_(&lower,&trans,&N,&N,&fone,A,&N,&fzero,X,&N);
-//   }
-
   static inline void aat_product(gene_matrix & A, gene_matrix & X, int N){
     BLAS_FUNC(syrk)(&lower,&notrans,&N,&N,&fone,A,&N,&fzero,X,&N);
   }
@@ -63,25 +59,6 @@ public :
     BLAS_FUNC(axpy)(&N,&a,X,&intone,Y,&intone);
   }
 
-  static inline void cholesky(const gene_matrix & X, gene_matrix & C, int N){
-    int N2 = N*N;
-    BLAS_FUNC(copy)(&N2, X, &intone, C, &intone);
-    char uplo = 'L';
-    int info = 0;
-    BLAS_FUNC(potrf)(&uplo, &N, C, &N, &info);
-    if(info!=0) std::cerr << "potrf_ error " << info << "\n";
-  }
-
-  static inline void partial_lu_decomp(const gene_matrix & X, gene_matrix & C, int N){
-    int N2 = N*N;
-    BLAS_FUNC(copy)(&N2, X, &intone, C, &intone);
-    char uplo = 'L';
-    int info = 0;
-    int * ipiv = (int*)alloca(sizeof(int)*N);
-    BLAS_FUNC(getrf)(&N, &N, C, &N, ipiv, &info);
-    if(info!=0) std::cerr << "getrf_ error " << info << "\n";
-  }
-  
   static inline void trisolve_lower(const gene_matrix & L, const gene_vector& B, gene_vector & X, int N){
     BLAS_FUNC(copy)(&N, B, &intone, X, &intone);
     BLAS_FUNC(trsv)(&lower, &notrans, &nonunit, &N, L, &N, X, &intone);
@@ -95,55 +72,6 @@ public :
   static inline void trmm(gene_matrix & A, gene_matrix & B, gene_matrix & X, int N){
     BLAS_FUNC(trmm)(&left, &lower, &notrans,&nonunit, &N,&N,&fone,A,&N,B,&N);
   }
-
-  #ifdef HAS_LAPACK
-
-  static inline void lu_decomp(const gene_matrix & X, gene_matrix & C, int N){
-    int N2 = N*N;
-    BLAS_FUNC(copy)(&N2, X, &intone, C, &intone);
-    char uplo = 'L';
-    int info = 0;
-    int * ipiv = (int*)alloca(sizeof(int)*N);
-    int * jpiv = (int*)alloca(sizeof(int)*N);
-    BLAS_FUNC(getc2)(&N, C, &N, ipiv, jpiv, &info);
-  }
-
-
-
-  static inline void hessenberg(const gene_matrix & X, gene_matrix & C, int N){
-    {
-      int N2 = N*N;
-      int inc = 1;
-      BLAS_FUNC(copy)(&N2, X, &inc, C, &inc);
-    }
-    int info = 0;
-    int ilo = 1;
-    int ihi = N;
-    int bsize = 64;
-    int worksize = N*bsize;
-    SCALAR* d = new SCALAR[N+worksize];
-    BLAS_FUNC(gehrd)(&N, &ilo, &ihi, C, &N, d, d+N, &worksize, &info);
-    delete[] d;
-  }
-
-  static inline void tridiagonalization(const gene_matrix & X, gene_matrix & C, int N){
-    {
-      int N2 = N*N;
-      int inc = 1;
-      BLAS_FUNC(copy)(&N2, X, &inc, C, &inc);
-    }
-    char uplo = 'U';
-    int info = 0;
-    int ilo = 1;
-    int ihi = N;
-    int bsize = 64;
-    int worksize = N*bsize;
-    SCALAR* d = new SCALAR[3*N+worksize];
-    BLAS_FUNC(sytrd)(&uplo, &N, C, &N, d, d+N, d+2*N, d+3*N, &worksize, &info);
-    delete[] d;
-  }
-  
-  #endif // HAS_LAPACK
 
 };
 

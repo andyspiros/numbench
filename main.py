@@ -1,12 +1,15 @@
 import os, sys, shlex
-import commands as cmd
 from PortageUtils import *
+import subprocess as sp
   
 class _Print:
-    def __init__(self):
+    def __init__(self, maxlevel=10):
         self._level = 0
+        self._maxlevel = maxlevel
     
     def __call__(self, arg):
+        if self._level > self._maxlevel:
+            return
         if self._level <= 0:
             print str(arg)
             return
@@ -18,7 +21,7 @@ class _Print:
     def down(self, n=1):
         self._level = max(self._level+n, 0)
      
-Print = _Print()
+Print = _Print(2)
     
     
 # Retrieve relevant directories
@@ -28,37 +31,48 @@ else:
     pkgsdir = os.environ['HOME'] + "/.benchmarks/packages/"
 rootsdir = "/var/tmp/benchmarks/roots/"
 testsdir = "/var/tmp/benchmarks/tests/"
-libdir = cmd.getoutput \
-  ('ABI=$(portageq envvar ABI); echo /usr/`portageq envvar LIBDIR_$ABI`/')
+libdir = sp.Popen \
+  ('ABI=$(portageq envvar ABI); echo /usr/`portageq envvar LIBDIR_$ABI`/', \
+  stdout=sp.PIPE, shell=True).communicate()[0].strip()
 
 
 
 def print_usage():
-    print "Usage: benchmarks [blas|cblas|lapack]"
+    print "Usage: benchmarks [blas|cblas|lapack] file args"
     
     
 def tests_from_input(input):
     tests = {}
     for line in input.split('\n'):
         line = line.strip()
-        spl = shlex.split(line)
+        spl = [i.strip() for i in shlex.split(line)]
         if len(spl) < 2:
             continue
-        package = available_packages(spl[1])
+        if line[0] == '#':
+            continue
+        avail = available_packages(spl[1])
         env = {}
+        # TODO: add @file for env set based on external file
+        # TODO: add -impl for skipping implementation
         for var in spl[2:]:
             s = var.split('=')
             env[s[0]] = s[1]
-        tests[spl[0]] = {'package' : package , 'env' : env}
+	avail = available_packages(spl[1])
+	if len(avail) > 1:
+            for n,p in enumerate(avail):
+	            tests[spl[0]+"_%02i"%n] = {'package':p , 'env':env}
+	else:
+	    tests[spl[0]] = {'package':avail[0] , 'env':env}
     return tests
     
     
 # Import the desired module or print help and exit
 try:
     tmp = __import__(sys.argv[1], fromlist = ['Module'])
-    mod = tmp.Module(Print, libdir)
+    mod = tmp.Module(Print, libdir, sys.argv[3:])
     del tmp
-except:
+    testsfname = sys.argv[2]
+except ImportError, IndexError:
     print_usage()
     exit(1)
 
@@ -101,7 +115,7 @@ which can contain any type of data and will be used for the final report.
 
 
 """
-The test variable is generated from a string which can be read from input.
+The test variable is generated from a string which can be read from the file.
 Here is an example of the parsed input.
 Every line contains a configuration and will be an entry in the tests
 dictionary; the line has to contain:
@@ -109,16 +123,11 @@ dictionary; the line has to contain:
 - a package description, which can, but does not must to, contain a version
 - a list of environment variables separated by means of spaces 
 """
-input = '''
-abcde blas-reference-3.3.1-r1 FC=gfortran
-fghij dev-cpp/eigen-3.0.0-r1 CXX=gcc CXXFLAGS='-O2'
-klmno dev-cpp/eigen-3.0.0-r1 CXX=icc CXXFLAGS='-O3'
-pqrst sci-libs/blas-reference-3.3.1-r1 FC=ifort
-'''
+input = file(testsfname).read()
 tests = tests_from_input(input)
 
 for tn,(name,test) in enumerate(tests.items(),1):
-    Print("BEGIN TEST %i" % tn)
+    Print("BEGIN TEST %i - %s" % (tn, name))
     
     pkgdir = "%s/%s/" % (pkgsdir, name)
     root = "%s/%s/" % (rootsdir, name)
@@ -126,13 +135,23 @@ for tn,(name,test) in enumerate(tests.items(),1):
     # Emerge package
     Print.down()
     package = "%s/%s-%s-%s" % test['package']
+    archive = pkgdir+package+".tbz2"
     Print("Emerging package %s" % package)
-    if os.exists(pkgdir+package+".tbz2"):
+    if os.path.exists(archive):
         Print("Package already emerged - skipping")
     else:
         try:
             install_package( \
               test['package'], env=test['env'], root=root, pkgdir=pkgdir)
+            # Unpack the archive onto the given root directory
+            archive = pkgdir + package + '.tbz2'
+            os.path.exists(root) or os.makedirs(root)
+            tarcmd = "tar xjf " + archive + " -C " + root
+            tarp = sp.Popen(tarcmd, stdout=sp.PIPE, stderr=sp.PIPE, shell=True)
+            tarp.communicate()
+            if tarp.returncode != 0:
+                raise InstallException(tarcmd)
+                
         except InstallException as e:
             Print("Package %s failed to emerge: %s" % (package, e.command))
             Print.up()
@@ -142,6 +161,7 @@ for tn,(name,test) in enumerate(tests.items(),1):
     
     # Find implementations
     impls = mod.get_impls(root)
+    test['implementations'] = impls
       
     # Test every implementation
     test['results'] = {}
@@ -158,5 +178,10 @@ for tn,(name,test) in enumerate(tests.items(),1):
     print
     
 
-print tests
-exit(0)
+results = {}
+for (name,test) in tests.items():
+    for impl in test['implementations']:
+        results[(name, impl)] = test['results'][impl]
+
+for r,rr in results.items():
+    print r, rr
