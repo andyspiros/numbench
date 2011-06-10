@@ -30,7 +30,8 @@ if os.getuid() == 0:
     figdir = "/var/cache/benchmarks/results/"
 else:
     pkgsdir = os.environ['HOME'] + "/.benchmarks/packages/"
-    figdir = os.environ['HOME'] + "/.benchmarks/results"
+    figdir = os.environ['HOME'] + "/.benchmarks/results/"
+figdir += time.strftime('%Y%m%d-%H%M') + '/'
 rootsdir = "/var/tmp/benchmarks/roots/"
 testsdir = "/var/tmp/benchmarks/tests/"
 libdir = sp.Popen \

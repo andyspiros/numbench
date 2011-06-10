@@ -144,7 +144,6 @@ class ModuleBase:
         for test in self.tests:
             newresults[test] = {}
             for nameimpl in results:
-                print results[nameimpl]
                 nameimplstr = "%s/%s" % nameimpl
                 resdat = results[nameimpl][test]
                 newresults[test][nameimplstr] = resdat       
