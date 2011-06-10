@@ -1,4 +1,2 @@
-abcde blas-reference-3.3.1-r1 FC=gfortran
-fghij dev-cpp/eigen-3.0.0-r1 CXX=g++ CXXFLAGS='-O2'
-#klmno dev-cpp/eigen-3.0.0-r1 CXX=icpc CXXFLAGS='-O3'
-#pqrst sci-libs/blas-reference-3.3.1-r1 FC=ifort
+eigen-O2 dev-cpp/eigen-3.0.0-r1 CXX=g++ CXXFLAGS='-O2'
+eigen-O3 dev-cpp/eigen-3.0.0-r1 CXX=g++ CXXFLAGS='-O3'

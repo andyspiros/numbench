@@ -1,6 +1,8 @@
 import os, shlex
 import commands as cmd
 import subprocess as sp
+import matplotlib.pyplot as plt
+import numpy as np
 
 run_cmd = lambda c : sp.Popen(c, stdout=sp.PIPE).communicate()[0]
 
@@ -8,6 +10,8 @@ class ModuleBase:
     def __init__(self, Print, libdir, args):
         self.Print = Print
         self.libdir = libdir
+        self.summary = False
+        self.summary_only = False
         
         avail1 = ['axpy', 'axpby', 'rot']
         avail2 = ['matrix_vector','atv','symv','syr2','ger','trisolve_vector']
@@ -15,6 +19,12 @@ class ModuleBase:
         
         tests = []
         for i in args:
+            if i == '-S':
+                self.summary_only = True
+                continue
+            if i == '-s':
+                self.summary = True
+                continue
             if i == '1':
                 tests += avail1
                 continue
@@ -52,7 +62,10 @@ class ModuleBase:
         
         if not runtests:
             Print("Not testing: results exist")
-            return files
+            results = {}
+            for i in self.tests:
+                results[i] = '%s/bench_%s_%s.dat' %(testdir, i, name)
+            return results
         
         for i in files:
             if os.path.exists(i): os.remove(i)
@@ -91,19 +104,20 @@ class ModuleBase:
         cp.communicate()
         if cp.returncode != 0:
             raise Exception("Compilation failed: " + " ".join(cl))
-        Print("Compilation successful: %s" % " ".join(cl))
+        Print("Compilation successful")
         
         # Run test
         args = [exe] + self.tests
         proc = sp.Popen(args, bufsize=1, stdout=sp.PIPE, stderr=sp.PIPE, 
           cwd = testdir)
-        results = []
+        results = {}
         while True:
             errline = proc.stderr.readline()
             if not errline:
                 break
             resfile = errline.split()[-1]
-            results.append(resfile)
+            testname = resfile[6:-5-len(name)]
+            results[testname] = resfile
             Print(resfile)
             Print.down()
             for i in xrange(100):
@@ -123,4 +137,45 @@ class ModuleBase:
                 os.environ[v] = oldenv[v]
             elif os.environ.has_key(v):
                 del os.environ[v]
-        return files
+        return results
+    
+    def save_results(self, results, figdir):
+        newresults = {}
+        for test in self.tests:
+            newresults[test] = {}
+            for nameimpl in results:
+                print results[nameimpl]
+                nameimplstr = "%s/%s" % nameimpl
+                resdat = results[nameimpl][test]
+                newresults[test][nameimplstr] = resdat       
+        
+        if self.summary or self.summary_only:
+            # Save summary figure
+            sprows = (len(self.tests)+1)/2
+            plt.figure(figsize=(16,6*sprows), dpi=300)
+            for i, test in enumerate(self.tests, 1):
+                plt.subplot(sprows, 2, i)
+                plt.title(test)
+                for impl in newresults[test]:
+                    x,y = np.loadtxt(newresults[test][impl], unpack=True)
+                    plt.semilogx(x,y, label=impl, hold=True)
+                plt.legend(loc='best')
+                plt.grid(True)
+            fname = figdir+ '/summary.png'
+            plt.savefig(fname, format='png')
+            self.Print('Summary figure saved: ' + fname)
+                
+        if not self.summary_only:
+            for test in self.tests:
+                plt.figure(figsize=(12,9), dpi=300)
+                plt.title(test)
+                for impl in newresults[test]:
+                    x,y = np.loadtxt(newresults[test][impl], unpack=True)
+                    plt.semilogx(x,y, label=impl, hold=True)
+                plt.legend(loc='best')
+                plt.grid(True)
+                fname = figdir + '/' + test + '.png'
+                plt.savefig(fname, format='png')
+                self.Print('Figure ' + fname + ' saved')
+            
+            

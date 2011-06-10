@@ -27,8 +27,10 @@ Print = _Print(2)
 # Retrieve relevant directories
 if os.getuid() == 0:
     pkgsdir = "/var/cache/benchmarks/packages/"
+    figdir = "/var/cache/benchmarks/results/"
 else:
     pkgsdir = os.environ['HOME'] + "/.benchmarks/packages/"
+    figdir = os.environ['HOME'] + "/.benchmarks/results"
 rootsdir = "/var/tmp/benchmarks/roots/"
 testsdir = "/var/tmp/benchmarks/tests/"
 libdir = sp.Popen \
@@ -178,10 +180,13 @@ for tn,(name,test) in enumerate(tests.items(),1):
     print
     
 
+                
+if not os.path.exists(figdir):
+    os.makedirs(figdir)
+        
 results = {}
 for (name,test) in tests.items():
     for impl in test['implementations']:
         results[(name, impl)] = test['results'][impl]
 
-for r,rr in results.items():
-    print r, rr
+mod.save_results(results, figdir)
