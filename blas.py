@@ -4,8 +4,11 @@ import subprocess as sp
 class Module(blasbase.ModuleBase): 
     @staticmethod
     def get_impls(root):
-        return [i for i in os.listdir(root + "/etc/env.d/alternatives/blas") \
-          if i[0] != '_']
+        output = sp.Popen(
+          ['eselect', '--no-color', '--brief', 'blas', 'list'],
+          env={'ROOT' : root}, stdout=sp.PIPE
+        ).communicate()[0]
+        return output.strip().split('\n')
            
     def _get_flags(self, root, impl, libdir):
         # Retrieve pkgconfig settings and map the directories to the new root

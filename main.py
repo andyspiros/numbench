@@ -22,7 +22,7 @@ class _Print:
     def down(self, n=1):
         self._level = max(self._level+n, 0)
      
-Print = _Print(2)
+Print = _Print(3)
     
     
 # Retrieve relevant directories
@@ -54,19 +54,18 @@ def tests_from_input(input):
             continue
         if line[0] == '#':
             continue
-        avail = available_packages(spl[1])
         env = {}
         # TODO: add @file for env set based on external file
         # TODO: add -impl for skipping implementation
         for var in spl[2:]:
-            s = var.split('=')
+            s = var.split('=', 1)
             env[s[0]] = s[1]
-	avail = available_packages(spl[1])
-	if len(avail) > 1:
+        avail = available_packages(spl[1])
+        if len(avail) > 1:
             for n,p in enumerate(avail):
-	            tests[spl[0]+"_%02i"%n] = {'package':p , 'env':env}
-	else:
-	    tests[spl[0]] = {'package':avail[0] , 'env':env}
+                tests[spl[0]+"_%02i"%n] = {'package':p , 'env':env}
+        else:
+            tests[spl[0]] = {'package':avail[0] , 'env':env}
     return tests
     
     
@@ -134,6 +133,14 @@ dictionary; the line has to contain:
 """
 input = file(testsfname).read()
 tests = tests_from_input(input)
+
+print "The following tests will be run:"
+for tname, ttest in tests.items():
+    print "Tests: " + tname
+    print " - Package: " + "%s/%s-%s-%s" % ttest['package']
+    print " - Environment: " + \
+      ' '.join([n+'="'+v+'"' for n,v in ttest['env'].items()])
+    print
 
 for tn,(name,test) in enumerate(tests.items(),1):
     Print("BEGIN TEST %i - %s" % (tn, name))
