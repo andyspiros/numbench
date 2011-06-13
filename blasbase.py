@@ -3,6 +3,7 @@ import commands as cmd
 import subprocess as sp
 import matplotlib.pyplot as plt
 import numpy as np
+import btlutils as btl
 
 run_cmd = lambda c : sp.Popen(c, stdout=sp.PIPE).communicate()[0]
 
@@ -85,29 +86,22 @@ class ModuleBase:
             os.environ['LD_LIBRARY_PATH'] = root + libdir
         
         # Compile
-        exe = testdir + "/test"
-        inc = """
-        -Ibtl/actions
-        -Ibtl/generic_bench
-        -Ibtl/generic_bench/utils
-        -Ibtl/libs/BLAS
-        -Ibtl/libs/STL
-        """.replace('\n', '')
-        libs = "-lrt -L" + root+libdir
-        cxxflags = run_cmd(['portageq', 'envvar', 'CXXFLAGS']).strip()
-        defines = "-DCBLASNAME=" + name
-        implflags = self._get_flags(root, impl, libdir)
-        cl = "g++ %s %s %s %s %s btl/libs/BLAS/main.cpp -o %s" \
-            % (inc, libs, cxxflags, defines, implflags, exe)
-        cl = shlex.split(cl)
-        cp = sp.Popen(cl, stdout=sp.PIPE, stderr=sp.PIPE)
-        cp.communicate()
-        if cp.returncode != 0:
-            raise Exception("Compilation failed: " + " ".join(cl))
-        Print("Compilation successful")
+        returncode, compilecl = btl.btlcompile(
+          exe = testdir + "/test",
+          source = "btl/libs/BLAS/main.cpp",
+          btldir = 'btl/',
+          includes = ['btl/libs/BLAS'],
+          defines = ["CBLASNAME=" + name],
+          libs = [],
+          libdirs = [root+libdir],
+          other = [self._get_flags(root, impl, libdir)]
+        )
+        if returncode != 0:
+            raise Exception("Compilation failed: " + compilecl)
+        Print("Compilation successful: " + compilecl)
         
         # Run test
-        args = [exe] + self.tests
+        args = [testdir + "/test"] + self.tests
         proc = sp.Popen(args, bufsize=1, stdout=sp.PIPE, stderr=sp.PIPE, 
           cwd = testdir)
         results = {}

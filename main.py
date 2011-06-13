@@ -1,6 +1,7 @@
 import os, sys, shlex
 from PortageUtils import *
 import subprocess as sp
+import time
   
 class _Print:
     def __init__(self, maxlevel=10):
@@ -78,6 +79,11 @@ try:
 except ImportError, IndexError:
     print_usage()
     exit(1)
+    
+#tmp = __import__(sys.argv[1], fromlist = ['Module'])
+#mod = tmp.Module(Print, libdir, sys.argv[3:])
+#del tmp
+#testsfname = sys.argv[2]
 
 
 """
