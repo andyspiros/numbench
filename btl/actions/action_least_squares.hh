@@ -117,4 +117,4 @@ private:
 };
 
 
-#endif// ACTION_LEAST_SQUARES
+#endif // ACTION_LEAST_SQUARES

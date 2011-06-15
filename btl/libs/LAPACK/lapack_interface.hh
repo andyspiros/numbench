@@ -9,6 +9,15 @@ extern "C" {
 
 void sgels_(char*, int*, int*, int*, float *, int*, float *, int*, float *, int*, int*);
 void dgels_(char*, int*, int*, int*, double*, int*, double*, int*, double*, int*, int*);
+
+//void sgetrf_(int*, int*, float *, int*, int*, int*);
+//void dgetrf_(int*, int*, double*, int*, int*, int*);
+
+//void spotrf_(char*, int*, float *, int*, int*);
+//void dpotrf_(char*, int*, double*, int*, int*);
+
+void ssyev_(char*, char*, int*, float *, int*, float *, float *, int*, int*);
+void dsyev_(char*, char*, int*, double*, int*, double*, double*, int*, int*);
 }
 
 

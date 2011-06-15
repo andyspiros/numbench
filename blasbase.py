@@ -1,8 +1,15 @@
-import os, shlex
+import sys, os, shlex
 import commands as cmd
 import subprocess as sp
-import matplotlib.pyplot as plt
-import numpy as np
+
+try:
+    import matplotlib.pyplot as plt
+    import numpy as np
+except ImportError:
+    sys.stderr.write('Error: matplotlib and numpy are needed' + \
+      'in order to generate the reports!\n')
+    sys.stderr.write('Continue anyway.\n')    
+    
 import btlutils as btl
 
 run_cmd = lambda c : sp.Popen(c, stdout=sp.PIPE).communicate()[0]

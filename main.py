@@ -64,8 +64,10 @@ def tests_from_input(input):
         if len(avail) > 1:
             for n,p in enumerate(avail):
                 tests[spl[0]+"_%02i"%n] = {'package':p , 'env':env}
-        else:
+        elif len(avail) == 1:
             tests[spl[0]] = {'package':avail[0] , 'env':env}
+        else:
+            sys.stderr.write('Error: package ' + spl[1] + ' not found\n')
     return tests
     
     

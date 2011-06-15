@@ -21,6 +21,7 @@
 #include "utilities.h"
 #include "STL_interface.hh"
 #include <string>
+#include <cmath>
 #include "init/init_function.hh"
 #include "init/init_vector.hh"
 #include "init/init_matrix.hh"
