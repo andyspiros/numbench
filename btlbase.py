@@ -92,6 +92,7 @@ class BTLBase:
             os.environ[k] = v
         
         # Compile
+        # TODO: use CXX instead of g++
         btldir = 'btl/'
         returncode, compilecl = btl.btlcompile(
           exe = testdir + "/test",

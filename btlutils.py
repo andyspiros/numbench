@@ -22,6 +22,7 @@ def btlcompile(exe, source, btldir, includes, defines, libs, libdirs, other):
     
     otherflags = ' '.join(other)
     
+    # TODO: use CXX instead of g++
     cl = "g++ -o %s %s %s %s %s %s %s %s" \
         % (exe, source, incs, defs, libs, libdirs, cxxflags, otherflags)
     cl = shlex.split(cl)

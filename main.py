@@ -204,8 +204,9 @@ if not os.path.exists(figdir):
         
 results = {}
 for (name,test) in tests.items():
-    for impl in test['implementations']:
-        results[(name, impl)] = test['results'][impl]
+    if test.has_key('implementations'):
+        for impl in test['implementations']:
+            results[(name, impl)] = test['results'][impl]
 
 mod.save_results(results, figdir)
 
