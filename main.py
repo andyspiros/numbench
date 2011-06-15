@@ -80,11 +80,6 @@ try:
 except ImportError, IndexError:
     print_usage()
     exit(1)
-    
-#tmp = __import__(sys.argv[1], fromlist = ['Module'])
-#mod = tmp.Module(Print, libdir, sys.argv[3:])
-#del tmp
-#testsfname = sys.argv[2]
 
 
 """
@@ -102,22 +97,22 @@ After the tests every successful tested item will contain the item "result",
 which can contain any type of data and will be used for the final report.
 """
 #tests = {
-#    "abcde" : {
+#    "reference-gfortran" : {
 #        "package" : ('sci-libs', 'blas-reference', '3.3.1', 'r1'),
 #        "env" : {'FC' : 'gfortran'}
 #    },
 #         
-#    "fghij" : {
+#    "eigen-gcc" : {
 #        "package" : ('dev-cpp', 'eigen', '3.0.0', 'r1'),
-#        "env" : {'CXX' : 'gcc', 'CXXFLAGS' : '-O2'}
+#        "env" : {'CXX' : 'g++', 'CXXFLAGS' : '-O2'}
 #    },
 #         
-#    "klmno" : {
+#    "eigen-icc" : {
 #        "package" : ('dev-cpp', 'eigen', '3.0.0', 'r1'),
 #        "env" : {'CXX' : 'icc', 'CXXFLAGS' : '-O3'}
 #    },
 #
-#    "pqrst" : {
+#    "reference-ifort" : {
 #        "package" : ('sci-libs', 'blas-reference', '3.3.1', 'r1'),
 #        "env" : {'FC' : 'ifort'}
 #    }
@@ -136,13 +131,17 @@ dictionary; the line has to contain:
 input = file(testsfname).read()
 tests = tests_from_input(input)
 
+# Write summary
+print 60*'='
 print "The following tests will be run:"
 for tname, ttest in tests.items():
-    print "Tests: " + tname
+    print "Test: " + tname
     print " - Package: " + "%s/%s-%s-%s" % ttest['package']
     print " - Environment: " + \
       ' '.join([n+'="'+v+'"' for n,v in ttest['env'].items()])
     print
+print 60*'='
+print
 
 for tn,(name,test) in enumerate(tests.items(),1):
     Print("BEGIN TEST %i - %s" % (tn, name))
@@ -187,9 +186,10 @@ for tn,(name,test) in enumerate(tests.items(),1):
         Print("Testing " + impl)
         Print.down()
         
-        # Compile/link the test suite against the library
+        # Run the test suite
         testdir = "%s/%s/%s" % (testsdir, name, impl)
-        test['results'][impl] = mod.run_test(root, impl, testdir)
+        test['results'][impl] = \
+          mod.run_test(root=root, impl=impl, testdir=testdir, env=test['env'])
         Print.up()
             
     Print.up()

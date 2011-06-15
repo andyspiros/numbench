@@ -5,62 +5,49 @@ import subprocess as sp
 try:
     import matplotlib.pyplot as plt
     import numpy as np
+    with_images = True
 except ImportError:
     sys.stderr.write('Error: matplotlib and numpy are needed' + \
       'in order to generate the reports!\n')
-    sys.stderr.write('Continue anyway.\n')    
+    sys.stderr.write('Continue anyway.\n\n')    
+    with_images = False
     
 import btlutils as btl
 
 run_cmd = lambda c : sp.Popen(c, stdout=sp.PIPE).communicate()[0]
 
-class ModuleBase:
+class BTLBase:
     def __init__(self, Print, libdir, args):
         self.Print = Print
         self.libdir = libdir
         self.summary = False
         self.summary_only = False
         
-        avail1 = ['axpy', 'axpby', 'rot']
-        avail2 = ['matrix_vector','atv','symv','syr2','ger','trisolve_vector']
-        avail3 = ['matrix_matrix', 'aat', 'trisolve_matrix', 'trmm']
+        self._initialize()
         
-        tests = []
+        passargs = []
         for i in args:
             if i == '-S':
                 self.summary_only = True
                 continue
-            if i == '-s':
+            elif i == '-s':
                 self.summary = True
                 continue
-            if i == '1':
-                tests += avail1
-                continue
-            if i == '2':
-                tests += avail2
-                continue
-            if i == '3':
-                tests += avail3
-                continue
-            if i in avail1 + avail2 + avail3:
-                tests.append(i)
-                continue
-            raise Exception("Argument not recognized: " + i)
-        self.tests = [i for i in avail1+avail2+avail3 if i in tests]
+            else:
+                passargs += [i]
         
-        if len(self.tests) == 0:
-            self.tests = ['axpy', 'matrix_vector', \
-              'trisolve_vector', 'matrix_matrix']
+        self._parse_args(passargs)
         
           
-    def run_test(self, root, impl, testdir):
+    def run_test(self, root, impl, testdir, env):
+        # Convenient renames and definition of report files 
         Print = self.Print
         libdir = self.libdir
-        name = 'blas'
+        name = self.libname
         files = ['%s/bench_%s_%s.dat' %(testdir, op, name) for op in self.tests]
         
-        # Create dir. If all results already exist use them, otherwise
-        # remove old results
+        # Create dir. If all results already exist use them and do not perform
+        # the tests, otherwise remove every old results.
         runtests = False
         if os.path.exists(testdir):
             runtests = not all([os.path.exists(i) for i in files])
@@ -77,31 +64,44 @@ class ModuleBase:
         
         for i in files:
             if os.path.exists(i): os.remove(i)
-        
-        # Setup environment for testing
-        oldenv = {}
-        for v in ('LIBRARY_PATH', 'INCLUDE_PATH', 'LD_LIBRARY_PATH'):
-            # Backup old environment variables
-            oldenv[v] = \
-              (os.environ.has_key(v) and (os.environ[v],) or (None,))[0]
-        os.environ['LIBRARY_PATH'] = root + libdir
-        os.environ['INCLUDE_PATH'] = root + '/usr/include'
-        if oldenv['LD_LIBRARY_PATH'] != None:
-            os.environ['LD_LIBRARY_PATH'] = \
-              root + libdir + ":" + oldenv['LD_LIBRARY_PATH']
+            
+        # Prepare the environment
+        if env.has_key('LIBRARY_PATH'):
+            env['LIBRARY_PATH'] = root+libdir + ":" + env['LIBRARY_PATH']
         else:
-            os.environ['LD_LIBRARY_PATH'] = root + libdir
+            env['LIBRARY_PATH'] = root+libdir
+            
+        if env.has_key('INCLUDE_PATH'):
+            env['INCLUDE_PATH'] = root+"/usr/include" +":"+ env['INCLUDE_PATH']
+        else:
+            env['INCLUDE_PATH'] = root+"/usr/include"
+            
+        if env.has_key('LD_LIBRARY_PATH'):
+            env['LD_LIBRARY_PATH'] = root+libdir + ":" + env['LD_LIBRARY_PATH']
+        else:
+            env['LD_LIBRARY_PATH'] = root+libdir
+        
+        # Backup the environment
+        oldenv = {}
+        for k in env.keys():
+            oldenv[k] = \
+              (os.environ.has_key(k) and (os.environ[k],) or (None,))[0]
+        
+        # Set the environment
+        for k,v in env.items():
+            os.environ[k] = v
         
         # Compile
+        btldir = 'btl/'
         returncode, compilecl = btl.btlcompile(
           exe = testdir + "/test",
-          source = "btl/libs/BLAS/main.cpp",
-          btldir = 'btl/',
-          includes = ['btl/libs/BLAS'],
-          defines = ["CBLASNAME=" + name],
+          source = btldir + self._btl_source(),
+          btldir = btldir,
+          includes = [btldir+d for d in self._btl_includes()],
+          defines = self._btl_defines(),
           libs = [],
           libdirs = [root+libdir],
-          other = [self._get_flags(root, impl, libdir)]
+          other = self._get_flags(root, impl, libdir)
         )
         if returncode != 0:
             raise Exception("Compilation failed: " + compilecl)
@@ -132,15 +132,20 @@ class ModuleBase:
         else:
             Print('Test successful')
         
-        # Restore old environment variables
-        for v in ('LIBRARY_PATH', 'INCLUDE_PATH', 'LD_LIBRARY_PATH'):
-            if oldenv[v] != None:
-                os.environ[v] = oldenv[v]
-            elif os.environ.has_key(v):
-                del os.environ[v]
+        # Restore the old environment
+        for k in env.keys():
+            if oldenv[k] != None:
+                os.environ[k] = oldenv[k]
+            elif os.environ.has_key(k):
+                del os.environ[k]
         return results
     
     def save_results(self, results, figdir):
+        if not with_images:
+            self.Print("Report generation skipped - missing libraries")
+            return
+    
+        # Re-order the result dictionary
         newresults = {}
         for test in self.tests:
             newresults[test] = {}
@@ -149,6 +154,7 @@ class ModuleBase:
                 resdat = results[nameimpl][test]
                 newresults[test][nameimplstr] = resdat       
         
+        # Generate summary - a single image with all plots
         if self.summary or self.summary_only:
             # Save summary figure
             sprows = (len(self.tests)+1)/2
@@ -165,6 +171,7 @@ class ModuleBase:
             plt.savefig(fname, format='png')
             self.Print('Summary figure saved: ' + fname)
                 
+        # Generate plots
         if not self.summary_only:
             for test in self.tests:
                 plt.figure(figsize=(12,9), dpi=300)
