@@ -1,4 +1,4 @@
-#define LPF(NAME) CAT(CAT(SCALAR_PREFIX,NAME),_)
+#define LAPACKFUNC(NAME) CAT(CAT(SCALAR_PREFIX,NAME),_)
 
 template<> class lapack_interface<SCALAR> : public c_interface_base<SCALAR>
 {
@@ -13,8 +13,8 @@ public:
 	{
 		int *ipiv = new int[N];
 		int info;
-		LPF(copy)(&N, b, &intone, x, &intone);
-		LPF(gesv)(&N, &intone, A, &N, ipiv, x, &N, &info);
+		LAPACKFUNC(copy)(&N, b, &intone, x, &intone);
+		LAPACKFUNC(gesv)(&N, &intone, A, &N, ipiv, x, &N, &info);
 		delete[] ipiv;
 	}
 
@@ -22,13 +22,13 @@ public:
 	{
 		int *ipiv = new int[N];
 		int info;
-		LPF(copy)(&N, b, &intone, x, &intone);
+		LAPACKFUNC(copy)(&N, b, &intone, x, &intone);
 		SCALAR work1;
 		int MONE = -1;
-		LPF(gels)(&notrans, &N, &N, &intone, A, &N, x, &N, &work1, &MONE, &info);
+		LAPACKFUNC(gels)(&notrans, &N, &N, &intone, A, &N, x, &N, &work1, &MONE, &info);
 		int lwork = (int)work1;
 		SCALAR *work2 = new SCALAR[lwork];
-		LPF(gels)(&notrans, &N, &N, &intone, A, &N, x, &N, work2, &lwork, &info);
+		LAPACKFUNC(gels)(&notrans, &N, &N, &intone, A, &N, x, &N, work2, &lwork, &info);
 		delete[] work2;
 		delete[] ipiv;
 	}
@@ -38,8 +38,8 @@ public:
 		int N2 = N*N;
 		int *ipiv = new int[N];
 		int info;
-		LPF(copy)(&N2, X, &intone, C, &intone);
-		LPF(getrf)(&N, &N, C, &N, ipiv, &info);
+		LAPACKFUNC(copy)(&N2, X, &intone, C, &intone);
+		LAPACKFUNC(getrf)(&N, &N, C, &N, ipiv, &info);
 		delete[] ipiv;
 	}
 
@@ -47,8 +47,8 @@ public:
 	{
 		int N2 = N*N;
 		int info;
-		LPF(copy)(&N2, X, &intone, C, &intone);
-		LPF(potrf)(&lower, &N, C, &N, &info);
+		LAPACKFUNC(copy)(&N2, X, &intone, C, &intone);
+		LAPACKFUNC(potrf)(&lower, &N, C, &N, &info);
 	}
 
 	static inline void symm_ev(const gene_matrix& X, gene_vector& W, int N)
@@ -56,11 +56,11 @@ public:
 		char jobz = 'N';
 		SCALAR *work = new SCALAR;
 		int lwork = -1, info;
-		LPF(syev)(&jobz, &lower, &N, X, &N, W, work, &lwork, &info);
+		LAPACKFUNC(syev)(&jobz, &lower, &N, X, &N, W, work, &lwork, &info);
 		lwork = *work;
 		delete work;
 		work = new SCALAR[lwork];
-		LPF(syev)(&jobz, &lower, &N, X, &N, W, work, &lwork, &info);
+		LAPACKFUNC(syev)(&jobz, &lower, &N, X, &N, W, work, &lwork, &info);
 		delete[] work;
 	}
 

@@ -1,8 +1,8 @@
-import os, blasbase
+import os, btlbase
 import subprocess as sp
 import shlex
 
-class Module(blasbase.BTLBase):
+class Module(btlbase.BTLBase):
     def _initialize(self):
         self.libname = "lapack"
         self.avail = ['general_solve', 'least_squares', 'lu_decomp', \
@@ -53,4 +53,4 @@ class Module(blasbase.BTLBase):
         ).communicate()[0]
         return output.strip().split('\n')
 
-del blasbase
+del btlbase

@@ -1,8 +1,29 @@
+#! /usr/bin/env python2
+
 import os, sys, shlex
 from PortageUtils import *
 import subprocess as sp
 import time
-  
+ 
+# Retrieve relevant files/directories
+curdir = os.path.abspath('.')
+scriptdir = os.path.dirname(os.path.realpath(__file__))
+if os.getuid() == 0:
+    pkgsdir = "/var/cache/benchmarks/packages/"
+    figdir = "/var/cache/benchmarks/results/"
+else:
+    pkgsdir = os.environ['HOME'] + "/.benchmarks/packages/"
+    figdir = os.environ['HOME'] + "/.benchmarks/results/"
+figdir += time.strftime('%Y%m%d-%H%M') + '/'
+rootsdir = "/var/tmp/benchmarks/roots/"
+testsdir = "/var/tmp/benchmarks/tests/"
+libdir = sp.Popen \
+  ('ABI=$(portageq envvar ABI); echo /usr/`portageq envvar LIBDIR_$ABI`/', \
+  stdout=sp.PIPE, shell=True).communicate()[0].strip()
+
+def print_usage():
+    print "Usage: benchmarks [blas|cblas|lapack] file args"   
+      
 class _Print:
     def __init__(self, maxlevel=10):
         self._level = 0
@@ -21,29 +42,19 @@ class _Print:
     
     def down(self, n=1):
         self._level = max(self._level+n, 0)
-     
 Print = _Print(3)
-    
-    
-# Retrieve relevant directories
-if os.getuid() == 0:
-    pkgsdir = "/var/cache/benchmarks/packages/"
-    figdir = "/var/cache/benchmarks/results/"
-else:
-    pkgsdir = os.environ['HOME'] + "/.benchmarks/packages/"
-    figdir = os.environ['HOME'] + "/.benchmarks/results/"
-figdir += time.strftime('%Y%m%d-%H%M') + '/'
-rootsdir = "/var/tmp/benchmarks/roots/"
-testsdir = "/var/tmp/benchmarks/tests/"
-libdir = sp.Popen \
-  ('ABI=$(portageq envvar ABI); echo /usr/`portageq envvar LIBDIR_$ABI`/', \
-  stdout=sp.PIPE, shell=True).communicate()[0].strip()
 
-
-
-def print_usage():
-    print "Usage: benchmarks [blas|cblas|lapack] file args"
-    
+# Import the desired module or print help and exit
+try:
+    testsfname = os.path.abspath(sys.argv[2])
+    os.chdir(scriptdir)
+    tmp = __import__(sys.argv[1], fromlist = ['Module'])
+    mod = tmp.Module(Print, libdir, sys.argv[3:])
+    del tmp
+except ImportError, IndexError:
+    print_usage()
+    exit(1)
+  
     
 def tests_from_input(input):
     tests = {}
@@ -70,16 +81,7 @@ def tests_from_input(input):
             sys.stderr.write('Error: package ' + spl[1] + ' not found\n')
     return tests
     
-    
-# Import the desired module or print help and exit
-try:
-    tmp = __import__(sys.argv[1], fromlist = ['Module'])
-    mod = tmp.Module(Print, libdir, sys.argv[3:])
-    del tmp
-    testsfname = sys.argv[2]
-except ImportError, IndexError:
-    print_usage()
-    exit(1)
+
 
 
 """
@@ -196,7 +198,7 @@ for tn,(name,test) in enumerate(tests.items(),1):
     print
     
 
-                
+# Reports will be saved in figdir
 if not os.path.exists(figdir):
     os.makedirs(figdir)
         
@@ -206,3 +208,4 @@ for (name,test) in tests.items():
         results[(name, impl)] = test['results'][impl]
 
 mod.save_results(results, figdir)
+
