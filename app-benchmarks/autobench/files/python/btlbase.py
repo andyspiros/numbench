@@ -2,6 +2,7 @@ import sys, os, shlex
 import commands as cmd
 import subprocess as sp
 from os.path import join as pjoin
+from htmlreport import HTMLreport
 
 try:
     import matplotlib.pyplot as plt
@@ -12,10 +13,74 @@ except ImportError:
       'in order to generate the reports!\n')
     sys.stderr.write('Continue anyway.\n\n')    
     with_images = False
-    
-import btlutils as btl
 
 run_cmd = lambda c : sp.Popen(c, stdout=sp.PIPE).communicate()[0]
+
+def btlcompile(exe, source, btldir, includes, defines, libs, libdirs, other, \
+  logfile=None):
+    """
+    Helper function that compiles a C++ source based on btl. The function
+    sets the compiler flags that are needed by btl (include directives, link
+    with rt,...). More options are accepted as arguments:
+    
+    exe: the generated executable
+    
+    source: the C++ source
+    
+    btldir: the base directory of the btl sources
+    
+    includes: an iterable containing the include directories (without -I)
+    
+    defines: an iterable of strings with define directives (without -D). In case
+    of key-value pairs, the equal sign and the value have to be in the same
+    string as the key: ['NDEBUG', 'FOO=BAR'] is transormed to
+    '-DNDEBUD -DFOO=BAR'
+    
+    libs: the libraries to link against (without -l)
+    
+    libdirs: the directories where the libraries are seeked (without -L)
+    
+    other: an iterable with compiler flags
+    
+    logfile: the path of the file where the log is saved. The directory must
+    exist. If None, no log is generated.
+    """
+    
+    incs = (
+      "%s/actions" % btldir,
+      "%s/generic_bench" % btldir,
+      "%s/generic_bench/utils" % btldir,
+      "%s/libs/STL" % btldir
+    ) + tuple(includes)
+    incs = ' '.join(['-I'+i for i in incs])
+    
+    defs = ' '.join(['-D'+d for d in ["NDEBUG"] + defines])
+    
+    libs = ' '.join(['-l'+l for l in ["rt"] + libs])
+    
+    libdirs = ' '.join(['-L'+L for L in libdirs])
+    
+    cxxflags = run_cmd(['portageq', 'envvar', 'CXXFLAGS']).strip()
+    
+    otherflags = ' '.join(other)
+    
+    # TODO: use CXX instead of g++
+    cl = "g++ -o %s %s %s %s %s %s %s %s" \
+        % (exe, source, incs, defs, libs, libdirs, cxxflags, otherflags)
+        
+    if logfile is None:
+        fout = sp.PIPE
+    else:
+        fout = file(logfile, 'w')
+        fout.write(cl + "\n" + 80*'-' + "\n")
+        fout.flush()
+    cl = shlex.split(cl)
+    cp = sp.Popen(cl, stdout=fout, stderr=sp.STDOUT)
+    cp.communicate()
+    if logfile is not None:
+        fout.close()
+    return (cp.returncode, ' '.join(cl))
+
 
 class BTLBase:
     def __init__(self, Print, libdir, args):
@@ -97,7 +162,7 @@ class BTLBase:
         # TODO: use CXX instead of g++
         btldir = 'btl/'
         logfile = os.path.join(logdir, name+"_comp.log")
-        returncode, compilecl = btl.btlcompile(
+        returncode, compilecl = btlcompile(
           exe = testdir + "/test",
           source = btldir + self._btl_source(),
           btldir = btldir,
@@ -163,7 +228,11 @@ class BTLBase:
             for nameimpl in results:
                 nameimplstr = "%s/%s" % nameimpl
                 resdat = results[nameimpl][test]
-                newresults[test][nameimplstr] = resdat       
+                newresults[test][nameimplstr] = resdat
+        
+        # Begin the HTML report
+        htmlfname = pjoin(figdir, 'index.html')
+        html = HTMLreport(htmlfname)
         
         # Generate summary - a single image with all plots
         if self.summary or self.summary_only:
@@ -178,22 +247,25 @@ class BTLBase:
                     plt.semilogx(x,y, label=impl, hold=True)
                 plt.legend(loc='best')
                 plt.grid(True)
-            fname = figdir+ '/summary.png'
+            fname = pjoin(figdir, 'summary.png')
             plt.savefig(fname, format='png')
+            html.addFig("Summary", image=os.path.basename(fname), width='95%')
             self.Print('Summary figure saved: ' + fname)
                 
         # Generate plots
         if not self.summary_only:
             for test in self.tests:
                 plt.figure(figsize=(12,9), dpi=300)
-                plt.title(test)
                 for impl in newresults[test]:
                     x,y = np.loadtxt(newresults[test][impl], unpack=True)
                     plt.semilogx(x,y, label=impl, hold=True)
                 plt.legend(loc='best')
                 plt.grid(True)
-                fname = os.path.join(figdir, test+".png")
+                fname = pjoin(figdir, test+".png")
                 plt.savefig(fname, format='png')
+                html.addFig(test, image=os.path.basename(fname))
                 self.Print('Figure ' + fname + ' saved')
+        
+        html.close()
             
             
