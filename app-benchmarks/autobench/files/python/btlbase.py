@@ -1,6 +1,7 @@
 import sys, os, shlex
 import commands as cmd
 import subprocess as sp
+from os.path import join as pjoin
 
 try:
     import matplotlib.pyplot as plt
@@ -44,7 +45,8 @@ class BTLBase:
         Print = self.Print
         libdir = self.libdir
         name = self.libname
-        files = ['%s/bench_%s_%s.dat' %(testdir, op, name) for op in self.tests]
+        files = [pjoin(testdir, 'bench_%s_%s.dat' % (op, name)) \
+          for op in self.tests]
         
         # Create dir. If all results already exist use them and do not perform
         # the tests, otherwise remove every old results.
@@ -58,8 +60,8 @@ class BTLBase:
         if not runtests:
             Print("Not testing: results exist")
             results = {}
-            for i in self.tests:
-                results[i] = '%s/bench_%s_%s.dat' %(testdir, i, name)
+            for op in self.tests:
+                results[op] = pjoin(testdir, 'bench_%s_%s.dat'%(op,name))
             return results
         
         for i in files:
@@ -125,7 +127,7 @@ class BTLBase:
                 break
             resfile = errline.split()[-1]
             testname = resfile[6:-5-len(name)]
-            results[testname] = resfile
+            results[testname] = pjoin(testdir, resfile)
             Print(resfile)
             Print.down()
             for i in xrange(100):
@@ -190,7 +192,7 @@ class BTLBase:
                     plt.semilogx(x,y, label=impl, hold=True)
                 plt.legend(loc='best')
                 plt.grid(True)
-                fname = figdir + '/' + test + '.png'
+                fname = os.path.join(figdir, test+".png")
                 plt.savefig(fname, format='png')
                 self.Print('Figure ' + fname + ' saved')
             

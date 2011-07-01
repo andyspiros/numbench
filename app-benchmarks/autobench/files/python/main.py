@@ -1,6 +1,7 @@
 #! /usr/bin/env python2
 
 import os, sys, shlex
+from os.path import join as pjoin
 from PortageUtils import *
 import subprocess as sp
 import time
@@ -8,18 +9,34 @@ import time
 # Retrieve relevant files/directories
 curdir = os.path.abspath('.')
 scriptdir = os.path.dirname(os.path.realpath(__file__))
-if os.getuid() == 0:
-    pkgsdir = "/var/cache/benchmarks/packages/"
-    figdir = "/var/cache/benchmarks/results/"
-else:
-    pkgsdir = os.environ['HOME'] + "/.benchmarks/packages/"
-    figdir = os.environ['HOME'] + "/.benchmarks/results/"
-figdir += time.strftime('%Y%m%d-%H%M') + '/'
 rootsdir = "/var/tmp/benchmarks/roots/"
 testsdir = "/var/tmp/benchmarks/tests/"
+if os.getuid() == 0:
+    pkgsdir = "/var/cache/benchmarks/packages/"
+    figdirb = "/var/cache/benchmarks/results/"
+else:
+    pkgsdir = os.environ['HOME'] + "/.benchmarks/packages/"
+    figdirb = os.environ['HOME'] + "/.benchmarks/results/"
+    
+# Library directory (lib32 vs. lib64)
 libdir = sp.Popen \
   ('ABI=$(portageq envvar ABI); echo /usr/`portageq envvar LIBDIR_$ABI`/', \
   stdout=sp.PIPE, shell=True).communicate()[0].strip()
+    
+# Figures directory
+figdir = figdirb + time.strftime('%Y-%m-%d')
+if os.path.exists(figdir):
+    n = 1
+    while True:
+        figdir = figdirb + time.strftime('%Y-%m-%d') + "_%i"%n
+        if not os.path.exists(figdir):
+            os.makedirs(figdir)
+            break
+        n += 1
+else:
+    os.makedirs(figdir)
+  
+# Logs directory
 logdir = "/var/log/benchmarks/" + time.strftime('%Y-%m-%d')
 if os.path.exists(logdir):
     n = 1
@@ -145,51 +162,54 @@ input = file(testsfname).read()
 tests = tests_from_input(input)
 
 # Write summary
-print 60*'='
+print 80*'='
 print "The following tests will be run:"
 for tname, ttest in tests.items():
     print "Test: " + tname
-    print " - Package: " + "%s/%s-%s-%s" % ttest['package']
+    print " - Package: " + normalize_cpv(ttest['package'])
     print " - Environment: " + \
       ' '.join([n+'="'+v+'"' for n,v in ttest['env'].items()])
     print
-print 60*'='
+print 80*'='
 print
 
 for tn,(name,test) in enumerate(tests.items(),1):
     Print("BEGIN TEST %i - %s" % (tn, name))
     
-    pkgdir = "%s/%s/" % (pkgsdir, name)
-    root = "%s/%s/" % (rootsdir, name)
-    tlogdir = os.path.join(logdir, name)
+    pkgdir = pjoin(pkgsdir, name)
+    root = pjoin(rootsdir, name)
+    tlogdir = pjoin(logdir, name)
     os.path.exists(tlogdir) or os.makedirs(tlogdir)
     
     # Emerge package
     Print.down()
-    package = "%s/%s-%s-%s" % test['package']
-    archive = pkgdir+package+".tbz2"
+    package = normalize_cpv(test['package'])
+    archive = pjoin(pkgdir, package+".tbz2")
     Print("Emerging package %s" % package)
     if os.path.exists(archive):
         Print("Package already emerged - skipping")
     else:
         try:
-            logfile = os.path.join(tlogdir, 'emerge.log')
+            logfile = pjoin(tlogdir, 'emerge.log')
+            Print("(Run 'tail -f " + logfile + " | less' on another terminal" \
+              + " to see the progress)")
             install_package( \
               test['package'], env=test['env'], root=root, pkgdir=pkgdir, \
               logfile=logfile
               )
             # Unpack the archive onto the given root directory
-            archive = pkgdir + package + '.tbz2'
             os.path.exists(root) or os.makedirs(root)
-            tarcmd = "tar xjf " + archive + " -C " + root
-            tarp = sp.Popen(tarcmd, stdout=sp.PIPE, stderr=sp.PIPE, shell=True)
-            tarp.communicate()
+            tarcmd = ['tar', 'xjf', archive, '-C', root]
+            logfile = file(pjoin(tlogdir, 'tar.log'), 'w')
+            tarp = sp.Popen(tarcmd, stdout=logfile, stderr=sp.STDOUT)
+            tarp.wait()
+            logfile.close()
             if tarp.returncode != 0:
-                raise InstallException(tarcmd)
+                raise InstallException(tarcmd, logfile.name)
                 
         except InstallException as e:
             Print("Package %s failed to emerge" % package)
-            Print("See emerge log: " + logfile)
+            Print("Error log: " + e.logfile)
             Print.up()
             print
             continue
@@ -206,7 +226,7 @@ for tn,(name,test) in enumerate(tests.items(),1):
         Print.down()
         
         # Run the test suite
-        testdir = "%s/%s/%s" % (testsdir, name, impl)
+        testdir = os.path.join(testsdir, name, impl)
         test['results'][impl] = \
           mod.run_test(root, impl, testdir, env=test['env'], logdir=tlogdir)
         Print.up()
@@ -216,9 +236,7 @@ for tn,(name,test) in enumerate(tests.items(),1):
     
 
 # Reports will be saved in figdir
-if not os.path.exists(figdir):
-    os.makedirs(figdir)
-        
+os.path.exists(figdir) or os.makedirs(figdir)        
 results = {}
 for (name,test) in tests.items():
     if test.has_key('implementations'):

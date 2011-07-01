@@ -4,8 +4,9 @@ import portage
 import os
 
 class InstallException(Exception):
-    def __init__(self, command):
+    def __init__(self, command, logfile):
         self.command = command
+        self.logfile = logfile
 
 def available_packages(pattern):
     """Returns a list of packages matching the given pattern.
@@ -16,6 +17,12 @@ def available_packages(pattern):
     """
     return [portage.catpkgsplit(l) \
       for l in cmd.getoutput('equery -q list -po ' + pattern).split()]
+    
+def normalize_cpv(cpv):
+    if cpv[-1] != 'r0':
+        return '%s/%s-%s-%s' % cpv
+    else:
+        return '%s/%s-%s' % cpv[:-1]
 
 
 def install_package(package, env={}, root='/', pkgdir='usr/portage/packages',
@@ -40,10 +47,7 @@ def install_package(package, env={}, root='/', pkgdir='usr/portage/packages',
     """  
     
     # Retrieve package string
-    if package[-1] != 'r0':
-        pkg = '%s/%s-%s-%s' % package
-    else:
-        pkg = '%s/%s-%s' % package[:-1]
+    pkg = normalize_cpv(package)
     
     # Setup command line
     env['PKGDIR'] = pkgdir
@@ -69,7 +73,7 @@ def install_package(package, env={}, root='/', pkgdir='usr/portage/packages',
         fout.close()
     if p.returncode != 0:
         # In case of error, print the whole emerge command
-        raise InstallException(cl)
+        raise InstallException(cl, logfile)
     
 if __name__ == '__main__':
     # Just a test
