@@ -3,7 +3,8 @@ import shlex
 
 run_cmd = lambda c : sp.Popen(c, stdout=sp.PIPE).communicate()[0]
 
-def btlcompile(exe, source, btldir, includes, defines, libs, libdirs, other):
+def btlcompile(exe, source, btldir, includes, defines, libs, libdirs, other, \
+  logfile=None):
     incs = (
       "%s/actions" % btldir,
       "%s/generic_bench" % btldir,
@@ -25,7 +26,16 @@ def btlcompile(exe, source, btldir, includes, defines, libs, libdirs, other):
     # TODO: use CXX instead of g++
     cl = "g++ -o %s %s %s %s %s %s %s %s" \
         % (exe, source, incs, defs, libs, libdirs, cxxflags, otherflags)
+        
+    if logfile is None:
+        fout = sp.PIPE
+    else:
+        fout = file(logfile, 'w')
+        fout.write(cl + "\n" + 80*'-' + "\n")
+        fout.flush()
     cl = shlex.split(cl)
-    cp = sp.Popen(cl, stdout=sp.PIPE, stderr=sp.PIPE)
+    cp = sp.Popen(cl, stdout=fout, stderr=sp.STDOUT)
     cp.communicate()
+    if logfile is not None:
+        fout.close()
     return (cp.returncode, ' '.join(cl))

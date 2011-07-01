@@ -1,4 +1,5 @@
 import commands as cmd
+import subprocess as sp
 import portage
 import os
 
@@ -17,7 +18,8 @@ def available_packages(pattern):
       for l in cmd.getoutput('equery -q list -po ' + pattern).split()]
 
 
-def install_package(package, env={}, root='/', pkgdir='usr/portage/packages'):
+def install_package(package, env={}, root='/', pkgdir='usr/portage/packages',
+                    logfile=None):
     """Emerge a package in the given root.
     
     package is the package to be emerged. It has to be a tuple
@@ -50,9 +52,22 @@ def install_package(package, env={}, root='/', pkgdir='usr/portage/packages'):
         envl += i + '="' + env[i] + '" '
     cl = envl + 'emerge --ignore-default-opts -OB "=' + pkg + '"'
     
-    # Execute emerge command
-    so = cmd.getstatusoutput(cl)
-    if so[0] != 0:
+    # Execute emerge command and log the results
+    if logfile is not None:
+        fout = file(logfile, 'w')
+        fout.write(cl+'\n'+80*'-'+'\n')
+        fout.flush()
+    else:
+        fout = sp.PIPE
+    p = sp.Popen( \
+      ['emerge', '--ignore-default-opts', '-OB', '=' + pkg], \
+      env = env, \
+      stdout = fout, stderr = fout \
+      )
+    p.wait()
+    if logfile is not None:
+        fout.close()
+    if p.returncode != 0:
         # In case of error, print the whole emerge command
         raise InstallException(cl)
     

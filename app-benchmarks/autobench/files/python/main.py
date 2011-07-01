@@ -20,6 +20,17 @@ testsdir = "/var/tmp/benchmarks/tests/"
 libdir = sp.Popen \
   ('ABI=$(portageq envvar ABI); echo /usr/`portageq envvar LIBDIR_$ABI`/', \
   stdout=sp.PIPE, shell=True).communicate()[0].strip()
+logdir = "/var/log/benchmarks/" + time.strftime('%Y-%m-%d')
+if os.path.exists(logdir):
+    n = 1
+    while True:
+        logdir = "/var/log/benchmarks/" + time.strftime('%Y-%m-%d') + "_%i"%n
+        if not os.path.exists(logdir):
+            os.makedirs(logdir)
+            break
+        n += 1
+else:
+    os.makedirs(logdir)
 
 def print_usage():
     print "Usage: benchmarks [blas|cblas|lapack] file args"   
@@ -150,6 +161,8 @@ for tn,(name,test) in enumerate(tests.items(),1):
     
     pkgdir = "%s/%s/" % (pkgsdir, name)
     root = "%s/%s/" % (rootsdir, name)
+    tlogdir = os.path.join(logdir, name)
+    os.path.exists(tlogdir) or os.makedirs(tlogdir)
     
     # Emerge package
     Print.down()
@@ -160,8 +173,11 @@ for tn,(name,test) in enumerate(tests.items(),1):
         Print("Package already emerged - skipping")
     else:
         try:
+            logfile = os.path.join(tlogdir, 'emerge.log')
             install_package( \
-              test['package'], env=test['env'], root=root, pkgdir=pkgdir)
+              test['package'], env=test['env'], root=root, pkgdir=pkgdir, \
+              logfile=logfile
+              )
             # Unpack the archive onto the given root directory
             archive = pkgdir + package + '.tbz2'
             os.path.exists(root) or os.makedirs(root)
@@ -172,7 +188,8 @@ for tn,(name,test) in enumerate(tests.items(),1):
                 raise InstallException(tarcmd)
                 
         except InstallException as e:
-            Print("Package %s failed to emerge: %s" % (package, e.command))
+            Print("Package %s failed to emerge" % package)
+            Print("See emerge log: " + logfile)
             Print.up()
             print
             continue
@@ -181,7 +198,7 @@ for tn,(name,test) in enumerate(tests.items(),1):
     # Find implementations
     impls = mod.get_impls(root)
     test['implementations'] = impls
-      
+    
     # Test every implementation
     test['results'] = {}
     for impl in impls:
@@ -191,7 +208,7 @@ for tn,(name,test) in enumerate(tests.items(),1):
         # Run the test suite
         testdir = "%s/%s/%s" % (testsdir, name, impl)
         test['results'][impl] = \
-          mod.run_test(root=root, impl=impl, testdir=testdir, env=test['env'])
+          mod.run_test(root, impl, testdir, env=test['env'], logdir=tlogdir)
         Print.up()
             
     Print.up()

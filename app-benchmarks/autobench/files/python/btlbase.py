@@ -39,7 +39,7 @@ class BTLBase:
         self._parse_args(passargs)
         
           
-    def run_test(self, root, impl, testdir, env):
+    def run_test(self, root, impl, testdir, env, logdir):
         # Convenient renames and definition of report files 
         Print = self.Print
         libdir = self.libdir
@@ -94,6 +94,7 @@ class BTLBase:
         # Compile
         # TODO: use CXX instead of g++
         btldir = 'btl/'
+        logfile = os.path.join(logdir, name+"_comp.log")
         returncode, compilecl = btl.btlcompile(
           exe = testdir + "/test",
           source = btldir + self._btl_source(),
@@ -102,19 +103,24 @@ class BTLBase:
           defines = self._btl_defines(),
           libs = [],
           libdirs = [root+libdir],
-          other = self._get_flags(root, impl, libdir)
+          other = self._get_flags(root, impl, libdir),
+          logfile = logfile
         )
         if returncode != 0:
-            raise Exception("Compilation failed: " + compilecl)
-        Print("Compilation successful: " + compilecl)
+            Print("Compilation failed")
+            Print("See log: " + logfile)
+            return
+        Print("Compilation successful")
         
         # Run test
-        args = [testdir + "/test"] + self.tests
+        logfile = file(os.path.join(logdir, name+"_run.log"), 'w')
+        args = [os.path.join(testdir,"test")] + self.tests
         proc = sp.Popen(args, bufsize=1, stdout=sp.PIPE, stderr=sp.PIPE, 
           cwd = testdir)
         results = {}
         while True:
             errline = proc.stderr.readline()
+            logfile.write(errline)
             if not errline:
                 break
             resfile = errline.split()[-1]
@@ -123,11 +129,13 @@ class BTLBase:
             Print(resfile)
             Print.down()
             for i in xrange(100):
-                outline = proc.stdout.readline().rstrip()
-                Print(outline)
+                outline = proc.stdout.readline()
+                logfile.write(outline)
+                Print(outline.rstrip())
             Print.up()
         Print.up()
         proc.wait()
+        logfile.close()
         if proc.returncode != 0:
             Print('Test failed')
         else:
