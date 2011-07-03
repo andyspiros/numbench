@@ -46,40 +46,53 @@ def btlcompile(exe, source, btldir, includes, defines, libs, libdirs, other, \
     exist. If None, no log is generated.
     """
     
+    # Compile flags
     incs = (
       "%s/actions" % btldir,
       "%s/generic_bench" % btldir,
       "%s/generic_bench/utils" % btldir,
       "%s/libs/STL" % btldir
     ) + tuple(includes)
-    incs = ' '.join(['-I'+i for i in incs])
+    incs = ['-I'+i for i in incs]
     
-    defs = ' '.join(['-D'+d for d in ["NDEBUG"] + defines])
+    defs = ['-D'+d for d in ["NDEBUG"] + defines]
     
-    libs = ' '.join(['-l'+l for l in ["rt"] + libs])
+    libs = ['-l'+l for l in ["rt"] + libs]
     
-    libdirs = ' '.join(['-L'+L for L in libdirs])
+    libdirs = ['-L'+L for L in libdirs]
     
-    cxxflags = run_cmd(['portageq', 'envvar', 'CXXFLAGS']).strip()
+    cxxflags = shlex.split(run_cmd(['portageq', 'envvar', 'CXXFLAGS']).strip())
     
-    otherflags = ' '.join(other)
+    otherfl = other
     
-    # TODO: use CXX instead of g++
-    cl = "g++ -o %s %s %s %s %s %s %s %s" \
-        % (exe, source, incs, defs, libs, libdirs, cxxflags, otherflags)
-        
+    # Retrieve compiler
+    cxx = 'g++'
+    cxx_portage = run_cmd(['portageq', 'envvar', 'CXX']).strip()
+    if cxx_portage != '':
+        cxx = cxx_portage
+    if os.environ.has_key('CXX'):
+        cxx = os.environ['CXX']
+    
+    # Compile command
+    cl = [cxx, '-o', exe, source]+incs+defs+libs+libdirs+cxxflags+other
+    
+    # Open logfile or redirect to PIPE 
     if logfile is None:
         fout = sp.PIPE
     else:
         fout = file(logfile, 'w')
-        fout.write(cl + "\n" + 80*'-' + "\n")
+        fout.write(str(cl) + "\n" + 80*'-' + "\n")
         fout.flush()
-    cl = shlex.split(cl)
+    
+    # Execute command
     cp = sp.Popen(cl, stdout=fout, stderr=sp.STDOUT)
-    cp.communicate()
+    cp.wait()
+    
+    # Close the log file (if any)
     if logfile is not None:
         fout.close()
-    return (cp.returncode, ' '.join(cl))
+    
+    return cp.returncode
 
 
 class BTLBase:
@@ -134,19 +147,21 @@ class BTLBase:
             
         # Prepare the environment
         if env.has_key('LIBRARY_PATH'):
-            env['LIBRARY_PATH'] = root+libdir + ":" + env['LIBRARY_PATH']
+            env['LIBRARY_PATH'] = pjoin(root,libdir) + ":" + env['LIBRARY_PATH']
         else:
-            env['LIBRARY_PATH'] = root+libdir
+            env['LIBRARY_PATH'] = pjoin(root, libdir)
             
         if env.has_key('INCLUDE_PATH'):
-            env['INCLUDE_PATH'] = root+"/usr/include" +":"+ env['INCLUDE_PATH']
+            env['INCLUDE_PATH'] = \
+              pjoin(root, "/usr/include") + ":" + env['INCLUDE_PATH']
         else:
-            env['INCLUDE_PATH'] = root+"/usr/include"
+            env['INCLUDE_PATH'] = pjoin(root, "/usr/include")
             
         if env.has_key('LD_LIBRARY_PATH'):
-            env['LD_LIBRARY_PATH'] = root+libdir + ":" + env['LD_LIBRARY_PATH']
+            env['LD_LIBRARY_PATH'] = \
+              pjoin(root, libdir) + ":" + env['LD_LIBRARY_PATH']
         else:
-            env['LD_LIBRARY_PATH'] = root+libdir
+            env['LD_LIBRARY_PATH'] = pjoin(root, libdir)
         
         # Backup the environment
         oldenv = {}
@@ -158,15 +173,14 @@ class BTLBase:
         for k,v in env.items():
             os.environ[k] = v
         
-        # Compile
-        # TODO: use CXX instead of g++
+        # Compile test suite
         btldir = 'btl/'
         logfile = os.path.join(logdir, name+"_comp.log")
-        returncode, compilecl = btlcompile(
-          exe = testdir + "/test",
-          source = btldir + self._btl_source(),
+        returncode = btlcompile(
+          exe = pjoin(testdir, "test"),
+          source = pjoin(btldir, self._btl_source()),
           btldir = btldir,
-          includes = [btldir+d for d in self._btl_includes()],
+          includes = [pjoin(btldir, d) for d in self._btl_includes()],
           defines = self._btl_defines(),
           libs = [],
           libdirs = [root+libdir],
@@ -180,29 +194,31 @@ class BTLBase:
         Print("Compilation successful")
         
         # Run test
-        logfile = file(os.path.join(logdir, name+"_run.log"), 'w')
-        args = [os.path.join(testdir,"test")] + self.tests
+        logfile = file(pjoin(logdir, name+"_run.log"), 'w')
+        args = [pjoin(testdir,"test")] + self.tests
         proc = sp.Popen(args, bufsize=1, stdout=sp.PIPE, stderr=sp.PIPE, 
           cwd = testdir)
         results = {}
         while True:
+            # Each operation test begins with a line on stderr
             errline = proc.stderr.readline()
-            logfile.write(errline)
             if not errline:
                 break
+            logfile.write(errline)
             resfile = errline.split()[-1]
             testname = resfile[6:-5-len(name)]
             results[testname] = pjoin(testdir, resfile)
             Print(resfile)
+            
+            # 100 different sizes for each operation test
             Print.down()
             for i in xrange(100):
                 outline = proc.stdout.readline()
                 logfile.write(outline)
                 Print(outline.rstrip())
             Print.up()
-        Print.up()
-        proc.wait()
         logfile.close()
+        proc.wait()
         if proc.returncode != 0:
             Print('Test failed')
         else:
@@ -226,7 +242,7 @@ class BTLBase:
         for test in self.tests:
             newresults[test] = {}
             for nameimpl in results:
-                nameimplstr = "%s/%s" % nameimpl
+                nameimplstr = pjoin(*nameimpl)
                 resdat = results[nameimpl][test]
                 newresults[test][nameimplstr] = resdat
         

@@ -7,6 +7,7 @@ import subprocess as sp
 import time
  
 # Retrieve relevant files/directories
+# TODO: use external config module to share these variables (or use environ?)
 curdir = os.path.abspath('.')
 scriptdir = os.path.dirname(os.path.realpath(__file__))
 rootsdir = "/var/tmp/benchmarks/roots/"
@@ -236,6 +237,12 @@ for tn,(name,test) in enumerate(tests.items(),1):
     
 
 # Reports will be saved in figdir
+
+# Results are reordered:
+# results
+# |-(name1, impl1) -> resultobject11
+# |-(name1, impl2) -> resultobject12
+# |-(name2, impl1) -> resultobject21
 os.path.exists(figdir) or os.makedirs(figdir)        
 results = {}
 for (name,test) in tests.items():
@@ -244,4 +251,3 @@ for (name,test) in tests.items():
             results[(name, impl)] = test['results'][impl]
 
 mod.save_results(results, figdir)
-
