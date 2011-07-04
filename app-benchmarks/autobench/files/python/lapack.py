@@ -27,6 +27,13 @@ class Module(btlbase.BTLBase):
         btlbase.BTLBase._parse_args(self, args)
     
     @staticmethod
+    def _testClass():
+        return LapackTest
+    
+    
+    
+class LapackTest(btlbase.BTLTest):
+    @staticmethod
     def _btl_source():
         return "libs/LAPACK/main.cpp"
     
@@ -34,5 +41,7 @@ class Module(btlbase.BTLBase):
     def _btl_includes():
         return ["libs/BLAS", "libs/LAPACK"]
     
-    def _btl_defines(self):
-        return ["LAPACKNAME=" + self.libname]
+    @staticmethod
+    def _btl_defines():
+        return ["LAPACKNAME=lapack"]
+    

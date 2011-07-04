@@ -1,85 +1,29 @@
 #! /usr/bin/env python2
 
-import os, sys, shlex
+import os, sys, shlex, time
 from os.path import join as pjoin
-from PortageUtils import *
 import subprocess as sp
-import time
- 
-# Retrieve relevant files/directories
-# TODO: use external config module to share these variables (or use environ?)
-curdir = os.path.abspath('.')
-scriptdir = os.path.dirname(os.path.realpath(__file__))
-rootsdir = "/var/tmp/benchmarks/roots/"
-testsdir = "/var/tmp/benchmarks/tests/"
-if os.getuid() == 0:
-    pkgsdir = "/var/cache/benchmarks/packages/"
-    figdirb = "/var/cache/benchmarks/results/"
-else:
-    pkgsdir = os.environ['HOME'] + "/.benchmarks/packages/"
-    figdirb = os.environ['HOME'] + "/.benchmarks/results/"
-    
-# Library directory (lib32 vs. lib64)
-libdir = sp.Popen \
-  ('ABI=$(portageq envvar ABI); echo /usr/`portageq envvar LIBDIR_$ABI`/', \
-  stdout=sp.PIPE, shell=True).communicate()[0].strip()
-    
-# Figures directory
-figdir = figdirb + time.strftime('%Y-%m-%d')
-if os.path.exists(figdir):
-    n = 1
-    while True:
-        figdir = figdirb + time.strftime('%Y-%m-%d') + "_%i"%n
-        if not os.path.exists(figdir):
-            os.makedirs(figdir)
-            break
-        n += 1
-else:
-    os.makedirs(figdir)
-  
-# Logs directory
-logdir = "/var/log/benchmarks/" + time.strftime('%Y-%m-%d')
-if os.path.exists(logdir):
-    n = 1
-    while True:
-        logdir = "/var/log/benchmarks/" + time.strftime('%Y-%m-%d') + "_%i"%n
-        if not os.path.exists(logdir):
-            os.makedirs(logdir)
-            break
-        n += 1
-else:
-    os.makedirs(logdir)
 
 def print_usage():
-    print "Usage: benchmarks [blas|cblas|lapack] file args"   
-      
-class _Print:
-    def __init__(self, maxlevel=10):
-        self._level = 0
-        self._maxlevel = maxlevel
-    
-    def __call__(self, arg):
-        if self._level > self._maxlevel:
-            return
-        if self._level <= 0:
-            print str(arg)
-            return
-        print (self._level-1)*"  " + "-- " + str(arg)
-        
-    def up(self, n=1):
-        self._level = max(self._level-n, 0)
-    
-    def down(self, n=1):
-        self._level = max(self._level+n, 0)
-Print = _Print(3)
+    print "Usage: benchmarks [blas|cblas|lapack] file args"
+
+if len(sys.argv) < 3:
+    print_usage()
+    exit(1)
+
+from PortageUtils import *
+import benchconfig as cfg
+from benchprint import Print
+
 
 # Import the desired module or print help and exit
 try:
     testsfname = os.path.abspath(sys.argv[2])
-    os.chdir(scriptdir)
+    os.chdir(cfg.scriptdir)
     tmp = __import__(sys.argv[1], fromlist = ['Module'])
-    mod = tmp.Module(Print, libdir, sys.argv[3:])
+    mod = tmp.Module(sys.argv[3:])
     del tmp
+    cfg.makedirs()
 except ImportError, IndexError:
     print_usage()
     exit(1)
@@ -177,9 +121,9 @@ print
 for tn,(name,test) in enumerate(tests.items(),1):
     Print("BEGIN TEST %i - %s" % (tn, name))
     
-    pkgdir = pjoin(pkgsdir, name)
-    root = pjoin(rootsdir, name)
-    tlogdir = pjoin(logdir, name)
+    pkgdir = pjoin(cfg.pkgsdir, name)
+    root = pjoin(cfg.rootsdir, name)
+    tlogdir = pjoin(cfg.logdir, name)
     os.path.exists(tlogdir) or os.makedirs(tlogdir)
     
     # Emerge package
@@ -227,27 +171,26 @@ for tn,(name,test) in enumerate(tests.items(),1):
         Print.down()
         
         # Run the test suite
-        testdir = os.path.join(testsdir, name, impl)
-        test['results'][impl] = \
-          mod.run_test(root, impl, testdir, env=test['env'], logdir=tlogdir)
+        testdir = os.path.join(cfg.testsdir, name, impl)
+        t = mod.getTest(root, impl, testdir, logdir=tlogdir)
+        test['results'][impl] = t.run_test()
         Print.up()
             
     Print.up()
     print
     
 
-# Reports will be saved in figdir
+# Reports will be saved in cfg.reportdir
 
 # Results are reordered:
 # results
 # |-(name1, impl1) -> resultobject11
 # |-(name1, impl2) -> resultobject12
-# |-(name2, impl1) -> resultobject21
-os.path.exists(figdir) or os.makedirs(figdir)        
+# |-(name2, impl1) -> resultobject21        
 results = {}
 for (name,test) in tests.items():
     if test.has_key('implementations'):
         for impl in test['implementations']:
             results[(name, impl)] = test['results'][impl]
 
-mod.save_results(results, figdir)
+mod.save_results(results)

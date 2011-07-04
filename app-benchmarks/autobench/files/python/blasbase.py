@@ -38,7 +38,13 @@ class BLASBase(btlbase.BTLBase):
               'trisolve_vector', 'matrix_matrix']
         
         btlbase.BTLBase._parse_args(self, args)
-    
+        
+    @staticmethod
+    def _testClass():
+        return BLASTest
+
+
+class BLASTest(btlbase.BTLTest):
     @staticmethod
     def _btl_source():
         return "libs/BLAS/main.cpp"

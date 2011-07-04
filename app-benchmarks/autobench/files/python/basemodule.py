@@ -1,8 +1,12 @@
 from os.path import join as pjoin
 import subprocess as sp
 import shlex, os
+
+import benchconfig as cfg
 from htmlreport import HTMLreport
 import basemodule
+from benchutils import *
+from benchprint import Print
 
 try:
     import matplotlib.pyplot as plt
@@ -14,12 +18,9 @@ except ImportError:
     sys.stderr.write('Continue anyway.\n\n')    
     with_images = False
 
-run_cmd = lambda c : sp.Popen(c, stdout=sp.PIPE).communicate()[0]
 
 class BaseModule:
-    def __init__(self, Print, libdir, args):
-        self.Print = Print
-        self.libdir = libdir
+    def __init__(self, args):
         self.summary = False
         self.summary_only = False
         
@@ -37,119 +38,26 @@ class BaseModule:
                 passargs += [i]
         
         self._parse_args(passargs)
-           
-    # Alternatives-2 version with pkg-config
-    def _get_flags(self, root, impl, libdir):
-        while libdir[0] == '/':
-            libdir = libdir[1:]
-        # Retrieve pkgconfig settings and map the directories to the new root
-        path = pjoin(root, "etc/env.d/alternatives", \
-          self.libname,impl,libdir, "pkgconfig")
-        cmd = ['pkg-config', '--libs', '--cflags', self.libname]
-        env = {'PKG_CONFIG_PATH':path}
-        pkgconf = sp.Popen(cmd, stdout=sp.PIPE, env=env).communicate()[0]
-        pkgconf = pkgconf.replace('-L/', '-L'+root+'/')
-        pkgconf = pkgconf.replace('-I/', '-I'+root+'/')
-        return shlex.split(pkgconf)
         
     # Alternatives-2 version
+    
     def get_impls(self, root):
         output = sp.Popen(
           ['eselect', '--no-color', '--brief', self.libname, 'list'],
           env={'ROOT' : root}, stdout=sp.PIPE).communicate()[0]
         return output.strip().split('\n')
-        
-    # Base version
-    def _generateResults(self, files):
-        return dict(zip(self.tests, files))
+           
+    def getTest(self, root, impl, testdir, logdir):
+        TestClass = self._testClass()
+        t = TestClass(root, impl, testdir, logdir)
+        t.libname = self.libname
+        t.tests = self.tests
+        t.files = self.files
+        return t
     
-    def run_test(self, root, impl, testdir, env, logdir):
-        # Convenient renames and definition of report files
-        Print = self.Print
-        name = self.libname
-        files = [pjoin(testdir,f) for f in self.files]
-        if self.libdir[0] == '/':
-            libdir = root+self.libdir
-        else:
-            libdir = pjoin(root, self.libdir)
-        
-        # Create dir. If all results already exist use them and do not perform
-        # the tests, otherwise remove every old results.
-        runtests = False
-        if os.path.exists(testdir):
-            runtests = not all([os.path.exists(i) for i in files])
-        else:
-            os.makedirs(testdir)
-            runtests = True
-        
-        if not runtests:
-            Print("Not testing: results exist")
-            return self._generateResults(files)
-        
-        for i in files:
-            if os.path.exists(i): os.remove(i)
-            
-        # Prepare the environment
-        if env.has_key('LIBRARY_PATH'):
-            env['LIBRARY_PATH'] = libdir + ":" + env['LIBRARY_PATH']
-        else:
-            env['LIBRARY_PATH'] = libdir
-            
-        if env.has_key('INCLUDE_PATH'):
-            env['INCLUDE_PATH'] = \
-              pjoin(root, "usr/include") + ":" + env['INCLUDE_PATH']
-        else:
-            env['INCLUDE_PATH'] = pjoin(root, "usr/include")
-            
-        if env.has_key('LD_LIBRARY_PATH'):
-            env['LD_LIBRARY_PATH'] = \
-              libdir + ":" + env['LD_LIBRARY_PATH']
-        else:
-            env['LD_LIBRARY_PATH'] = libdir
-        
-        # Backup the environment
-        oldenv = {}
-        for k in env.keys():
-            oldenv[k] = \
-              (os.environ.has_key(k) and (os.environ[k],) or (None,))[0]
-        
-        # Set the new environment
-        for k,v in env.items():
-            os.environ[k] = v
-        
-        # Compile test suite
-        logfile = os.path.join(logdir, name+"_comp.log")
-        returncode, exe = self._compileTest(logfile=logfile, testdir=testdir, \
-          root=root, impl=impl, libdir=libdir)
-        if returncode != 0:
-            Print("Compilation failed")
-            Print("See log: " + logfile)
-            return
-        Print("Compilation successful")
-        
-        # Run test
-        logfile = pjoin(logdir, name+"_run.log")
-        retcode = self._executeTest(logfile=logfile, exe=exe, testdir=testdir)
-        if returncode != 0:
-            Print("Test failed")
-            Print("See log: " + logfile)
-            return
-        Print("Test successful")
-        
-        # Restore the old environment
-        for k in env.keys():
-            if oldenv[k] != None:
-                os.environ[k] = oldenv[k]
-            elif os.environ.has_key(k):
-                del os.environ[k]
-                
-        # Return
-        return self._generateResults(files)
-    
-    
-    def save_results(self, results, figdir, plottype='plot'):
+    def save_results(self, results, plottype='plot'):
         if not with_images:
-            self.Print("Report generation skipped - missing libraries")
+            Print("Report generation skipped - missing libraries")
             return
         
         if plottype == 'plot': plotf = plt.plot
@@ -165,11 +73,13 @@ class BaseModule:
             newresults[test] = {}
             for nameimpl in results:
                 nameimplstr = pjoin(*nameimpl)
+                if results[nameimpl] == None:
+                    continue
                 resdat = results[nameimpl][test]
                 newresults[test][nameimplstr] = resdat
         
         # Begin the HTML report
-        htmlfname = pjoin(figdir, 'index.html')
+        htmlfname = pjoin(cfg.reportdir, 'index.html')
         html = HTMLreport(htmlfname)
         
         # Generate summary - a single image with all plots
@@ -185,10 +95,10 @@ class BaseModule:
                     plotf(x,y, label=impl, hold=True)
                 plt.legend(loc='best')
                 plt.grid(True)
-            fname = pjoin(figdir, 'summary.png')
+            fname = pjoin(cfg.reportdir, 'summary.png')
             plt.savefig(fname, format='png')
             html.addFig("Summary", image=os.path.basename(fname), width='95%')
-            self.Print('Summary figure saved: ' + fname)
+            Print('Summary figure saved: ' + fname)
                 
         # Generate plots
         if not self.summary_only:
@@ -199,9 +109,123 @@ class BaseModule:
                     plotf(x,y, label=impl, hold=True)
                 plt.legend(loc='best')
                 plt.grid(True)
-                fname = pjoin(figdir, test+".png")
+                fname = pjoin(cfg.reportdir, test+".png")
                 plt.savefig(fname, format='png')
                 html.addFig(test, image=os.path.basename(fname))
-                self.Print('Figure ' + fname + ' saved')
+                Print('Figure ' + fname + ' saved')
         
         html.close()
+        Print('HTML report generated: ' + htmlfname)
+
+class CompilationError(Exception):
+    def __init__(self, logfile):
+        self.logfile = logfile
+
+
+class BaseTest:
+    libname = None
+    tests = None
+    files = None
+    
+    def __init__(self, root, impl, testdir, logdir):
+        self.root = root
+        self.impl = impl
+        self.testdir = testdir
+        self.logdir = pjoin(logdir, impl)
+        self.compileenv = {}
+        self.runenv = {}
+        
+        mkdir(self.logdir)
+        
+        self.libdir = cfg.libdir
+        while self.libdir[0] == '/':
+            self.libdir = self.libdir[1:]
+        self.libdir = pjoin(self.root, self.libdir)
+        
+    # Base version
+    def _generateResults(self):
+        return dict(zip(self.tests, self.files))
+           
+    # Alternatives-2 version with pkg-config
+    def _get_flags(self):
+        libdir = cfg.libdir
+        while libdir[0] == '/':
+            libdir = libdir[1:]
+        
+        # Retrieve pkgconfig settings and map the directories to the new root
+        path = pjoin(self.root, "etc/env.d/alternatives", \
+          self.libname, self.impl, libdir, "pkgconfig")
+        cmd = ['pkg-config', '--libs', '--cflags', self.libname]
+        env = {
+          'PKG_CONFIG_PATH' : path,
+          'PKG_CONFIG_LIBDIR' : '',
+          'PKG_CONFIG_SYSROOT_DIR' : self.root
+        }
+        proc = sp.Popen(cmd, stdout=sp.PIPE, stderr=sp.STDOUT, env=env)
+        pkgconf = proc.communicate()[0]
+        
+        # Write logfile
+        logfname = pjoin(self.logdir, 'pkgconfig.log')
+        logfile = file(logfname, 'w')
+        logfile.write('PKG_CONFIG_PATH='+path + '\n')
+        logfile.write('PKG_CONFIG_LIBDIR=""' + '\n')
+        logfile.write('PKG_CONFIG_SYSROOT_DIR='+self.root + '\n')
+        logfile.write(' '.join(cmd) + '\n')
+        logfile.write(80*'-' + '\n')
+        logfile.write(pkgconf)
+        logfile.close()
+        
+        if proc.returncode != 0:
+            raise CompilationError(logfname)
+        
+        return shlex.split(pkgconf)
+    
+    def run_test(self):
+        # Convenient renames and definition of report files
+        name = self.libname
+        root = self.root
+        testdir = self.testdir
+        self.files = [pjoin(testdir,f) for f in self.files]
+        env = {} # TODO: remove this
+        if cfg.libdir[0] == '/':
+            libdir = root+cfg.libdir
+        else:
+            libdir = pjoin(root, cfg.libdir)
+        
+        # Create dir. If all results already exist use them and do not perform
+        # the tests, otherwise remove every old results.
+        runtests = False
+        if os.path.exists(testdir):
+            runtests = not all([os.path.exists(i) for i in self.files])
+        else:
+            os.makedirs(testdir)
+            runtests = True
+        if not runtests:
+            Print("Not testing: results exist")
+            return self._generateResults()
+        for i in self.files:
+            if os.path.exists(i): os.remove(i)
+        
+        # Compile test suite
+        try:
+            returncode, exe, logfile = self._compileTest()
+            if returncode != 0:
+                raise CompilationError(logfile)
+        except CompilationError as e:
+            Print("Compilation failed")
+            Print("See log: " + e.logfile)
+            return
+        Print("Compilation successful")
+        
+        # Run test
+        logfile = pjoin(self.logdir, name+"_run.log")
+        retcode = self._executeTest(exe)
+        if returncode != 0:
+            Print("Test failed")
+            Print("See log: " + logfile)
+            return
+        Print("Test successful")
+                
+        # Return
+        return self._generateResults()
+    
