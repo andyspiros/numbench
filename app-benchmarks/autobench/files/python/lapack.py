@@ -23,34 +23,16 @@ class Module(btlbase.BTLBase):
         # If no test is specified, run everything
         if len(self.tests) == 0:
             self.tests = self.avail
+        
+        btlbase.BTLBase._parse_args(self, args)
     
     @staticmethod
     def _btl_source():
-        return "/libs/LAPACK/main.cpp"
+        return "libs/LAPACK/main.cpp"
     
     @staticmethod
     def _btl_includes():
-        return ["/libs/BLAS", "libs/LAPACK"]
+        return ["libs/BLAS", "libs/LAPACK"]
     
     def _btl_defines(self):
         return ["LAPACKNAME=" + self.libname]
-           
-    def _get_flags(self, root, impl, libdir):
-        # Retrieve pkgconfig settings and map the directories to the new root
-        path = "%s/etc/env.d/alternatives/%s/%s/%s/pkgconfig" % \
-          (root, self.libname, impl, libdir)
-        pkgconf = sp.Popen('pkg-config --libs --cflags lapack', shell=True, \
-          stdout=sp.PIPE, env={'PKG_CONFIG_PATH':path}).communicate()[0]
-        pkgconf = pkgconf.replace('-L/', '-L'+root+'/')
-        pkgconf = pkgconf.replace('-I/', '-I'+root+'/')
-        return shlex.split(pkgconf)
-        
-        
-    def get_impls(self, root):
-        output = sp.Popen(
-          ['eselect', '--no-color', '--brief', self.libname, 'list'],
-          env={'ROOT' : root}, stdout=sp.PIPE
-        ).communicate()[0]
-        return output.strip().split('\n')
-
-del btlbase

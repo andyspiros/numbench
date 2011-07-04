@@ -36,6 +36,8 @@ class BLASBase(btlbase.BTLBase):
         if len(self.tests) == 0:
             self.tests = ['axpy', 'matrix_vector', \
               'trisolve_vector', 'matrix_matrix']
+        
+        btlbase.BTLBase._parse_args(self, args)
     
     @staticmethod
     def _btl_source():
@@ -47,24 +49,3 @@ class BLASBase(btlbase.BTLBase):
     
     def _btl_defines(self):
         return ["CBLASNAME=" + self.libname, "BLAS_INTERFACE"]
-           
-    def _get_flags(self, root, impl, libdir):
-        # Retrieve pkgconfig settings and map the directories to the new root
-        path = pjoin(root, "etc/env.d/alternatives", \
-          self.libname,impl,libdir, "pkgconfig")
-        cmd = ['pkg-config', '--libs', '--cflags', self.libname]
-        env = {'PKG_CONFIG_PATH':path}
-        pkgconf = sp.Popen(cmd, stdout=sp.PIPE, env=env).communicate()[0]
-        pkgconf = pkgconf.replace('-L/', '-L'+root+'/')
-        pkgconf = pkgconf.replace('-I/', '-I'+root+'/')
-        return shlex.split(pkgconf)
-        
-        
-    def get_impls(self, root):
-        output = sp.Popen(
-          ['eselect', '--no-color', '--brief', self.libname, 'list'],
-          env={'ROOT' : root}, stdout=sp.PIPE
-        ).communicate()[0]
-        return output.strip().split('\n')
-
-del btlbase
