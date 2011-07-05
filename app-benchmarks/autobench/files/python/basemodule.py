@@ -60,6 +60,13 @@ class BaseModule:
             Print("Report generation skipped - missing libraries")
             return
         
+        try:
+            plt.figure()
+        except:
+            Print("Unable to generate plots")
+            Print("Please make sure that X is running and $DISPLAY is set")
+            return
+        
         if plottype == 'plot': plotf = plt.plot
         elif plottype == 'semilogx': plotf = plt.semilogx
         elif plottype == 'semilogy': plotf = plt.semilogy
@@ -151,31 +158,62 @@ class BaseTest:
         libdir = cfg.libdir
         while libdir[0] == '/':
             libdir = libdir[1:]
+        result = 0
         
-        # Retrieve pkgconfig settings and map the directories to the new root
-        path = pjoin(self.root, "etc/env.d/alternatives", \
+        # First run: retrieve requirements
+        pkgpath = pjoin(self.root, "etc/env.d/alternatives", \
           self.libname, self.impl, libdir, "pkgconfig")
-        cmd = ['pkg-config', '--libs', '--cflags', self.libname]
         env = {
-          'PKG_CONFIG_PATH' : path,
-          'PKG_CONFIG_LIBDIR' : '',
-          'PKG_CONFIG_SYSROOT_DIR' : self.root
+          'PKG_CONFIG_PATH' : pkgpath,
+          'PKG_CONFIG_LIBDIR' : ''
         }
-        proc = sp.Popen(cmd, stdout=sp.PIPE, stderr=sp.STDOUT, env=env)
-        pkgconf = proc.communicate()[0]
+        args = ['pkg-config', '--print-requires', self.libname]
+        proc1 = sp.Popen(args, env=env, stdout=sp.PIPE, stderr=sp.STDOUT)
+        req =  proc1.communicate()[0].split()
+        result += proc1.returncode
+        
+        # Modify pcfile
+        pcfname = pjoin(pkgpath, self.libname+'.pc')
+        if os.path.exists(pcfname):
+            pcfname = os.path.realpath(pcfname)
+        else:
+            raise CompilationError('no log file: implementation void')
+        pclines = file(pcfname, 'r').readlines()
+        newlines = [l for l in pclines if l[:10] != 'Requires: ']
+        pcfile = file(pcfname, 'w')
+        pcfile.writelines(newlines)
+        pcfile.close()
+        
+        # Second run: flags without requirements
+        args = ['pkg-config', '--libs', '--cflags', self.libname]
+        env['PKG_CONFIG_SYSROOT_DIR'] = self.root
+        proc2 = sp.Popen(args, stdout=sp.PIPE, stderr=sp.STDOUT, env=env)
+        pkgconf = proc2.communicate()[0] + ' '
+        result += proc1.returncode
+        
+        # Restore old file
+        pcfile = file(pcfname, 'w')
+        pcfile.writelines(pclines)
+        pcfile.close()
+        
+        # Third run: requirements flags
+        if len(req) > 0:
+            args = ['pkg-config', '--libs', '--cflags'] + req
+            proc3 = sp.Popen(args, stdout=sp.PIPE, stderr=sp.STDOUT)
+            pkgconf += proc3.communicate()[0]
+            result += proc1.returncode
         
         # Write logfile
         logfname = pjoin(self.logdir, 'pkgconfig.log')
         logfile = file(logfname, 'w')
-        logfile.write('PKG_CONFIG_PATH='+path + '\n')
+        logfile.write('PKG_CONFIG_PATH='+pkgpath + '\n')
         logfile.write('PKG_CONFIG_LIBDIR=""' + '\n')
         logfile.write('PKG_CONFIG_SYSROOT_DIR='+self.root + '\n')
-        logfile.write(' '.join(cmd) + '\n')
         logfile.write(80*'-' + '\n')
         logfile.write(pkgconf)
         logfile.close()
         
-        if proc.returncode != 0:
+        if result != 0:
             raise CompilationError(logfname)
         
         return shlex.split(pkgconf)

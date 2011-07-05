@@ -48,6 +48,24 @@ vector<T> logspace(const T& min, const T& max, const unsigned& N)
 	return result;
 }
 
+template<typename T>
+vector<T> logsizes(const T& min, const T& max, const unsigned& N)
+{
+	if (N <= 10)
+		return logspace(min, max, N);
+
+	vector<T> result;
+	result.reserve(N);
+
+	for (unsigned i = 0; i < 9; ++i)
+		result.push_back(i+1);
+	vector<T> lres = logspace(10, max, N-9);
+	for (unsigned i = 9; i < N; ++i)
+		result.push_back(lres[i-9]);
+
+	return result;
+}
+
 double axpy_test(const int& size)
 {
 	// Set up
@@ -162,7 +180,7 @@ void test(T t, const int& min, const int& max, const unsigned& N, const string& 
 	fname << "accuracy_" << name << "_blas.dat";
 	fout.open(fname.str().c_str());
 	cout << name << " test -- " << fname.str() << endl;
-	vector<int> axpy_sizes = logspace(min, max, N);
+	vector<int> axpy_sizes = logsizes(min, max, N);
 	N_ = 0;
 	for (vector<int>::const_reverse_iterator i = axpy_sizes.rbegin(), e = axpy_sizes.rend(); i!=e; ++i) {
 		result = t(*i);
@@ -173,7 +191,7 @@ void test(T t, const int& min, const int& max, const unsigned& N, const string& 
 	cout << "\n";
 }
 
-int main()
+int main(int argv, char **argc)
 {
     bool
     axpy=false, axpby=false, rot=false,
@@ -197,6 +215,7 @@ int main()
         else if (arg == "aat") aat = true;
         else if (arg == "trisolve_matrix") trisolve_matrix = true;
         else if (arg == "trmm") trmm = true;
+    }
     
     
 	/* AXPY test */
