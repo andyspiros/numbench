@@ -1,2 +1,4 @@
-gsl-gcc gsl-1.15-r1 CC=gcc CFLAGS=-O2
-gsl-icc gsl-1.15-r1 CC=gcc CFLAGS=-O3
+cblas-reference sci-libs/cblas-reference-20110218 CFLAGS=-O3
+gsl gsl-1.15-r1 CC=gcc CFLAGS=-O3
+goto sci-libs/gotoblas2-1.13 CFLAGS=-O3 USE='incblas'
+openblas sci-libs/openblas CFLAGS=-O3 USE=incblas

@@ -41,6 +41,7 @@ class BTLTest(basemodule.BaseTest):
         
         # Defines
         defines = ['NDEBUG'] + self._btl_defines()
+        defines = self._btl_defines()
         
         # Flags
         flags = []
@@ -103,7 +104,7 @@ class BTLTest(basemodule.BaseTest):
         
         # Open pipe
         logfile = file(pjoin(self.logdir, 'btlrun.log'), 'w')
-        args = [exe] + self.tests
+        args = [exe] + list(self.tests)
         logfile.write(' '.join([n+'='+v for n,v in self.runenv.items()]) + ' ')
         logfile.write(' '.join(args) + '\n')
         logfile.write(80*'-' + '\n')

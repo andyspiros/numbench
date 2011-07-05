@@ -1,2 +1,3 @@
-reference-O2 sci-libs/lapack-reference-3.3.1-r1 FFLAGS=-O2
-reference-O3 sci-libs/lapack-reference-3.3.1-r1 FFLAGS=-O3
+#lapack-reference sci-libs/lapack-reference-3.3.1-r1 FFLAGS=-O3 CFLAGS=-O3
+atlas sci-libs/atlas-3.8.4 CFLAGS=-O3 FFLAGS=-O3
+acml sci-libs/acml-4.4.0-r1

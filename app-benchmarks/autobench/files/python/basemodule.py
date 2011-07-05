@@ -40,7 +40,6 @@ class BaseModule:
         self._parse_args(passargs)
         
     # Alternatives-2 version
-    
     def get_impls(self, root):
         output = sp.Popen(
           ['eselect', '--no-color', '--brief', self.libname, 'list'],
@@ -101,6 +100,8 @@ class BaseModule:
                     x,y = np.loadtxt(newresults[test][impl], unpack=True)
                     plotf(x,y, label=impl, hold=True)
                 plt.legend(loc='best')
+                plt.xlabel('size')
+                plt.ylabel('MFlops')
                 plt.grid(True)
             fname = pjoin(cfg.reportdir, 'summary.png')
             plt.savefig(fname, format='png')
@@ -115,6 +116,8 @@ class BaseModule:
                     x,y = np.loadtxt(newresults[test][impl], unpack=True)
                     plotf(x,y, label=impl, hold=True)
                 plt.legend(loc='best')
+                plt.xlabel('size')
+                plt.ylabel('MFlops')
                 plt.grid(True)
                 fname = pjoin(cfg.reportdir, test+".png")
                 plt.savefig(fname, format='png')

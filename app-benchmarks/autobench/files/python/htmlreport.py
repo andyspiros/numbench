@@ -42,10 +42,11 @@ h1, h2, .plot, .descr, .date {
         if descr.strip() != '': 
             self.content += '<p class="descr">' + descr + '</p>'
         self.content += '<div class="plot">'
+        self.content += '<a href="' + image + '">' 
         self.content += '<img src="' + image + '" alt="' + alt + '"'
         if width is not None:
             self.content += ' style="width:' + str(width) + '"'
-        self.content += ' />'
+        self.content += ' /></a>'
         self.content += '</div>'
         self.content += '</div>'
         
