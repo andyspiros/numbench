@@ -1,3 +1,4 @@
-#lapack-reference sci-libs/lapack-reference-3.3.1-r1 FFLAGS=-O3 CFLAGS=-O3
+lapack-reference sci-libs/lapack-reference-3.3.1-r1 FFLAGS=-O3 CFLAGS=-O3 blas:atlas descr|"lapack-reference with atlas as BLAS implementation"
+lapack-reference sci-libs/lapack-reference-3.3.1-r1 FFLAGS=-O3 CFLAGS=-O3 blas:atlas-threads descr|"lapack-reference with threaded atlas as BLAS implementation"
 atlas sci-libs/atlas-3.8.4 CFLAGS=-O3 FFLAGS=-O3
-acml sci-libs/acml-4.4.0-r1
+acml sci-libs/acml-4.4.0-r1 -acml32-gfortran -acml32-gfortran-openmp descr|"AMD numerical library"

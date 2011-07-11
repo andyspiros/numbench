@@ -14,6 +14,12 @@ LICENSE="GPL-2"
 KEYWORDS="~amd64 ~x86"
 SLOT="0"
 
+RDEPEND="!app-admin/eselect-blas
+		 !app-admin/eselect-cblas
+		 !app-admin/eselect-lapack
+		 >=dev-python/matplotlib-1.0.0
+		 =app-admin/eselect-1.2.15-r1"
+
 src_install() {
     local libdir=/usr/$(get_libdir)
     dodir $libdir
@@ -21,5 +27,4 @@ src_install() {
     cp -r "${FILESDIR}"/python "${D}"/$libdir/autobench
     chmod +x "${D}"/$libdir/autobench/main.py
     dosym $libdir/autobench/main.py /usr/bin/autobench
-#    ln -s $libdir/autobench/main.py "${D}"/usr/bin/autobench 
 }

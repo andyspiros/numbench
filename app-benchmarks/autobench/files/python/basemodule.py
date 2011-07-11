@@ -5,8 +5,9 @@ import shlex, os
 import benchconfig as cfg
 from htmlreport import HTMLreport
 import basemodule
-from benchutils import *
+from benchutils import mkdir, run_cmd
 from benchprint import Print
+import benchpkgconfig as pc
 
 try:
     import matplotlib.pyplot as plt
@@ -158,70 +159,26 @@ class BaseTest:
            
     # Alternatives-2 version with pkg-config
     def _get_flags(self):
-        libdir = cfg.libdir
-        while libdir[0] == '/':
-            libdir = libdir[1:]
-        result = 0
+        # 1. Run with no requires
+        pfile = pc.GetFile(self.libname, self.impl, self.root)
+        flags = pc.Run(pfile, self.root, False)
         
-        # First run: retrieve requirements
-        pkgpath = pjoin(self.root, "etc/env.d/alternatives", \
-          self.libname, self.impl, libdir, "pkgconfig")
-        env = {
-          'PKG_CONFIG_PATH' : pkgpath,
-          'PKG_CONFIG_LIBDIR' : ''
-        }
-        args = ['pkg-config', '--print-requires', self.libname]
-        proc1 = sp.Popen(args, env=env, stdout=sp.PIPE, stderr=sp.STDOUT)
-        req =  proc1.communicate()[0].split()
-        result += proc1.returncode
+        # 2. Get requires
+        requires = pc.Requires(pfile)
         
-        # Modify pcfile
-        pcfname = pjoin(pkgpath, self.libname+'.pc')
-        if os.path.exists(pcfname):
-            pcfname = os.path.realpath(pcfname)
-        else:
-            raise CompilationError('no log file: implementation void')
-        pclines = file(pcfname, 'r').readlines()
-        newlines = [l for l in pclines if l[:10] != 'Requires: ']
-        pcfile = file(pcfname, 'w')
-        pcfile.writelines(newlines)
-        pcfile.close()
+        # 3.Substitute requires and add flags
+        for r in requires:
+            if r in self.changes.keys():
+                pfile = pc.GetFile(r, self.changes[r])
+                flags += ' ' + pc.Run(pfile)
+            else:
+                flags += ' ' + pc.Run(r)
         
-        # Second run: flags without requirements
-        args = ['pkg-config', '--libs', '--cflags', self.libname]
-        env['PKG_CONFIG_SYSROOT_DIR'] = self.root
-        proc2 = sp.Popen(args, stdout=sp.PIPE, stderr=sp.STDOUT, env=env)
-        pkgconf = proc2.communicate()[0] + ' '
-        result += proc1.returncode
-        
-        # Restore old file
-        pcfile = file(pcfname, 'w')
-        pcfile.writelines(pclines)
-        pcfile.close()
-        
-        # Third run: requirements flags
-        if len(req) > 0:
-            args = ['pkg-config', '--libs', '--cflags'] + req
-            proc3 = sp.Popen(args, stdout=sp.PIPE, stderr=sp.STDOUT)
-            pkgconf += proc3.communicate()[0]
-            result += proc1.returncode
-        
-        # Write logfile
-        logfname = pjoin(self.logdir, 'pkgconfig.log')
-        logfile = file(logfname, 'w')
-        logfile.write('PKG_CONFIG_PATH='+pkgpath + '\n')
-        logfile.write('PKG_CONFIG_LIBDIR=""' + '\n')
-        logfile.write('PKG_CONFIG_SYSROOT_DIR='+self.root + '\n')
-        logfile.write(80*'-' + '\n')
-        logfile.write(pkgconf)
-        logfile.close()
-        
-        if result != 0:
-            raise CompilationError(logfname)
-        
-        return shlex.split(pkgconf)
+        return shlex.split(flags)
     
-    def run_test(self):
+    def run_test(self, changes={}):
+        self.changes = changes
+        
         # Convenient renames and definition of report files
         name = self.libname
         root = self.root
@@ -261,7 +218,7 @@ class BaseTest:
         # Run test
         logfile = pjoin(self.logdir, name+"_run.log")
         retcode = self._executeTest(exe)
-        if returncode != 0:
+        if retcode != 0:
             Print("Test failed")
             Print("See log: " + logfile)
             return

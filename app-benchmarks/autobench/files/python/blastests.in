@@ -1,5 +1,5 @@
 #blas-reference sci-libs/blas-reference-3.3.1-r1 FFLAGS=-O3
-acml sci-libs/acml-4.4.0-r1
+acml sci-libs/acml-4.4.0-r1 -acml32-gfortran -acml32-gfortran-openmp
 #goto sci-libs/gotoblas2-1.13 CFLAGS=-O3 USE='incblas'
 #atlas sci-libs/atlas-3.8.4 CFLAGS=-O3 FFLAGS=-O3
 #openblas sci-libs/openblas CFLAGS=-O3 USE=incblas

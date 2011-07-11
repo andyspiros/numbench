@@ -25,6 +25,7 @@ try:
     del tmp
     cfg.makedirs()
 except ImportError, IndexError:
+    print e
     print_usage()
     exit(1)
   
@@ -40,16 +41,28 @@ def tests_from_input(input):
             continue
         env = {}
         # TODO: add @file for env set based on external file
-        # TODO: add -impl for skipping implementation
+        skip = []
+        change = {}
+        descr = None
         for var in spl[2:]:
-            s = var.split('=', 1)
-            env[s[0]] = s[1]
+            if var[0] == '-':
+                skip.append(var[1:])
+            elif ':' in var and not '=' in var:
+                c_0, c_1 = var.split(':', 1)
+                change[c_0] = c_1
+            elif var[:6] == 'descr|':
+                descr = var[6:]
+            else:
+                e_0, e_1 = var.split('=', 1)
+                env[e_0] = e_1
         avail = available_packages(spl[1])
         if len(avail) > 1:
             for n,p in enumerate(avail):
-                tests[spl[0]+"_%02i"%n] = {'package':p , 'env':env}
+                tests[spl[0]+"_%02i"%n] = {'package':p , 'env':env, \
+                  'skip':skip, 'changes':change, 'descr':descr}
         elif len(avail) == 1:
-            tests[spl[0]] = {'package':avail[0] , 'env':env}
+            tests[spl[0]] = {'package':avail[0] , 'env':env, 'skip':skip, \
+              'changes':change, 'descr':descr}
         else:
             sys.stderr.write('Error: package ' + spl[1] + ' not found\n')
     return tests
@@ -111,14 +124,25 @@ print 80*'='
 print "The following tests will be run:"
 for tname, ttest in tests.items():
     print "Test: " + tname
+    if ttest['descr'] is not None:
+        print " - Description: " + ttest['descr']
     print " - Package: " + normalize_cpv(ttest['package'])
-    print " - Environment: " + \
-      ' '.join([n+'="'+v+'"' for n,v in ttest['env'].items()])
+    if len(ttest['env']) != 0:
+        print " - Environment: " + \
+          ' '.join([n+'="'+v+'"' for n,v in ttest['env'].items()])
+    if len(ttest['skip']) != 0:
+        print " - Skip implementations: " + ' '.join(ttest['skip'])
+    if len(ttest['changes']) != 0:
+        print " - Dependency specifications:",
+        for c_0, c_1 in ttest['changes'].items():
+            print c_0 + ':' + c_1,
+        print
     print
 print 80*'='
 print
 
 for tn,(name,test) in enumerate(tests.items(),1):
+    Print._level = 0
     Print("BEGIN TEST %i - %s" % (tn, name))
     
     pkgdir = pjoin(cfg.pkgsdir, name)
@@ -161,7 +185,7 @@ for tn,(name,test) in enumerate(tests.items(),1):
     Print("Package emerged")
     
     # Find implementations
-    impls = mod.get_impls(root)
+    impls = [i for i in mod.get_impls(root) if not i in test['skip']]
     test['implementations'] = impls
     
     # Test every implementation
@@ -173,7 +197,7 @@ for tn,(name,test) in enumerate(tests.items(),1):
         # Run the test suite
         testdir = os.path.join(cfg.testsdir, name, impl)
         t = mod.getTest(root, impl, testdir, logdir=tlogdir)
-        test['results'][impl] = t.run_test()
+        test['results'][impl] = t.run_test(test['changes'])
         Print.up()
             
     Print.up()

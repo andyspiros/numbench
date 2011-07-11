@@ -2,7 +2,7 @@ import subprocess as sp
 import shlex, os
 from os.path import join as pjoin
 
-from benchutils import *
+from benchutils import mkdir, run_cmd
 from benchprint import Print
 from htmlreport import HTMLreport
 import basemodule

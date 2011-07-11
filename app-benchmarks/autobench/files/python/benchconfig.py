@@ -51,7 +51,11 @@ if needsinitialization:
     del reportdirb
     
     # Logs directory
-    logdirb = "/var/log/benchmarks/" + modname + "_" + time.strftime('%Y-%m-%d')
+    if isroot:
+        logdirb = "/var/log/benchmarks/"+modname+"_"+time.strftime('%Y-%m-%d')
+    else:
+        logdirb = pjoin(os.environ['HOME'], ".benchmarks/log",
+                        modname + "_" + time.strftime('%Y-%m-%d'))
     if os.path.exists(logdirb):
         n = 1
         while True:

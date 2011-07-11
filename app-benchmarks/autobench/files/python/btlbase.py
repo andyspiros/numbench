@@ -2,7 +2,7 @@ import sys, os, shlex
 import subprocess as sp
 from os.path import join as pjoin
 
-from benchutils import *
+from benchutils import mkdir, run_cmd
 from benchprint import Print
 from htmlreport import HTMLreport
 import basemodule
@@ -128,6 +128,8 @@ class BTLTest(basemodule.BaseTest):
                 outline = proc.stdout.readline()
                 # If the line is void, something gone wrong
                 if not outline:
+                    Print.up()
+                    Print('Execution error')
                     return 1
                 logfile.write(outline)
                 Print(outline.strip())
