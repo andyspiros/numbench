@@ -1,6 +1,7 @@
-from os.path import join as pjoin
+from os.path import join as pjoin, basename, dirname
 import subprocess as sp
 import shlex, os
+import shutil as shu
 
 import benchconfig as cfg
 from htmlreport import HTMLreport
@@ -71,6 +72,11 @@ class BaseModule:
             Print("Unable to generate plots")
             Print("Please make sure that X is running and $DISPLAY is set")
             return
+        
+        # Copy inputfile and logs
+        shu.copytree(cfg.logdir, pjoin(cfg.reportdir, 'log'))
+        baseinfile = basename(cfg.inputfile)
+        shu.copy2(cfg.inputfile, pjoin(cfg.reportdir, baseinfile))
         
         if plottype == 'plot': plotf = plt.plot
         elif plottype == 'semilogx': plotf = plt.semilogx

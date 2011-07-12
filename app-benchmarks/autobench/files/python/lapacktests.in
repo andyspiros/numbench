@@ -1,4 +1,9 @@
-lapack-reference sci-libs/lapack-reference-3.3.1-r1 FFLAGS=-O3 CFLAGS=-O3 blas:atlas descr|"lapack-reference with atlas as BLAS implementation"
-lapack-reference sci-libs/lapack-reference-3.3.1-r1 FFLAGS=-O3 CFLAGS=-O3 blas:atlas-threads descr|"lapack-reference with threaded atlas as BLAS implementation"
-atlas sci-libs/atlas-3.8.4 CFLAGS=-O3 FFLAGS=-O3
-acml sci-libs/acml-4.4.0-r1 -acml32-gfortran -acml32-gfortran-openmp descr|"AMD numerical library"
+# Testing different implementations of LAPACK
+
+# lapack-reference relies on blas: test this with different blas implementations
+reference_eigen sci-libs/lapack-reference-3.3.1-r1 blas:eigen
+reference_openblas sci-libs/lapack-reference-3.3.1-r1 blas:openblas-threads
+
+# Testing other full LAPACK implementations enabling vectorization
+atlas sci-libs/atlas-3.9.41 CFLAGS="-O3 -march=native -msse3 -msse4.1 -msse4.2"
+acml sci-libs/acml-4.4.0-r1 -acml32-gfortran -acml32-gfortran-openmp

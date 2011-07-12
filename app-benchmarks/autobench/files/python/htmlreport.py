@@ -1,7 +1,11 @@
 import time
+from os.path import join as pjoin, basename
+
+import benchconfig as cfg
 
 class HTMLreport:
-    def __init__(self, fname, title="Benchmarks report"):
+    def __init__(self, fname, title="Benchmarks report", \
+                  inputfile=pjoin(cfg.reportdir, basename(cfg.inputfile))):
         self.fname = fname
         self.content = """
 <html>
@@ -16,8 +20,16 @@ img {
   height:80%;
 }
 
+pre {
+  background-color: #EEE;
+}
+
 h1, h2, .plot, .descr, .info {
   text-align: center;
+}
+
+.inputfile {
+  margin-bottom: 40px;
 }
 
 .fig {
@@ -49,6 +61,13 @@ h1, h2, .plot, .descr, .info {
                 mem = l.split(':',1)[1].strip()
         if mem:
             self.content += '<p class="info">Total memory: ' + mem + '</p>'
+        
+        self.content += '<div class="inputfile">Input file: ' + \
+          '<a href="%s">%s</a>' % (basename(inputfile), cfg.inputfile) + \
+          '<pre>%s</pre></div>' % file(cfg.inputfile, 'r').read()
+          
+        self.content += '<div class="log">Logs: <a href="log">%s</a></div>' \
+          % cfg.logdir
         
         
     def addFig(self, title, image, descr='', alt='', width=None):

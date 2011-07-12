@@ -18,7 +18,7 @@ from benchprint import Print
 
 # Import the desired module or print help and exit
 try:
-    testsfname = os.path.abspath(sys.argv[2])
+    cfg.inputfile = os.path.abspath(sys.argv[2])
     os.chdir(cfg.scriptdir)
     tmp = __import__(sys.argv[1], fromlist = ['Module'])
     mod = tmp.Module(sys.argv[3:])
@@ -116,7 +116,11 @@ dictionary; the line has to contain:
 - a package description, which can, but does not must to, contain a version
 - a list of environment variables separated by means of spaces 
 """
-input = file(testsfname).read()
+if not os.path.exists(cfg.inputfile):
+    sys.stderr.write("File not found: " + cfg.inputfile)
+    print_usage()
+    exit(1)
+input = file(cfg.inputfile).read()
 tests = tests_from_input(input)
 
 # Write summary

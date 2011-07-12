@@ -19,10 +19,10 @@ int main(int argv, char **argc)
 
   for (int i = 1; i < argv; ++i) {
     std::string arg = argc[i];
-    if (arg == "fftw_1d_forward_measure" || arg == "all") fftw_1d_forward_measure = true;
-    if (arg == "fftw_1d_forward_estimate" || arg == "all") fftw_1d_forward_estimate = true;
-    if (arg == "fftw_1d_backward_measure" || arg == "all") fftw_1d_backward_measure = true;
-    if (arg == "fftw_1d_backward_estimate" || arg == "all") fftw_1d_backward_estimate = true;
+    if (arg == "FFTW_1D_Forward_Measure" || arg == "all") fftw_1d_forward_measure = true;
+    if (arg == "FFTW_1D_Forward_Estimate" || arg == "all") fftw_1d_forward_estimate = true;
+    if (arg == "FFTW_1D_Backward_Measure" || arg == "all") fftw_1d_backward_measure = true;
+    if (arg == "FFTW_1D_Backward_Estimate" || arg == "all") fftw_1d_backward_estimate = true;
   }
 
 

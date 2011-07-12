@@ -1,5 +1,8 @@
-#blas-reference sci-libs/blas-reference-3.3.1-r1 FFLAGS=-O3
-acml sci-libs/acml-4.4.0-r1 -acml32-gfortran -acml32-gfortran-openmp
-#goto sci-libs/gotoblas2-1.13 CFLAGS=-O3 USE='incblas'
-#atlas sci-libs/atlas-3.8.4 CFLAGS=-O3 FFLAGS=-O3
-#openblas sci-libs/openblas CFLAGS=-O3 USE=incblas
+# Testing almost all implementations using gcc-4.6.1 and enabling vectorization
+
+blas-reference sci-libs/blas-reference-3.3.1-r1 FC=gfortran-4.6.1 FFLAGS="-O3 -pipe -march=native -msse3 -msse4.1 -msse4.2"
+acml sci-libs/acml-4.4.0-r1 -acml32-gfortran -acml32-gfortran-openmp -acml64-gfortran-openmp
+goto sci-libs/gotoblas2-1.13 CFLAGS="-O3 -march=native" USE='incblas' TARGET=NEHALEM
+atlas sci-libs/atlas-3.9.41 CC=gcc-4.6.1 CFLAGS="-O3 -pipe -march=native -msse3 -msse4.1 -msse4.2"
+openblas sci-libs/openblas CC=gcc-4.6.1 CFLAGS="-O3 -pipe -march=native -msse3 -msse4.1 -msse4.2" USE=incblas TARGET=NEHALEM
+eigen dev-cpp/eigen-3.0.1-r1 CC=gcc-4.6.1 CXX=g++-4.6.1 CFLAGS="-O3 -pipe -march=native -msse3 -msse4.1 -msse4.2" CXXFLAGS="-O3 -pipe -march=native -msse3 -msse4.1 -msse4.2"

@@ -6,7 +6,7 @@ from os.path import join as pjoin
 class BLASBase(btlbase.BTLBase):
     def _initialize(self):
         self.avail1 = ['axpy', 'axpby', 'rot']
-        self.avail2 = ['matrix_vector','atv','symv','syr2','ger',
+        self.avail2 = ['matrix_vector','atv','symv', 'ger', 'syr2',
           'trisolve_vector']
         self.avail3 = ['matrix_matrix', 'aat', 'trisolve_matrix', 'trmm']
         self.avail = self.avail1 + self.avail2 + self.avail3
