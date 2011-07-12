@@ -29,10 +29,10 @@ class BaseModule:
         
         passargs = []
         for i in args:
-            if i == '-S':
+            if i in ('-S', '--summary-only'):
                 self.summary_only = True
                 continue
-            elif i == '-s':
+            elif i in ('-s', '--summary'):
                 self.summary = True
                 continue
             else:
@@ -45,7 +45,11 @@ class BaseModule:
         output = sp.Popen(
           ['eselect', '--no-color', '--brief', self.libname, 'list'],
           env={'ROOT' : root}, stdout=sp.PIPE).communicate()[0]
-        return output.strip().split('\n')
+        output = output.strip()
+        if '(none found)' in output:
+            return []
+        else:
+            return [i.split()[0] for i in output.split('\n')] 
            
     def getTest(self, root, impl, testdir, logdir):
         TestClass = self._testClass()
@@ -94,19 +98,22 @@ class BaseModule:
             # Save summary figure
             sprows = (len(self.tests)+1)/2
             plt.figure(figsize=(16,6*sprows), dpi=300)
+            plt.subplots_adjust(wspace=.4, hspace=.4)
             for i, test in enumerate(self.tests, 1):
                 plt.subplot(sprows, 2, i)
                 plt.title(test)
                 for impl in newresults[test]:
                     x,y = np.loadtxt(newresults[test][impl], unpack=True)
                     plotf(x,y, label=impl, hold=True)
-                plt.legend(loc='best')
+                if self.summary_only:
+                    plt.legend(loc='best')
                 plt.xlabel('size')
                 plt.ylabel('MFlops')
                 plt.grid(True)
             fname = pjoin(cfg.reportdir, 'summary.png')
-            plt.savefig(fname, format='png')
-            html.addFig("Summary", image=os.path.basename(fname), width='95%')
+            plt.savefig(fname, format='png', bbox_inches='tight', \
+              transparent=True)
+            html.addFig("Summary", image=os.path.basename(fname), width='90%')
             Print('Summary figure saved: ' + fname)
                 
         # Generate plots
@@ -121,7 +128,8 @@ class BaseModule:
                 plt.ylabel('MFlops')
                 plt.grid(True)
                 fname = pjoin(cfg.reportdir, test+".png")
-                plt.savefig(fname, format='png')
+                plt.savefig(fname, format='png', bbox_inches='tight', \
+                  transparent=True)
                 html.addFig(test, image=os.path.basename(fname))
                 Print('Figure ' + fname + ' saved')
         

@@ -54,4 +54,4 @@ class BLASTest(btlbase.BTLTest):
         return ["libs/BLAS"]
     
     def _btl_defines(self):
-        return ["CBLASNAME=" + self.libname, "BLAS_INTERFACE"]
+        return ["CBLASNAME="+self.libname, self.libname.upper()+"_INTERFACE"]

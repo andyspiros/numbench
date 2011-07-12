@@ -190,6 +190,8 @@ for tn,(name,test) in enumerate(tests.items(),1):
     
     # Test every implementation
     test['results'] = {}
+    if len(impls) == 0:
+        Print("No implementation found")
     for impl in impls:
         Print("Testing " + impl)
         Print.down()
