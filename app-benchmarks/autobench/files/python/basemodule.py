@@ -8,6 +8,7 @@ import basemodule
 from benchutils import mkdir, run_cmd
 from benchprint import Print
 import benchpkgconfig as pc
+from testdescr import testdescr
 
 try:
     import matplotlib.pyplot as plt
@@ -101,7 +102,7 @@ class BaseModule:
             plt.subplots_adjust(wspace=.4, hspace=.4)
             for i, test in enumerate(self.tests, 1):
                 plt.subplot(sprows, 2, i)
-                plt.title(test)
+                plt.title(testdescr[test])
                 for impl in newresults[test]:
                     x,y = np.loadtxt(newresults[test][impl], unpack=True)
                     plotf(x,y, label=impl, hold=True)
@@ -130,7 +131,7 @@ class BaseModule:
                 fname = pjoin(cfg.reportdir, test+".png")
                 plt.savefig(fname, format='png', bbox_inches='tight', \
                   transparent=True)
-                html.addFig(test, image=os.path.basename(fname))
+                html.addFig(testdescr[test], image=os.path.basename(fname))
                 Print('Figure ' + fname + ' saved')
         
         html.close()
