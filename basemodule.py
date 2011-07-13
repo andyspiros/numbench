@@ -12,9 +12,13 @@ import benchpkgconfig as pc
 from testdescr import testdescr
 
 try:
-    import matplotlib.pyplot as plt
-    import numpy as np
-    with_images = True
+    if not locals().has_key('initialized'):
+        initialized = True
+	import matplotlib
+	matplotlib.use('Agg')
+        import matplotlib.pyplot as plt
+        import numpy as np
+        with_images = True
 except ImportError:
     sys.stderr.write('Error: matplotlib and numpy are needed' + \
       'in order to generate the reports!\n')
