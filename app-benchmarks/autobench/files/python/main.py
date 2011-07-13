@@ -218,7 +218,7 @@ for tn,(name,test) in enumerate(cfg.tests.items(),1):
 # |-(name1, impl2) -> resultobject12
 # |-(name2, impl1) -> resultobject21        
 results = {}
-for (name,test) in tests.items():
+for (name,test) in cfg.tests.items():
     if test.has_key('implementations'):
         for impl in test['implementations']:
             results[(name, impl)] = test['results'][impl]
