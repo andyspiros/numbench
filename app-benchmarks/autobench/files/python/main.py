@@ -121,12 +121,12 @@ if not os.path.exists(cfg.inputfile):
     print_usage()
     exit(1)
 input = file(cfg.inputfile).read()
-tests = tests_from_input(input)
+cfg.tests = tests_from_input(input)
 
 # Write summary
 print 80*'='
 print "The following tests will be run:"
-for tname, ttest in tests.items():
+for tname, ttest in cfg.tests.items():
     print "Test: " + tname
     if ttest['descr'] is not None:
         print " - Description: " + ttest['descr']
@@ -145,7 +145,7 @@ for tname, ttest in tests.items():
 print 80*'='
 print
 
-for tn,(name,test) in enumerate(tests.items(),1):
+for tn,(name,test) in enumerate(cfg.tests.items(),1):
     Print._level = 0
     Print("BEGIN TEST %i - %s" % (tn, name))
     

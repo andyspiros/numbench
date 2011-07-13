@@ -66,7 +66,7 @@ def install_package(package, env={}, root='/', pkgdir='usr/portage/packages',
     p = sp.Popen( \
       ['emerge', '--ignore-default-opts', '-OB', '=' + pkg], \
       env = env, \
-      stdout = fout, stderr = fout \
+      stdout = fout, stderr = sp.STDOUT \
       )
     p.wait()
     if logfile is not None:
