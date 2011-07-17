@@ -38,14 +38,14 @@ extern "C" void cblas_saxpy(const int, const float, const float*, const int, flo
 using namespace std;
 
 template <template<class> class Perf_Analyzer, class Action>
-BTL_DONT_INLINE void bench( int size_min, int size_max, int nb_point )
+BTL_DONT_INLINE void bench( int size_min, int size_max, int nb_point, bool silent = false )
 {
   if (BtlConfig::skipAction(Action::name()))
     return;
 
   string filename="bench_"+Action::name()+".dat";
 
-  INFOS("starting " <<filename);
+  if (!silent) { INFOS("starting " <<filename); }
 
   // utilities
 
@@ -65,7 +65,8 @@ BTL_DONT_INLINE void bench( int size_min, int size_max, int nb_point )
   for (int i=nb_point-1;i>=0;i--)
   {
     //INFOS("size=" <<tab_sizes[i]<<"   ("<<nb_point-i<<"/"<<nb_point<<")");
-    std::cout << " " << "size = " << tab_sizes[i] << "  " << std::flush;
+    if (!silent)
+      std::cout << " " << "size = " << tab_sizes[i] << "  " << std::flush;
 
     BTL_DISABLE_SSE_EXCEPTIONS();
     #ifdef HAVE_MKL
@@ -75,14 +76,14 @@ BTL_DONT_INLINE void bench( int size_min, int size_max, int nb_point )
     }
     #endif
 
-    tab_mflops[i] = perf_action.eval_mflops(tab_sizes[i]);
-    std::cout << tab_mflops[i];
+    tab_mflops[i] = perf_action.eval_mflops(tab_sizes[i], silent);
+    if (!silent) std::cout << tab_mflops[i];
     
     if (hasOldResults)
     {
       while (oldi>=0 && oldSizes[oldi]>tab_sizes[i])
         --oldi;
-      if (oldi>=0 && oldSizes[oldi]==tab_sizes[i])
+      if (oldi>=0 && oldSizes[oldi]==tab_sizes[i] && !silent)
       {
         if (oldFlops[oldi]<tab_mflops[i])
           std::cout << "\t > ";
@@ -92,6 +93,7 @@ BTL_DONT_INLINE void bench( int size_min, int size_max, int nb_point )
       }
       --oldi;
     }
+    if (!silent)
     std::cout << " MFlops    (" << nb_point-i << "/" << nb_point << ")" << std::endl;
   }
 
@@ -144,17 +146,17 @@ BTL_DONT_INLINE void bench( int size_min, int size_max, int nb_point )
   }
 
   // dump the result in a file  :
-  dump_xy_file(tab_sizes,tab_mflops,filename);
+  if (!silent) dump_xy_file(tab_sizes,tab_mflops,filename);
 
 }
 
 // default Perf Analyzer
 
 template <class Action>
-BTL_DONT_INLINE void bench( int size_min, int size_max, int nb_point ){
+BTL_DONT_INLINE void bench( int size_min, int size_max, int nb_point, bool silent ){
 
   // if the rdtsc is not available :
-  bench<Portable_Perf_Analyzer,Action>(size_min,size_max,nb_point);
+  bench<Portable_Perf_Analyzer,Action>(size_min,size_max,nb_point,silent);
   // if the rdtsc is available :
 //    bench<Mixed_Perf_Analyzer,Action>(size_min,size_max,nb_point);
 
