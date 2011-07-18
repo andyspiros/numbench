@@ -27,6 +27,11 @@
 #include "init/init_vector.hh"
 #include "init/init_matrix.hh"
 
+#include <complex>
+extern "C" {
+#include "blas.h"
+}
+
 using namespace std;
 
 template<class Interface>
@@ -39,7 +44,7 @@ public :
   BTL_DONT_INLINE Action_parallel_matrix_vector_product( int size ):_size(size)
   {
     MESSAGE("Action_parallel_matrix_vector_product Ctor");
-    const int iZERO = 0, iONE = 1;
+    int iZERO = 0, iONE = 1;
 
     GlobalRows = _size;
     GlobalCols = _size;
@@ -59,6 +64,14 @@ public :
       init_vector<null_function>(Global_y_stl, GlobalRows);
 
       // Compute YTest (?)
+      Test_y_stl.resize(GlobalRows);
+      double alpha = 1., beta = 0.;
+      char notrans = 'N';
+      dgemv_(&notrans, &GlobalRows, &GlobalCols,
+          &alpha, &Global_A_stl[0], &GlobalRows,
+                  &Global_x_stl[0], &iONE,
+           &beta,   &Test_y_stl[0], &iONE
+      );
     }
 
     Interface::scatter_matrix(Global_A_stl, Local_A_stl, GlobalRows, GlobalCols, BlockRows, BlockCols,  LocalRows, LocalCols);
@@ -87,7 +100,6 @@ public :
   }
 
   // invalidate copy ctor
-
   Action_parallel_matrix_vector_product( const  Action_parallel_matrix_vector_product & )
   {
     INFOS("illegal call to Action_parallel_matrix_vector_product Copy Ctor");
@@ -95,7 +107,6 @@ public :
   }
 
   // Dtor
-
   BTL_DONT_INLINE ~Action_parallel_matrix_vector_product( void ){
 
     MESSAGE("Action_parallel_matrix_vector_product Dtor");
@@ -113,7 +124,6 @@ public :
   }
 
   // action name
-
   static inline std::string name( void )
   {
     return "parallel_matrix_vector_" + Interface::name();
@@ -138,10 +148,21 @@ public :
   }
 
   BTL_DONT_INLINE void check_result( void ){
+    int iONE = 1;
+    double dmONE = -1.;
+    int GlobalYCols;
+    Interface::vector_to_stl(Local_y, Local_y_stl);
+
+    Interface::gather_matrix(Global_y_stl, Local_y_stl, GlobalRows, GlobalYCols, BlockRows, BlockCols, LocalYRows, LocalYCols);
 
     // calculation check
+    if (iamroot) {
+      daxpy_(&GlobalRows, &dmONE, &Global_y_stl[0], &iONE, &Test_y_stl[0], &iONE);
+      double nrm = dnrm2_(&GlobalRows, &Test_y_stl[0], &iONE);
 
-    // TODO
+      if (nrm > 1e-5)
+        std::cerr << "Error: " << nrm << std::endl;
+    }
 
   }
 
@@ -150,6 +171,7 @@ private :
   typename Interface::stl_matrix Global_A_stl;
   typename Interface::stl_vector Global_x_stl;
   typename Interface::stl_vector Global_y_stl;
+  typename Interface::stl_vector Test_y_stl;
 
   typename Interface::stl_matrix Local_A_stl;
   typename Interface::stl_vector Local_x_stl;

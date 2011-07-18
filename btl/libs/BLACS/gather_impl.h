@@ -55,9 +55,7 @@ inline void gather(
     minfo[0] = LocalRows; minfo[1] = LocalCols;
     igsum2d_(&context, "Col", " ", &iONE, &iONE, minfo, &iONE, &imONE, &imONE);
     igsum2d_(&context, "Row", " ", &iONE, &iONE, minfo+1, &iONE, &imONE, &imONE);
-    if(iamroot) {
-    	GlobalRows = minfo[0]; GlobalCols = minfo[1];
-    }
+    GlobalRows = minfo[0]; GlobalCols = minfo[1];
 
     
     /* Reserve space on root */
