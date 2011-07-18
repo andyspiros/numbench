@@ -3,7 +3,7 @@
 #include "bench.hh"
 
 #include <iostream>
-using namespace std;
+//using namespace std;
 
 #include "pblas_interface.hh"
 #include "action_parallel_matrix_vector_product.hh"
@@ -22,7 +22,7 @@ int main(int argc, char **argv)
   blacs_gridinit_(&context, "Row-major", &procrows, &proccols);
   bool iamroot = (myid == 0);
 
-  bench<Action_parallel_matrix_vector_product<pblas_interface<REAL_TYPE> > >(MIN_MV,MAX_MV,NB_POINT,!iamroot);
+  distr_bench<Action_parallel_matrix_vector_product<pblas_interface<REAL_TYPE> > >(10,MAX_MV,NB_POINT,!iamroot);
 
 //  blacs_exit_(&iZERO);
   MPI_Finalize();

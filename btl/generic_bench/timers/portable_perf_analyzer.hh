@@ -42,12 +42,8 @@ public:
   {
     Action action(size);
 
-//     action.initialize();
-//     time_action = time_calculate(action);
-    while (m_time_action < MIN_TIME)
-    {
-      if(_nb_calc==0) _nb_calc = 1;
-      else            _nb_calc *= 2;
+    while (m_time_action < MIN_TIME) {
+      _nb_calc = _nb_calc ? 2*_nb_calc : 1;
       action.initialize();
       m_time_action = time_calculate(action);
     }
@@ -79,7 +75,7 @@ public:
     // time measurement
     action.calculate();
     _chronos.start();
-    for (int ii=0;ii<_nb_calc;ii++)
+    for (int ii=0; ii<_nb_calc; ii++)
     {
       action.calculate();
     }

@@ -22,6 +22,7 @@
 #include "utilities.h"
 #include "STL_interface.hh"
 #include <string>
+#include <algorithm>
 #include "init/init_function.hh"
 #include "init/init_vector.hh"
 #include "init/init_matrix.hh"
@@ -76,9 +77,13 @@ public :
     // Descinit
     int context = Interface::context();
     int info;
-    descinit_(descA, &GlobalRows, &GlobalCols, &BlockRows, &BlockCols, &iZERO, &iZERO, &context,  &LocalRows, &info);
-    descinit_(descX, &GlobalCols,       &iONE, &BlockRows, &BlockCols, &iZERO, &iZERO, &context, &LocalXRows, &info);
-    descinit_(descY, &GlobalRows,       &iONE, &BlockRows, &BlockCols, &iZERO, &iZERO, &context, &LocalYRows, &info);
+    int LDA, LDX, LDY;
+    LDA = std::max(1, LocalRows);
+    LDX = std::max(1, LocalXRows);
+    LDY = std::max(1, LocalYRows);
+    descinit_(descA, &GlobalRows, &GlobalCols, &BlockRows, &BlockCols, &iZERO, &iZERO, &context, &LDA, &info);
+    descinit_(descX, &GlobalCols,       &iONE, &BlockRows, &BlockCols, &iZERO, &iZERO, &context, &LDX, &info);
+    descinit_(descY, &GlobalRows,       &iONE, &BlockRows, &BlockCols, &iZERO, &iZERO, &context, &LDY, &info);
   }
 
   // invalidate copy ctor
