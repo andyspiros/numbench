@@ -1,24 +1,5 @@
-//=====================================================
-// File   :  action_matrix_vector_product.hh
-// Author :  L. Plagne <laurent.plagne@edf.fr)>
-// Copyright (C) EDF R&D,  lun sep 30 14:23:19 CEST 2002
-//=====================================================
-//
-// This program is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public License
-// as published by the Free Software Foundation; either version 2
-// of the License, or (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-// You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-//
-#ifndef ACTION_MATRIX_VECTOR_PRODUCT
-#define ACTION_MATRIX_VECTOR_PRODUCT
+#ifndef ACTION_PARALLEL_MATRIX_VECTOR_PRODUCT
+#define ACTION_PARALLEL_MATRIX_VECTOR_PRODUCT
 #include "utilities.h"
 #include "STL_interface.hh"
 #include <string>
@@ -27,10 +8,7 @@
 #include "init/init_vector.hh"
 #include "init/init_matrix.hh"
 
-#include <complex>
-extern "C" {
 #include "blas.h"
-}
 
 using namespace std;
 
@@ -62,16 +40,6 @@ public :
       init_vector<pseudo_random>(Global_A_stl, GlobalRows*GlobalCols);
       init_vector<pseudo_random>(Global_x_stl, GlobalCols);
       init_vector<null_function>(Global_y_stl, GlobalRows);
-
-      // Compute YTest (?)
-      Test_y_stl.resize(GlobalRows);
-      double alpha = 1., beta = 0.;
-      char notrans = 'N';
-      dgemv_(&notrans, &GlobalRows, &GlobalCols,
-          &alpha, &Global_A_stl[0], &GlobalRows,
-                  &Global_x_stl[0], &iONE,
-           &beta,   &Test_y_stl[0], &iONE
-      );
     }
 
     Interface::scatter_matrix(Global_A_stl, Local_A_stl, GlobalRows, GlobalCols, BlockRows, BlockCols,  LocalRows, LocalCols);
@@ -113,11 +81,11 @@ public :
 
     // deallocation
 
-    Interface::free_matrix(Local_A_ref, GlobalRows*GlobalCols);;
+    Interface::free_matrix(Local_A_ref, GlobalRows*GlobalCols);
     Interface::free_vector(Local_x_ref);
     Interface::free_vector(Local_y_ref);
 
-    Interface::free_matrix(Local_A, GlobalRows*GlobalCols);;
+    Interface::free_matrix(Local_A, GlobalRows*GlobalCols);
     Interface::free_vector(Local_x);
     Interface::free_vector(Local_y);
 
@@ -126,7 +94,7 @@ public :
   // action name
   static inline std::string name( void )
   {
-    return "parallel_matrix_vector_" + Interface::name();
+    return "matrix_vector_" + Interface::name();
   }
 
   double nb_op_base( void ){
@@ -134,11 +102,9 @@ public :
   }
 
   BTL_DONT_INLINE  void initialize( void ){
-
     Interface::copy_matrix(Local_A_ref,Local_A,LocalRows*LocalCols);
     Interface::copy_vector(Local_x_ref,Local_x,LocalXRows*LocalXCols);
     Interface::copy_vector(Local_y_ref,Local_y,LocalYRows*LocalYCols);
-
   }
 
   BTL_DONT_INLINE void calculate( void ) {
@@ -148,8 +114,6 @@ public :
   }
 
   BTL_DONT_INLINE void check_result( void ){
-    int iONE = 1;
-    double dmONE = -1.;
     int GlobalYCols;
     Interface::vector_to_stl(Local_y, Local_y_stl);
 
@@ -157,11 +121,16 @@ public :
 
     // calculation check
     if (iamroot) {
-      daxpy_(&GlobalRows, &dmONE, &Global_y_stl[0], &iONE, &Test_y_stl[0], &iONE);
-      double nrm = dnrm2_(&GlobalRows, &Test_y_stl[0], &iONE);
 
-      if (nrm > 1e-5)
-        std::cerr << "Error: " << nrm << std::endl;
+      // Compute YTest
+      Test_y_stl.resize(GlobalRows);
+      STL_interface<typename Interface::real_type>::matrix_vector_product(Global_A_stl, Global_x_stl, Test_y_stl, _size);
+
+      typename Interface::real_type error =
+            STL_interface<typename Interface::real_type>::norm_diff(Global_y_stl, Test_y_stl);
+
+      if (error > 1e-5)
+        std::cerr << "Error: " << error << std::endl;
     }
 
   }
@@ -194,6 +163,3 @@ private :
 
 
 #endif
-
-
-

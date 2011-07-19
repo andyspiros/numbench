@@ -10,6 +10,19 @@ public:
     return MAKE_STRING(PBLASNAME);
   }
 
+  static inline void parallel_axpy(const SCALAR& coef,
+      gene_vector& x, int *descX,
+      gene_vector& y, int *descY,
+      const int& size
+      )
+  {
+    int iZERO = 0, iONE = 1;
+    PBLAS_FUNC(axpy)(&size, &coef,
+        x, &iONE, &iONE, descX, &iONE,
+        y, &iONE, &iONE, descY, &iONE
+    );
+  }
+
   static inline void parallel_matrix_vector_product(
       int GlobalRows, int GlobalCols,
       gene_matrix& A, int *descA,

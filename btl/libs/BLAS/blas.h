@@ -11,6 +11,10 @@ typedef long BLASLONG;
 typedef unsigned long BLASULONG;
 #endif
 
+#include <complex>
+
+extern "C" {
+
 int    BLASFUNC(xerbla)(const char *, int *info, int);
 
 float  BLASFUNC(sdot)  (int *, float  *, int *, float  *, int *);
@@ -671,5 +675,7 @@ int BLASFUNC(qpotri)(char *, int *, double *, int *, int *);
 int BLASFUNC(cpotri)(char *, int *, float  *, int *, int *);
 int BLASFUNC(zpotri)(char *, int *, double *, int *, int *);
 int BLASFUNC(xpotri)(char *, int *, double *, int *, int *);
+
+}
 
 #endif

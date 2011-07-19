@@ -2,11 +2,6 @@
 #define CAT_(x,y) x##y
 #define CAT(x,y) CAT_(x,y)
 
-#ifndef TYPENAME
-#  define TYPENAME double
-#  define TYPEPREFIX d
-#endif
-
 #define FUNCNAME(name) CAT(CAT(TYPEPREFIX, name),_)
 #define vector_t std::vector<TYPENAME>
 
@@ -33,8 +28,8 @@ inline void gather(
     blacs_pinfo_(&myid, &procnum);
     blacs_gridinfo_(&context, &procrows, &proccols, &myrow, &mycol);
     bool iamroot = (myrow == rootrow && mycol == rootcol);
-    double *GlobalMatrix;
-    const double *LocalMatrix = &LocalMatrixVector[0];
+    TYPENAME *GlobalMatrix;
+    const TYPENAME *LocalMatrix = &LocalMatrixVector[0];
 
     /* Broadcast matrix info */
     int binfo[2];

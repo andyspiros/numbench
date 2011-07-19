@@ -1,11 +1,6 @@
 #define CAT_(x,y) x##y
 #define CAT(x,y) CAT_(x,y)
 
-//#ifndef TYPENAME
-//#  define TYPENAME double
-//#  define TYPEPREFIX d
-//#endif
-
 #define FUNCNAME(name) CAT(CAT(TYPEPREFIX, name),_)
 #define vector_t std::vector<TYPENAME>
 

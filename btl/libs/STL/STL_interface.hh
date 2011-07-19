@@ -133,6 +133,17 @@ public :
     }
   }
 
+  static inline void matrix_vector_product(gene_vector& A, gene_vector & B, gene_vector & X, int N)
+  {
+    real somme;
+    for (int i=0;i<N;i++){
+      somme=0.0;
+      for (int j=0;j<N;j++)
+        somme+=A[j*N+i]*B[j];
+      X[i]=somme;
+    }
+  }
+
   static inline void symv(gene_matrix & A, gene_vector & B, gene_vector & X, int N)
   {
     for (int j=0; j<N; ++j)
