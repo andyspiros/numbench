@@ -29,8 +29,12 @@
 #include <vector>
 #include <string>
 #include "timers/portable_perf_analyzer.hh"
+
+#ifdef DISTRIBUTED
 #include "timers/distributed_perf_analyzer_root.hh"
 #include "timers/distributed_perf_analyzer_node.hh"
+#endif
+
 // #include "timers/mixed_perf_analyzer.hh"
 // #include "timers/x86_perf_analyzer.hh"
 // #include "timers/STL_perf_analyzer.hh"
@@ -80,6 +84,7 @@ BTL_DONT_INLINE void bench( int size_min, int size_max, int nb_point, bool silen
   bench<Portable_Perf_Analyzer,Action>(size_min,size_max,nb_point,silent);
 }
 
+#ifdef DISTRIBUTED
 // distributed Perf Analyzer
 
 template <class Action>
@@ -92,5 +97,6 @@ BTL_DONT_INLINE void distr_bench( int size_min, int size_max, int nb_point, bool
   else
     bench<Distributed_Perf_Analyzer_Root, Action>(size_min, size_max, nb_point, silent);
 }
+#endif
 
 #endif

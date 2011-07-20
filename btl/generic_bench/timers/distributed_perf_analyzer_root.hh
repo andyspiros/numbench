@@ -45,14 +45,14 @@ public:
     for (int i = 1; i < tries; ++i) {
       Action _action(size);
       if (!silent)
-        std::cout << " " << _action.nb_op_base()*_nb_calc/(m_time_action*1e6) << " ";
+        std::cout << " " << _action.nb_op_base()*_nb_calc/(m_time_action*1e6) << " " << std::flush;
       _action.initialize();
       m_time_action = std::min(m_time_action, time_calculate(_action));
     }
     double time_action = m_time_action / (double(_nb_calc));
 
     /* Check */
-    int do_check = (BtlConfig::Instance.checkResults && size<128) ? 1 : 1;
+    int do_check = (BtlConfig::Instance.checkResults && size<128) ? 1 : 0;
     igebs2d_(&context, "A", " ", &iONE, &iONE, &do_check, &iONE);
     if (do_check > 0) {
       action.initialize();

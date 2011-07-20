@@ -5,7 +5,10 @@ class Module(btlbase.BTLBase):
         self.libname = "fftw"
         self.avail = (
           "FFTW_1D_Forward_Measure", "FFTW_1D_Forward_Estimate",
-          "FFTW_1D_Backward_Measure", "FFTW_1D_Backward_Estimate"
+          "FFTW_1D_Backward_Measure", "FFTW_1D_Backward_Estimate",
+          
+          "FFTW_2D_Forward_Measure", "FFTW_2D_Forward_Estimate",
+          "FFTW_2D_Backward_Measure", "FFTW_2D_Backward_Estimate"
         )
     
     def _parse_args(self, args):     
