@@ -54,5 +54,15 @@ public:
     PBLAS_FUNC(getrf)(&GlobalRows, &GlobalCols, X, &iONE, &iONE, desc,
         &ipiv[0], &info);
   }
+
+  static inline void parallel_cholesky(gene_matrix& X, const int* desc)
+  {
+    const int N = desc[2], iONE = 1;
+    const char UPLO = 'U';
+    int info;
+    PBLAS_FUNC(potrf)(&UPLO, &N, X, &iONE, &iONE, desc, &info);
+//    if (info != 0)
+//      cerr << " { cholesky error : " << info << " } ";
+  }
 };
 

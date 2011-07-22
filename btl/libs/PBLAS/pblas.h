@@ -46,8 +46,13 @@ extern "C" {
   /*************
    * Scalapack *
    *************/
+  // lu_decomp
   void psgetrf_(const int*, const int*,  float*, const int*, const int*, const int*, int*, int*);
   void pdgetrf_(const int*, const int*, double*, const int*, const int*, const int*, int*, int*);
+
+  // cholesky
+  void pspotrf_(const char*, const int*,  float*, const int*, const int*, const int*, int*);
+  void pdpotrf_(const char*, const int*, double*, const int*, const int*, const int*, int*);
 
 
 #ifdef __cplusplus
