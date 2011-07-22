@@ -10,8 +10,6 @@
 
 #include "blas.h"
 
-using namespace std;
-
 template<class Interface>
 class Action_parallel_matrix_vector_product {
 
@@ -42,9 +40,9 @@ public :
       init_vector<null_function>(Global_y_stl, GlobalRows);
     }
 
-    Interface::scatter_matrix(Global_A_stl, Local_A_stl, GlobalRows, GlobalCols, BlockRows, BlockCols,  LocalRows, LocalCols);
-    Interface::scatter_matrix(Global_x_stl, Local_x_stl, GlobalCols, LocalXCols, BlockRows, BlockCols, LocalXRows, LocalXCols);
-    Interface::scatter_matrix(Global_y_stl, Local_y_stl, GlobalRows, LocalYCols, BlockRows, BlockCols, LocalYRows, LocalYCols);
+    Interface::scatter_matrix(Global_A_stl, Local_A_stl, descA, GlobalRows, GlobalCols, BlockRows, BlockCols);
+    Interface::scatter_matrix(Global_x_stl, Local_x_stl, descX, GlobalCols, 1, BlockRows, BlockCols);
+    Interface::scatter_matrix(Global_y_stl, Local_y_stl, descY, GlobalRows, 1, BlockRows, BlockCols);
 
     // generic local matrix and vectors initialization
 
@@ -54,17 +52,6 @@ public :
     Interface::vector_from_stl(Local_x    , Local_x_stl);
     Interface::vector_from_stl(Local_y_ref, Local_y_stl);
     Interface::vector_from_stl(Local_y    , Local_y_stl);
-
-    // Descinit
-    int context = Interface::context();
-    int info;
-    int LDA, LDX, LDY;
-    LDA = std::max(1, LocalRows);
-    LDX = std::max(1, LocalXRows);
-    LDY = std::max(1, LocalYRows);
-    descinit_(descA, &GlobalRows, &GlobalCols, &BlockRows, &BlockCols, &iZERO, &iZERO, &context, &LDA, &info);
-    descinit_(descX, &GlobalCols,       &iONE, &BlockRows, &BlockCols, &iZERO, &iZERO, &context, &LDX, &info);
-    descinit_(descY, &GlobalRows,       &iONE, &BlockRows, &BlockCols, &iZERO, &iZERO, &context, &LDY, &info);
   }
 
   // invalidate copy ctor

@@ -33,6 +33,7 @@ public:
     real_type alpha = 1., beta = 0.;
     int iONE = 1;
     int myid, procnum;
+    const char notrans = 'N';
     blacs_pinfo_(&myid, &procnum);
 
     PBLAS_FUNC(gemv)(&notrans, &GlobalRows, &GlobalCols,
@@ -41,6 +42,17 @@ public:
          &beta, y, &iONE, &iONE, descY, &iONE
     );
 
+  }
+
+
+  static inline void parallel_lu_decomp(gene_matrix& X, const int* desc)
+  {
+    const int GlobalRows = desc[2], GlobalCols = desc[3];
+    const int iONE = 1;
+    int info;
+    std::vector<int> ipiv(desc[8] + desc[4]);
+    PBLAS_FUNC(getrf)(&GlobalRows, &GlobalCols, X, &iONE, &iONE, desc,
+        &ipiv[0], &info);
   }
 };
 

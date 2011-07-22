@@ -1,3 +1,6 @@
+#ifndef LAPACK_INTERFACE_HH
+#define LAPACK_INTERFACE_HH
+
 #include <../BLAS/c_interface_base.h>
 #include <complex>
 
@@ -24,8 +27,10 @@ void dsyev_(char*, char*, int*, double*, int*, double*, double*, int*, int*);
 #define MAKE_STRING2(S) #S
 #define MAKE_STRING(S) MAKE_STRING2(S)
 
-#define CAT2(A,B) A##B
-#define CAT(A,B) CAT2(A,B)
+#ifndef CAT
+#  define CAT2(A,B) A##B
+#  define CAT(A,B) CAT2(A,B)
+#endif
 
 template <typename real> class lapack_interface;
 
@@ -51,3 +56,5 @@ static int zeroint = 0;
 #include "lapack_interface_impl.hh"
 #undef SCALAR
 #undef SCALAR_PREFIX
+
+#endif /* LAPACK_INTERFACE_HH */

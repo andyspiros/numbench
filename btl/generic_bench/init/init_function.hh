@@ -32,7 +32,7 @@ double simple_function(int index_i, int index_j)
 
 double pseudo_random(int index)
 {
-  return std::rand()/double(RAND_MAX);
+  return static_cast<int>((std::rand()/double(RAND_MAX)-.5)*20);
 }
 
 double pseudo_random(int index_i, int index_j)

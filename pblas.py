@@ -5,7 +5,7 @@ numproc = 4
 class Module(btlbase.BTLBase):
     def _initialize(self):
         self.libname = "scalapack"
-        self.avail = ['axpy', 'matrix_vector']
+        self.avail = ['axpy', 'matrix_vector', 'lu_decomp']
     
     def _parse_args(self, args):     
         # Parse arguments

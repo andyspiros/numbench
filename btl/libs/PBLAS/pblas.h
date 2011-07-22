@@ -6,7 +6,7 @@ extern "C" {
 #endif
 
   int numroc_(const int*, const int*, const int*, const int*, const int*);
-  int descinit_(const int*, const int*, const int*, const int*, const int*, const int*, const int*, const int*, const int*, int*);
+  void descinit_(int*, const int*, const int*, const int*, const int*, const int*, const int*, const int*, const int*, int*);
 
 
   /* Level 1 */
@@ -40,6 +40,14 @@ extern "C" {
                    const double*, const int*, const int*, const int*, const int*,
     const double*,       double*, const int*, const int*, const int*, const int*
   );
+
+
+
+  /*************
+   * Scalapack *
+   *************/
+  void psgetrf_(const int*, const int*,  float*, const int*, const int*, const int*, int*, int*);
+  void pdgetrf_(const int*, const int*, double*, const int*, const int*, const int*, int*, int*);
 
 
 #ifdef __cplusplus

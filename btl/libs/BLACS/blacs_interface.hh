@@ -2,7 +2,13 @@
 #define BTL_BLACS_INTERFACE_H
 
 #include <vector>
+#include <algorithm>
 #include "blacs.h"
+extern "C" {
+  void descinit_(int*, const int*, const int*, const int*, const int*, const int*, const int*, const int*, const int*, int*);
+  int numroc_(const int*, const int*, const int*, const int*, const int*);
+}
+
 #include "scatter.h"
 #include "gather.h"
 
@@ -80,12 +86,43 @@ public:
     scatter(context(), GlobalMatrix, LocalMatrix, GlobalRows, GlobalCols, BlockRows, BlockCols, LocalRows, LocalCols);
   }
 
+  static void scatter_matrix(const stl_vector& GlobalMatrix, stl_vector& LocalMatrix,
+      int *desc,
+      const int& GlobalRows=0, const int& GlobalCols=0,
+      const int& BlockRows=0, const int& BlockCols=0
+  ) {
+    int GlobalRows_ = GlobalRows, GlobalCols_ = GlobalCols,
+        BlockRows_ = BlockRows, BlockCols_ = BlockCols,
+        LocalRows_, LocalCols_;
+    const int ctxt = context();
+    scatter(ctxt, GlobalMatrix, LocalMatrix,
+        GlobalRows_, GlobalCols_, BlockRows_, BlockCols_, LocalRows_, LocalCols_
+    );
+
+    const int iZERO = 0;
+    int info;
+    const int LLD = std::max(1, LocalRows_);
+    descinit_(desc, &GlobalRows_, &GlobalCols_, &BlockRows_, &BlockCols_,
+        &iZERO, &iZERO, &ctxt, &LLD, &info
+    );
+  }
+
   static void gather_matrix(stl_vector& GlobalMatrix, const stl_vector& LocalMatrix,
       int& GlobalRows, int& GlobalCols,
       int&  BlockRows, int&  BlockCols,
       int&  LocalRows, int&  LocalCols
   ) {
     gather(context(), GlobalMatrix, LocalMatrix, GlobalRows, GlobalCols, BlockRows, BlockCols, LocalRows, LocalCols);
+  }
+
+  static void gather_matrix(stl_vector& GlobalMatrix, const stl_vector& LocalMatrix,
+      int* desc
+  ) {
+    int GlobalRows = desc[2], GlobalCols = desc[3],
+        BlockRows = desc[4], BlockCols = desc[5],
+        LocalRows = desc[8], LocalCols = LocalMatrix.size()/desc[8];
+    const int ctxt = context();
+    gather(ctxt, GlobalMatrix, LocalMatrix, GlobalRows, GlobalCols, BlockRows, BlockCols, LocalRows, LocalCols);
   }
 
 
