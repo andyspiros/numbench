@@ -29,7 +29,8 @@ public :
       init_vector<pseudo_random>(Global_A_stl, size*size);
     }
 
-    Interface::scatter_matrix(Global_A_stl, Local_A_stl, desc, size, size, 64, 64);
+    const int blocksize = std::max(std::min(size/4, 64), 2);
+    Interface::scatter_matrix(Global_A_stl, Local_A_stl, desc, size, size, blocksize, blocksize);
     LocalRows = desc[8];
     LocalCols = Local_A_stl.size()/desc[8];
 

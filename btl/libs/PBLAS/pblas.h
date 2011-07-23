@@ -54,6 +54,14 @@ extern "C" {
   void pspotrf_(const char*, const int*,  float*, const int*, const int*, const int*, int*);
   void pdpotrf_(const char*, const int*, double*, const int*, const int*, const int*, int*);
 
+  // qr_decomp
+  void psgeqpf_(const int*, const int*,  float*, const int*, const int*, const int*, int*,  float*,  float*, const int*, int*);
+  void pdgeqpf_(const int*, const int*, double*, const int*, const int*, const int*, int*, double*, double*, const int*, int*);
+
+  // symm_ev
+  void pssyevd_(const char*, const char*, const int*,  float*, const int*, const int*, const int*,  float*,  float*, const int*, const int*, const int*,  float*, const int*, int*, const int*, int*);
+  void pdsyevd_(const char*, const char*, const int*, double*, const int*, const int*, const int*, double*, double*, const int*, const int*, const int*, double*, const int*, int*, const int*, int*);
+
 
 #ifdef __cplusplus
 }

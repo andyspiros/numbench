@@ -1,5 +1,5 @@
-#ifndef ACTION_PARALLEL_CHOLESKY_HH_
-#define ACTION_PARALLEL_CHOLESKY_HH_
+#ifndef ACTION_PARALLEL_QR_DECOMP_HH_
+#define ACTION_PARALLEL_QR_DECOMP_HH_
 
 #include "utilities.h"
 #include "init/init_function.hh"
@@ -9,17 +9,17 @@
 #include "STL_interface.hh"
 
 #include <string>
+#include <algorithm>
 
 template<class Interface>
-class Action_parallel_cholesky {
-  typedef lapack_interface<typename Interface::real_type> LapackInterface;
+class Action_parallel_qr_decomp {
 
 public :
 
   // Constructor
-  BTL_DONT_INLINE Action_parallel_cholesky( int size ) : _size(size)
+  BTL_DONT_INLINE Action_parallel_qr_decomp( int size ) : _size(size)
   {
-    MESSAGE("Action_parallel_cholesky Ctor");
+    MESSAGE("Action_parallel_qr_decomp Ctor");
 
     int myid, procnum;
     blacs_pinfo_(&myid, &procnum);
@@ -27,16 +27,7 @@ public :
 
     // STL matrix and vector initialization
     if (iamroot) {
-        typename LapackInterface::stl_matrix temp_stl;
-        init_matrix_symm<pseudo_random>(temp_stl, size);
-        Global_A_stl.reserve(size*size);
-        const double add = 5000./size;
-        for (int r = 0; r < size; ++r)
-          for (int c = 0; c < size; ++c)
-            if (r==c)
-              Global_A_stl.push_back((std::abs(temp_stl[r][c])+add)*size);
-            else
-              Global_A_stl.push_back(temp_stl[r][c]);
+      init_vector<pseudo_random>(Global_A_stl, size*size);
     }
 
     const int blocksize = std::max(std::min(size/4, 64), 2);
@@ -48,25 +39,21 @@ public :
     Interface::matrix_from_stl(Local_A_ref, Local_A_stl);
     Interface::matrix_from_stl(Local_A    , Local_A_stl);
 
-    _cost = 0;
-    for (int j=0; j<_size; ++j) {
-      double r = std::max(_size - j -1,0);
-      _cost += 2*(r*j+r+j);
-    }
+    _cost = 2.0*size*size*size;
   }
 
 
   // Invalidate copy constructor
-  Action_parallel_cholesky(const Action_parallel_cholesky&)
+  Action_parallel_qr_decomp(const Action_parallel_qr_decomp&)
   {
-    INFOS("illegal call to Action_parallel_cholesky copy constructor");
+    INFOS("illegal call to Action_parallel_qr_decomp copy constructor");
     exit(1);
   }
 
   // Destructor
-  ~Action_parallel_cholesky()
+  ~Action_parallel_qr_decomp()
   {
-    MESSAGE("Action_parallel_cholesky destructor");
+    MESSAGE("Action_parallel_qr_decomp destructor");
 
     // Deallocation
     Interface::free_matrix(Local_A_ref, Local_A_stl.size());
@@ -76,7 +63,7 @@ public :
   // Action name
   static inline std::string name()
   {
-    return "cholesky_" + Interface::name();
+    return "qr_decomp_" + Interface::name();
   }
 
   double nb_op_base()
@@ -91,13 +78,12 @@ public :
 
   BTL_DONT_INLINE void calculate()
   {
-    Interface::parallel_cholesky(Local_A, desc);
+    Interface::parallel_qr_decomp(Local_A, desc);
   }
 
   BTL_DONT_INLINE void check_result()
   {
   }
-
 
 private:
   int _size, desc[9], LocalRows, LocalCols;
@@ -110,4 +96,5 @@ private:
   typename Interface::gene_matrix Local_A;
 };
 
-#endif /* ACTION_PARALLEL_CHOLESKY_HH_ */
+
+#endif /* ACTION_PARALLEL_QR_DECOMP_HH_ */

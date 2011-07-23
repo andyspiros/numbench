@@ -61,8 +61,58 @@ public:
     const char UPLO = 'U';
     int info;
     PBLAS_FUNC(potrf)(&UPLO, &N, X, &iONE, &iONE, desc, &info);
+    if (info != 0)
+      cerr << " { cholesky error : " << info << " } ";
+  }
+
+  static inline void parallel_qr_decomp(gene_matrix& X, const int* desc)
+  {
+    const int GlobalRows = desc[2], GlobalCols = desc[3],
+              BlockRows = desc[4], BlockCols = desc[5],
+              ctxt = desc[1];
+
+    int myrow, mycol, nprow, npcol, lwork;
+    SCALAR lworkd;
+    blacs_gridinfo_(&ctxt, &nprow, &npcol, &myrow, &mycol);
+
+    const int iONE = 1, iZERO = 0, imONE = -1,
+             ipivdim = numroc_(&GlobalCols, &BlockCols, &mycol, &iZERO, &npcol);
+    int info;
+    std::vector<int> ipiv(ipivdim);
+    std::vector<SCALAR> tau(ipivdim);
+
+    // Retrieve LWORK
+    PBLAS_FUNC(geqpf)(&GlobalRows, &GlobalCols, X, &iONE, &iONE, desc, &ipiv[0], &tau[0], &lworkd, &imONE, &info);
+    lwork = static_cast<int>(lworkd);
 //    if (info != 0)
-//      cerr << " { cholesky error : " << info << " } ";
+//      cerr << " { qr_decomp lwork error } ";
+
+    std::vector<SCALAR> work(lwork);
+    PBLAS_FUNC(geqpf)(&GlobalRows, &GlobalCols, X, &iONE, &iONE, desc, &ipiv[0], &tau[0], &work[0], &lwork, &info);
+//    if (info != 0)
+//      cerr << " { qr_decomp computation error } ";
+  }
+
+  static inline void parallel_symm_ev(gene_matrix& A, const int* descA, gene_vector& w, gene_matrix& Z, const int* descZ)
+  {
+    const char jobz = 'V', uplo = 'u';
+    const int N = descA[2], iONE = 1, iZERO = 0, imONE = -1;
+    std::vector<SCALAR> work;
+    std::vector<int> iwork;
+    int lwork, liwork, info;
+    SCALAR lworkd;
+
+    // Retrieve l(i)work
+    PBLAS_FUNC(syevd)(&jobz, &uplo, &N, A, &iONE, &iONE, descA, w,
+        Z, &iONE, &iONE, descZ, &lworkd, &imONE, &liwork, &imONE, &info);
+    lwork = static_cast<int>(lworkd);
+    work.resize(lwork); iwork.resize(liwork);
+//    if (info != 0)
+//      cerr << " { symm_ev l(i)work error } ";
+
+    PBLAS_FUNC(syevd)(&jobz, &uplo, &N, A, &iONE, &iONE, descA, w,
+        Z, &iONE, &iONE, descZ, &work[0], &lwork, &iwork[0], &liwork, &info);
+//    if (info != 0)
+//      cerr << " { symm_ev computation error } ";
   }
 };
-
