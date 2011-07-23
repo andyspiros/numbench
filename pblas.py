@@ -6,7 +6,7 @@ class Module(btlbase.BTLBase):
     def _initialize(self):
         self.libname = "scalapack"
         self.avail = ['axpy', 'matrix_vector', 'lu_decomp', 'cholesky',
-          'qr_decomp', 'symm_ev']
+          'qr_decomp', 'svd_decomp', 'symm_ev']
     
     def _parse_args(self, args):     
         # Parse arguments

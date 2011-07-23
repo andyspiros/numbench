@@ -58,6 +58,10 @@ extern "C" {
   void psgeqpf_(const int*, const int*,  float*, const int*, const int*, const int*, int*,  float*,  float*, const int*, int*);
   void pdgeqpf_(const int*, const int*, double*, const int*, const int*, const int*, int*, double*, double*, const int*, int*);
 
+  // svd_decomp
+  void psgesvd_(const char*, const char*, const int*, const int*,  float*, const int*, const int*, const int*,  float*,  float*, const int*, const int*, const int*,  float*, const int*, const int*, const int*,  float*, const int*, int*);
+  void pdgesvd_(const char*, const char*, const int*, const int*, double*, const int*, const int*, const int*, double*, double*, const int*, const int*, const int*, double*, const int*, const int*, const int*, double*, const int*, int*);
+
   // symm_ev
   void pssyevd_(const char*, const char*, const int*,  float*, const int*, const int*, const int*,  float*,  float*, const int*, const int*, const int*,  float*, const int*, int*, const int*, int*);
   void pdsyevd_(const char*, const char*, const int*, double*, const int*, const int*, const int*, double*, double*, const int*, const int*, const int*, double*, const int*, int*, const int*, int*);

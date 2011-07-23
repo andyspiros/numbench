@@ -53,6 +53,8 @@ public:
     std::vector<int> ipiv(desc[8] + desc[4]);
     PBLAS_FUNC(getrf)(&GlobalRows, &GlobalCols, X, &iONE, &iONE, desc,
         &ipiv[0], &info);
+//    if (info != 0)
+//      cerr << " { LU error : " << info << " } ";
   }
 
   static inline void parallel_cholesky(gene_matrix& X, const int* desc)
@@ -61,8 +63,8 @@ public:
     const char UPLO = 'U';
     int info;
     PBLAS_FUNC(potrf)(&UPLO, &N, X, &iONE, &iONE, desc, &info);
-    if (info != 0)
-      cerr << " { cholesky error : " << info << " } ";
+//    if (info != 0)
+//      cerr << " { cholesky error : " << info << " } ";
   }
 
   static inline void parallel_qr_decomp(gene_matrix& X, const int* desc)
@@ -114,5 +116,27 @@ public:
         Z, &iONE, &iONE, descZ, &work[0], &lwork, &iwork[0], &liwork, &info);
 //    if (info != 0)
 //      cerr << " { symm_ev computation error } ";
+  }
+
+  static inline void parallel_svd_decomp(gene_matrix& A, int* descA, gene_matrix& U, int *descU, gene_matrix& V, int *descV, gene_vector& s)
+  {
+    const char job = 'V';
+    const int size = descA[2], iONE = 1, iZERO = 0, imONE = -1;
+    std::vector<SCALAR> work;
+    int info, lwork;
+    SCALAR lworkd;
+
+    // Retrieve lwork
+    PBLAS_FUNC(gesvd)(&job, &job, &size, &size, A, &iONE, &iONE, descA, s,
+        U, &iONE, &iONE, descU, V, &iONE, &iONE, descV, &lworkd, &imONE, &info);
+//    if (info != 0)
+//      cerr << " { svd_decomp lwork error } ";
+    lwork = static_cast<int>(lworkd);
+    work.resize(lwork);
+
+    PBLAS_FUNC(gesvd)(&job, &job, &size, &size, A, &iONE, &iONE, descA, s,
+        U, &iONE, &iONE, descU, V, &iONE, &iONE, descV, &work[0], &lwork, &info);
+//    if (info != 0)
+//      cerr << " { svd_decomp computation error } ";
   }
 };

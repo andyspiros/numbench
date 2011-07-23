@@ -59,7 +59,7 @@ public :
   // Destructor
   ~Action_parallel_symm_ev()
   {
-    MESSAGE("Action_parallel_lu_decomp destructor");
+    MESSAGE("Action_parallel_symm_ev destructor");
 
     // Deallocation
     Interface::free_matrix(Local_A_ref, Local_A_stl.size());
@@ -118,4 +118,4 @@ private:
 };
 
 
-#endif /* ACTION_PARALLEL_LU_DECOMP_HH_ */
+#endif /* ACTION_PARALLEL_SYMM_EV_HH_ */
