@@ -52,7 +52,7 @@ public:
     double time_action = m_time_action / (double(_nb_calc));
 
     /* Check */
-    int do_check = (BtlConfig::Instance.checkResults && size<128) ? 1 : 0;
+    int do_check = (BtlConfig::Instance.checkResults && size<128) ? 1 : 1;
     igebs2d_(&context, "A", " ", &iONE, &iONE, &do_check, &iONE);
     if (do_check > 0) {
       action.initialize();
