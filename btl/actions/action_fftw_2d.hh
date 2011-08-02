@@ -41,7 +41,7 @@ public:
   Action_FFTW_2D_Forward_Estimate(const int& size) :
     Action_FFTW_base<Interface>(size, 2)
   {
-    Interface::fftw_init_plan(this->p, size, this->X, this->Y, FFTW_FORWARD, FFTW_ESTIMATE);
+    Interface::fftw_init_plan_2d(this->p, size, this->X, this->Y, FFTW_FORWARD, FFTW_ESTIMATE);
   }
 
   // Action name
@@ -66,7 +66,7 @@ public:
   Action_FFTW_2D_Backward_Measure(const int& size) :
     Action_FFTW_base<Interface>(size, 2)
   {
-    Interface::fftw_init_plan(this->p, size, this->X, this->Y, FFTW_BACKWARD, FFTW_MEASURE);
+    Interface::fftw_init_plan_2d(this->p, size, this->X, this->Y, FFTW_BACKWARD, FFTW_MEASURE);
   }
 
   // Action name
@@ -92,7 +92,7 @@ public:
   Action_FFTW_2D_Backward_Estimate(const int& size) :
     Action_FFTW_base<Interface>(size, 2)
   {
-    Interface::fftw_init_plan(this->p, size, this->X, this->Y, FFTW_BACKWARD, FFTW_ESTIMATE);
+    Interface::fftw_init_plan_2d(this->p, size, this->X, this->Y, FFTW_BACKWARD, FFTW_ESTIMATE);
   }
 
   // Action name

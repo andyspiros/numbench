@@ -58,6 +58,10 @@ public:
 		p = fftw_plan_dft_2d(N, N, x, y, sign, flags);
 	}
 
+        static inline void fftw_init_plan_3d(plan & p, const int & N, gene_vector & x, gene_vector& y, const int & sign, const int & flags){
+                p = fftw_plan_dft_2d(N, N, N, x, y, sign, flags);
+        }
+
 	static inline void fftw_run(plan & p){
 		fftw_execute(p);
 	}

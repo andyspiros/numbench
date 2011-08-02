@@ -63,7 +63,7 @@ class BTLTest(basemodule.BaseTest):
         self.compileenv['LD_LIBRARY_PATH'] = ':'.join(libdirs)
         self.runenv['LD_LIBRARY_PATH'] = ':'.join(libdirs)
         # PATH
-        envpath = ':'.join([pjoin(root, l) for l in ('bin', 'usr/bin')])
+        envpath = ':'.join([pjoin(self.root, l) for l in ('bin', 'usr/bin')])
         if (os.environ.has_key('PATH')):
             envpath += ':' + os.environ['PATH']
         self.compileenv['PATH'] = envpath
