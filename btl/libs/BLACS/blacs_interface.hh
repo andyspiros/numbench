@@ -76,6 +76,11 @@ public:
     blacs_get_(&ignored, &what, &ctxt);
     return ctxt;
   }
+  static int myid() {
+    int procnum, myid;
+    blacs_pinfo_(&myid, &procnum);
+    return myid;
+  }
 
 
   static void scatter_matrix(const stl_vector& GlobalMatrix, stl_vector& LocalMatrix,

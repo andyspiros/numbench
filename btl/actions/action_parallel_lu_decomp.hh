@@ -26,16 +26,17 @@ public :
 
     // STL matrix and vector initialization
     if (iamroot) {
-      init_vector<pseudo_random>(Global_A_stl, size*size);
+        /* Using a constant seed */
+        const unsigned seed = 3;
+        init_matrix(Global_A_stl, size, seed);
     }
 
     const int blocksize = std::max(std::min(size/4, 64), 2);
-    Interface::scatter_matrix(Global_A_stl, Local_A_stl, desc, size, size, blocksize, blocksize);
+    scatter_matrix(Global_A_stl, Local_A_stl, desc, size, size, blocksize, blocksize);
     LocalRows = desc[8];
     LocalCols = Local_A_stl.size()/desc[8];
 
     // Generic local matrix and vectors initialization
-    Interface::matrix_from_stl(Local_A_ref, Local_A_stl);
     Interface::matrix_from_stl(Local_A    , Local_A_stl);
 
     _cost = 2.0*size*size*size/3.0 + static_cast<double>(size*size);
@@ -55,7 +56,6 @@ public :
     MESSAGE("Action_parallel_lu_decomp destructor");
 
     // Deallocation
-    Interface::free_matrix(Local_A_ref, Local_A_stl.size());
     Interface::free_matrix(Local_A    , Local_A_stl.size());
   }
 
@@ -72,12 +72,12 @@ public :
 
   BTL_DONT_INLINE void initialize()
   {
-    Interface::copy_matrix(Local_A_ref, Local_A, Local_A_stl.size());
   }
 
   BTL_DONT_INLINE void calculate()
   {
-    Interface::parallel_lu_decomp(Local_A, desc);
+    Interface::copy_matrix(&Local_A_stl[0], Local_A, Local_A_stl.size());
+    Interface::parallel_lu_decomp(Local_A, ipiv_stl, desc);
   }
 
   BTL_DONT_INLINE void check_result()
@@ -100,6 +100,13 @@ public :
 //
 //      Interface::free_matrix(A, _size*_size);
 //    }
+
+
+//    if (_size > 2) {
+//      double error = Interface::test_LU(Global_A_stl, Local_A, desc);
+//      if (iamroot)
+//        cout << " {error: " << error << "} ";
+//    }
   }
 
 private:
@@ -109,8 +116,9 @@ private:
 
   typename Interface::stl_matrix Global_A_stl;
   typename Interface::stl_matrix Local_A_stl;
-  typename Interface::gene_matrix Local_A_ref;
   typename Interface::gene_matrix Local_A;
+
+  std::vector<int> ipiv_stl;
 };
 
 

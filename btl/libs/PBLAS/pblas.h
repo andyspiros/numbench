@@ -42,6 +42,19 @@ extern "C" {
   );
 
 
+  /* Level 3 */
+
+  // Single
+  void pstrmm_(const char*, const char*, const char*, const char*, const int*, const int*, const  float*,
+      const  float*, const int*, const int*, const int*,
+             float*, const int*, const int*, const int*);
+
+  // Double
+  void pdtrmm_(const char*, const char*, const char*, const char*, const int*, const int*, const double*,
+      const double*, const int*, const int*, const int*,
+            double*, const int*, const int*, const int*);
+
+
 
   /*************
    * Scalapack *

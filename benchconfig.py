@@ -1,6 +1,7 @@
 import sys, os, time
 import subprocess as sp
-from benchutils import *
+#from benchutils import mkdir
+import benchutils as bu
 
 try:
     needsinitialization = not initialized
@@ -68,11 +69,11 @@ if needsinitialization:
     del logdirb
     
 def makedirs():
-    mkdir(rootsdir)
-    mkdir(testsdir)
-    mkdir(pkgsdir)
-    mkdir(reportdir)
-    mkdir(logdir)
+    bu.mkdir(rootsdir)
+    bu.mkdir(testsdir)
+    bu.mkdir(pkgsdir)
+    bu.mkdir(reportdir)
+    bu.mkdir(logdir)
     
     
     

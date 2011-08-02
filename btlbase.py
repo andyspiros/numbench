@@ -22,11 +22,9 @@ class BTLBase(basemodule.BaseModule):
     
 class BTLTest(basemodule.BaseTest):
     
-    compileenv = {}
-    runenv = {}
-    
     def _compileTest(self):
         self.compileenv = {}
+        self.runenv = {}
         
         # Includes
         includes = [pjoin(cfg.btldir, i) for i in \
@@ -64,6 +62,12 @@ class BTLTest(basemodule.BaseTest):
         self.compileenv['LIBRARY_PATH'] = ':'.join(libdirs)
         self.compileenv['LD_LIBRARY_PATH'] = ':'.join(libdirs)
         self.runenv['LD_LIBRARY_PATH'] = ':'.join(libdirs)
+        # PATH
+        envpath = ':'.join([pjoin(root, l) for l in ('bin', 'usr/bin')])
+        if (os.environ.has_key('PATH')):
+            envpath += ':' + os.environ['PATH']
+        self.compileenv['PATH'] = envpath
+        self.runenv['PATH'] = envpath
         
         exe = pjoin(self.testdir, "test")
     
@@ -105,13 +109,12 @@ class BTLTest(basemodule.BaseTest):
         # Open pipe
         logfile = file(pjoin(self.logdir, 'btlrun.log'), 'w')
         args = preargs + [exe] + list(self.tests)
-        logfile.write(' '.join([n+'='+v for n,v in self.runenv.items()]) + ' ')
+        logfile.write(' '.join( \
+          [n + '="'+v+'"' for n,v in self.runenv.items()]  ) + ' ')
         logfile.write(' '.join(args) + '\n')
         logfile.write(80*'-' + '\n')
         proc = sp.Popen(args, bufsize=1, stdout=sp.PIPE, stderr=sp.PIPE, 
-          #env=self.runenv,
-          env={'LD_LIBRARY_PATH' : self.runenv['LD_LIBRARY_PATH']},
-          cwd=self.testdir)
+          env=self.runenv, cwd=self.testdir)
         
         # Interpret output
         while True:
@@ -138,4 +141,5 @@ class BTLTest(basemodule.BaseTest):
             Print.up()
         logfile.close()
         proc.wait()
+        Print("Execution finished with return code " + str(proc.returncode))
         return proc.returncode

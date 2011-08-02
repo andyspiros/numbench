@@ -60,7 +60,7 @@ int main(int argc, char **argv)
   distr_bench<Action_parallel_lu_decomp<pblas_interface<REAL_TYPE> > >(MIN_MM,MAX_MM,NB_POINT, !iamroot);
 
   if (cholesky)
-  distr_bench<Action_parallel_cholesky<pblas_interface<REAL_TYPE> > >(MIN_MM,MAX_MM,NB_POINT, !iamroot);
+  distr_bench<Action_parallel_cholesky<pblas_interface<REAL_TYPE> > >(MIN_MM, MAX_MM, NB_POINT, !iamroot);
 
   if (qr_decomp)
   distr_bench<Action_parallel_qr_decomp<pblas_interface<REAL_TYPE> > >(MIN_MM,MAX_MM,NB_POINT, !iamroot);

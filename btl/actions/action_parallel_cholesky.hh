@@ -9,6 +9,8 @@
 #include "STL_interface.hh"
 
 #include <string>
+#include <sstream>
+#include <fstream>
 
 template<class Interface>
 class Action_parallel_cholesky {
@@ -27,25 +29,17 @@ public :
 
     // STL matrix and vector initialization
     if (iamroot) {
-        typename LapackInterface::stl_matrix temp_stl;
-        init_matrix_symm<pseudo_random>(temp_stl, size);
-        Global_A_stl.reserve(size*size);
-        const double add = 5000./size;
-        for (int r = 0; r < size; ++r)
-          for (int c = 0; c < size; ++c)
-            if (r==c)
-              Global_A_stl.push_back((std::abs(temp_stl[r][c])+add)*size);
-            else
-              Global_A_stl.push_back(temp_stl[r][c]);
+        /* Using a constant seed */
+        const unsigned seed = 3;
+        init_SPD_matrix(Global_A_stl, size, seed);
     }
 
     const int blocksize = std::max(std::min(size/4, 64), 2);
-    Interface::scatter_matrix(Global_A_stl, Local_A_stl, desc, size, size, blocksize, blocksize);
+    scatter_matrix(Global_A_stl, Local_A_stl, desc, size, size, blocksize, blocksize);
     LocalRows = desc[8];
     LocalCols = Local_A_stl.size()/desc[8];
 
     // Generic local matrix and vectors initialization
-    Interface::matrix_from_stl(Local_A_ref, Local_A_stl);
     Interface::matrix_from_stl(Local_A    , Local_A_stl);
 
     _cost = 0;
@@ -69,7 +63,6 @@ public :
     MESSAGE("Action_parallel_cholesky destructor");
 
     // Deallocation
-    Interface::free_matrix(Local_A_ref, Local_A_stl.size());
     Interface::free_matrix(Local_A    , Local_A_stl.size());
   }
 
@@ -86,16 +79,21 @@ public :
 
   BTL_DONT_INLINE void initialize()
   {
-    Interface::copy_matrix(Local_A_ref, Local_A, Local_A_stl.size());
   }
 
   BTL_DONT_INLINE void calculate()
   {
+    Interface::copy_matrix(&Local_A_stl[0], Local_A, Local_A_stl.size());
     Interface::parallel_cholesky(Local_A, desc);
   }
 
   BTL_DONT_INLINE void check_result()
   {
+    if (_size > 2) {
+      double error = Interface::test_cholesky(Global_A_stl, Local_A, desc);
+      if (iamroot)
+        cout << " {error: " << error << "} ";
+    }
   }
 
 
@@ -106,8 +104,10 @@ private:
 
   typename Interface::stl_matrix Global_A_stl;
   typename Interface::stl_matrix Local_A_stl;
-  typename Interface::gene_matrix Local_A_ref;
   typename Interface::gene_matrix Local_A;
+
+  typename Interface::stl_matrix Glotal_Test_stl;
+  typename Interface::stl_matrix Local_Test_stl;
 };
 
 #endif /* ACTION_PARALLEL_CHOLESKY_HH_ */

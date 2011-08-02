@@ -1,3 +1,4 @@
+#include "blas.h"
 #include "pblas.h"
 #include "blacs_interface.hh"
 

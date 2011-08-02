@@ -20,6 +20,8 @@
 #ifndef INIT_MATRIX_HH
 #define INIT_MATRIX_HH
 
+#include "LinearCongruential.hh"
+
 // The Vector class must satisfy the following part of STL vector concept :
 //            resize() method
 //            [] operator for setting element
@@ -58,6 +60,32 @@ BTL_DONT_INLINE void init_matrix_symm(Matrix&  A, int size){
       double x = init_function(row,col);
       A[row][col] = A[col][row] = x;
     }
+  }
+}
+
+template<class Matrix> BTL_DONT_INLINE
+void init_matrix(Matrix& A, const int& size, const unsigned& seed)
+{
+  typedef typename Matrix::value_type value_t;
+  A.resize(size*size);
+  LinearCongruential rng(seed);
+  for (typename Matrix::iterator i = A.begin(), end = A.end(); i != end; ++i)
+    *i = rng.get_01();
+}
+
+template<class Matrix> BTL_DONT_INLINE
+void init_SPD_matrix(Matrix& A, const int& size, const unsigned& seed)
+{
+  typedef typename Matrix::value_type value_t;
+  A.resize(size*size);
+  LinearCongruential rng(seed);
+  for (int r = 0; r < size; ++r) {
+      A[r+size*r] = rng.get_01() + size;
+      for (int c = r+1; c < size; ++c) {
+          const value_t v = rng.get_01();
+          A[r+size*c] = v;
+          A[c+size*r] = v;
+      }
   }
 }
 
