@@ -65,7 +65,7 @@ class BaseModule:
         t.files = self.files
         return t
     
-    def save_results(self, results, plottype='plot'):
+    def save_results(self, results, plottype='plot', ylabel="MFlops"):
         if not with_images:
             Print("Report generation skipped - missing libraries")
             return
@@ -119,7 +119,7 @@ class BaseModule:
                 if self.summary_only:
                     plt.legend(loc='best')
                 plt.xlabel('size')
-                plt.ylabel('MFlops')
+                plt.ylabel(ylabel)
                 plt.grid(True)
             fname = pjoin(cfg.reportdir, 'summary.png')
             plt.savefig(fname, format='png', bbox_inches='tight', \
@@ -136,7 +136,7 @@ class BaseModule:
                     plotf(x,y, label=impl, hold=True)
                 plt.legend(loc='best')
                 plt.xlabel('size')
-                plt.ylabel('MFlops')
+                plt.ylabel(ylabel)
                 plt.grid(True)
                 fname = pjoin(cfg.reportdir, test+".png")
                 plt.savefig(fname, format='png', bbox_inches='tight', \

@@ -3,6 +3,7 @@
 
 #include <../BLAS/c_interface_base.h>
 #include <complex>
+#include "lapack.hh"
 
 extern "C" {
 #include "../BLAS/blas.h"

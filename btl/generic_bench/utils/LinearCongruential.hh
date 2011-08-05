@@ -12,7 +12,7 @@ public:
   LinearCongruential(const int_t& seed) :
     a_(1664525u), c_(1013904223u), m_(getM()), i_(0)
   {
-    buffer_.resize(100);
+    buffer_.resize(4096/sizeof(unsigned));
     fillBuffer(seed);
   }
 

@@ -599,8 +599,8 @@ int BLASFUNC(cgetf2)(int *, int *, float  *, int *, int *, int *);
 int BLASFUNC(zgetf2)(int *, int *, double *, int *, int *, int *);
 int BLASFUNC(xgetf2)(int *, int *, double *, int *, int *, int *);
 
-int BLASFUNC(sgetrf)(int *, int *, float  *, int *, int *, int *);
-int BLASFUNC(dgetrf)(int *, int *, double *, int *, int *, int *);
+//int BLASFUNC(sgetrf)(int *, int *, float  *, int *, int *, int *);
+//int BLASFUNC(dgetrf)(int *, int *, double *, int *, int *, int *);
 int BLASFUNC(qgetrf)(int *, int *, double *, int *, int *, int *);
 int BLASFUNC(cgetrf)(int *, int *, float  *, int *, int *, int *);
 int BLASFUNC(zgetrf)(int *, int *, double *, int *, int *, int *);
@@ -634,8 +634,8 @@ int BLASFUNC(cpotf2)(char *, int *, float  *, int *, int *);
 int BLASFUNC(zpotf2)(char *, int *, double *, int *, int *);
 int BLASFUNC(xpotf2)(char *, int *, double *, int *, int *);
 
-int BLASFUNC(spotrf)(char *, int *, float  *, int *, int *);
-int BLASFUNC(dpotrf)(char *, int *, double *, int *, int *);
+//int BLASFUNC(spotrf)(char *, int *, float  *, int *, int *);
+//int BLASFUNC(dpotrf)(char *, int *, double *, int *, int *);
 int BLASFUNC(qpotrf)(char *, int *, double *, int *, int *);
 int BLASFUNC(cpotrf)(char *, int *, float  *, int *, int *);
 int BLASFUNC(zpotrf)(char *, int *, double *, int *, int *);

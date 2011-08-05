@@ -19,6 +19,8 @@ testdescr = {
 'least_squares': 'Least squares solution',
 'lu_decomp': 'LU-decomposition',
 'cholesky': 'Cholesky decomposition',
+'svd_decomp': 'SVD-decomposition',
+'qr_decomp': 'QR-decomposition',
 'symm_ev': 'Symmetric Eigenvalue computation',
 
 # FFTW
