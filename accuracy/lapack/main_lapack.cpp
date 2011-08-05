@@ -29,7 +29,7 @@ extern "C" {
 template<typename exec_t>
 void test(exec_t exec, const std::string& testname, const int& max = 3000, const int& N = 100)
 {
-  static vector<int> sizes = logsizes(1, max, N);
+  vector<int> sizes = logsizes(1, max, N);
   Timer timer;
 
   ostringstream fname;

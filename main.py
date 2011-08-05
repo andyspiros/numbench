@@ -108,6 +108,8 @@ cfg.tests = tests_from_input(input)
 # Write summary
 print 80*'='
 print "The following tests will be run:"
+print "-------------------------------"
+print
 for tname, ttest in cfg.tests.items():
     print "Test: " + tname
     if ttest['descr'] is not None:
