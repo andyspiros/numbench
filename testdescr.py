@@ -1,5 +1,5 @@
 testdescr = {
-# (C)BLAS             
+# (C)BLAS
 'axpy' : 'y = a*x + y',
 'axpby' : 'y = a*x + b*y',
 'rot': 'Apply Givens rotation',
@@ -27,5 +27,11 @@ testdescr = {
 'FFTW_1D_Forward_Measure': 'FFTW 1D Forward (Measure)',
 'FFTW_1D_Backward_Measure': 'FFTW 1D Backward (Measure)',
 'FFTW_1D_Forward_Estimate': 'FFTW 1D Forward (Estimate)',
-'FFTW_1D_Backward_Estimate': 'FFTW 1D Backward (Estimate)'
+'FFTW_1D_Backward_Estimate': 'FFTW 1D Backward (Estimate)',
+
+# METIS
+'pmetis-8': 'Graph partitioning using pmetis - 8 partitions',
+'kmetis-8': 'Graph partitioning using kmetis - 8 partitions',
+'pmetis-64': 'Graph partitioning using pmetis - 64 partitions',
+'kmetis-64': 'Graph partitioning using kmetis - 64 partitions',
 }
