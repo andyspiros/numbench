@@ -21,6 +21,8 @@ testdescr = {
 'cholesky': 'Cholesky decomposition',
 'svd_decomp': 'SVD-decomposition',
 'qr_decomp': 'QR-decomposition',
+'syev': 'Diagonalization of a symmetric matrix',
+'stev': 'Diagonalization of a tridiagonal matrix',
 'symm_ev': 'Symmetric Eigenvalue computation',
 
 # FFTW

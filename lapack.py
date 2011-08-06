@@ -6,7 +6,7 @@ class Module(btlbase.BTLBase):
     def _initialize(self):
         self.libname = "lapack"
         self.avail = ['general_solve', 'least_squares', 'lu_decomp', \
-          'cholesky', 'symm_ev']
+          'cholesky', 'qr_decomp', 'svd_decomp', 'syev', 'stev', 'symm_ev']
     
     def _parse_args(self, args):     
         # Parse arguments
@@ -22,7 +22,8 @@ class Module(btlbase.BTLBase):
         
         # If no test is specified, run everything
         if len(self.tests) == 0:
-            self.tests = self.avail
+            self.tests = ['lu_decomp', 'cholesky', 'qr_decomp', 'svd_decomp',\
+                          'syev', 'stev']
         
         btlbase.BTLBase._parse_args(self, args)
     

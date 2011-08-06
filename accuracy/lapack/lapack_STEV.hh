@@ -7,7 +7,7 @@
 double test_STEV(const int& N, const unsigned& seed = 0)
 {
   LinearCongruential lc(seed);
-  vector<double> A(N*N), D(N), E(N-1), Z(N*N), DD(N*N), work(2*N-2), tmp(N*N);
+  vector<double> A(N*N), D(N), E(N-1), Z(N*N), DD(N*N), work(max(1, 2*N-2)), tmp(N*N);
 
   /* Fill D, E and A */
   for (int i = 0; i < N-1; ++i) {
