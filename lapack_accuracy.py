@@ -12,7 +12,8 @@ class Module(basemodule.BaseModule):
     
     def _initialize(self):
         self.libname = 'lapack'
-        self.avail=['lu_decomp', 'cholesky', 'svd_decomp', 'qr_decomp']
+        self.avail=['lu_decomp', 'cholesky', 'svd_decomp', 'qr_decomp', \
+                    'syev', 'stev']
     
     def _parse_args(self, args):     
         # Parse arguments
@@ -125,7 +126,7 @@ class LAPACK_accuracyTest(basemodule.BaseTest):
         logfile.write(' '.join([n+'='+v for n,v in self.runenv.items()]) + ' ')
         logfile.write(' '.join(args) + '\n')
         logfile.write(80*'-' + '\n')
-        proc = sp.Popen(args, bufsize=1, stdout=sp.PIPE, stderr=sp.PIPE, 
+        proc = sp.Popen(args, bufsize=1, stdout=sp.PIPE, stderr=logfile, 
           env=self.runenv, cwd=self.testdir)
         
         # Interpret output
@@ -143,7 +144,7 @@ class LAPACK_accuracyTest(basemodule.BaseTest):
                 Print.down()
             else:
                 Print(line[1:-1])
-        Print.up()          
-        logfile.close()      
+        Print.up()
+        logfile.close()
         proc.wait()
         return proc.returncode

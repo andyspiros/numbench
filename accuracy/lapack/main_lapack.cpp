@@ -26,6 +26,8 @@ extern "C" {
 #include "lapack_cholesky.hh"
 #include "lapack_SVD.hh"
 #include "lapack_QR.hh"
+#include "lapack_SYEV.hh"
+#include "lapack_STEV.hh"
 
 template<typename exec_t>
 void test(exec_t exec, const std::string& testname, const int& max = 3000, const int& N = 100)
@@ -59,7 +61,8 @@ void test(exec_t exec, const std::string& testname, const int& max = 3000, const
 int main(int argc, char **argv)
 {
   bool
-  lu_decomp=false, cholesky = false, svd_decomp=false, qr_decomp=false
+  lu_decomp=false, cholesky = false, svd_decomp=false, qr_decomp=false,
+  syev=false, stev=false
   ;
 
   for (int i = 1; i < argc; ++i) {
@@ -68,6 +71,8 @@ int main(int argc, char **argv)
           else if (arg == "cholesky") cholesky = true;
           else if (arg == "svd_decomp") svd_decomp = true;
           else if (arg == "qr_decomp") qr_decomp = true;
+          else if (arg == "syev") syev = true;
+          else if (arg == "stev") stev = true;
   }
 
   if (lu_decomp) {
@@ -79,11 +84,19 @@ int main(int argc, char **argv)
   }
 
   if (svd_decomp) {
-      test(test_SVD, "svd_decomp", 3000, 100);
+      test(test_SVD, "svd_decomp", 1000, 90);
   }
 
   if (qr_decomp) {
-      test(test_QR, "qr_decomp", 3000, 100);
+      test(test_QR, "qr_decomp", 500, 70);
+  }
+
+  if (syev) {
+      test(test_SYEV, "syev", 1000, 90);
+  }
+
+  if (stev) {
+      test(test_STEV, "stev", 1000, 90);
   }
 
   return 0;

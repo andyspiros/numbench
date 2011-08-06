@@ -17,7 +17,10 @@ if needsinitialization:
     # Script directories
     curdir = os.path.abspath('.')
     scriptdir = os.path.dirname(os.path.realpath(__file__))
-    btldir = '/usr/include/btl'
+    if os.environ.has_key('BTLDIR'):
+        btldir = os.environ['BTLDIR']
+    else:
+        btldir = '/usr/include/btl'
     
     # Library directory (lib32 vs. lib64)
     libdir = sp.Popen \
