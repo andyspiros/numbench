@@ -16,6 +16,7 @@ extern "C" {
   void daxpy_(const int*, const double*, const double*, const int*, double*, const int*);
   void dcopy_(const int*, const double*, const int*, double*, const int*);
   double dnrm2_(const int*, const double*, const int*);
+  void dsyr_(const char*, const int*, const double*, const double*, const int*, double*, const int*);
   void dger_(const int*, const int*, const double*, const double*, const int*, const double*, const int*, double*, const int*);
   void dgemm_(const char*, const char*, const int*, const int*, const int*, const double*, const double*, const int*, const double*, const int*, const double*, double*, const int*);
   void dsymm_(const char*, const char*, const int*, const int*, const double*, const double*, const int*, const double*, const int*, const double*, double*, const int*);
@@ -44,8 +45,8 @@ void test(exec_t exec, const std::string& testname, const int& max = 3000, const
       int times = 0;
       do
         error += exec(size, times++);
-      while (timer.elapsed() < 1.);
-      cout << " " << setw(4) << right << size;
+      while (timer.elapsed() < 1. || times < 16);
+      cout << " size: " << setw(4) << right << size;
       cout << setw(15) << right << error/times << "    ";
       cout << "[" << setw(6) << times << " samples]  ";
       cout << "(" << setw(3) << right << (i-sizes.begin()+1) << "/" << N << ")" << endl;
@@ -78,11 +79,11 @@ int main(int argc, char **argv)
   }
 
   if (svd_decomp) {
-      test(test_SVD, "svd_decomp", 1500, 90);
+      test(test_SVD, "svd_decomp", 3000, 100);
   }
 
   if (qr_decomp) {
-      test(test_QR, "qr_decomp", 600, 75);
+      test(test_QR, "qr_decomp", 3000, 100);
   }
 
   return 0;

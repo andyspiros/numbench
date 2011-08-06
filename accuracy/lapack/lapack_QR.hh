@@ -34,14 +34,14 @@ double test_QR(const int& N, const unsigned& seed = 0)
   for (int i = 0; i < N; ++i) {
       /* Generate H_i */
       for (int r = 0; r < N; ++r)
-        for (int c = 0; c < N; ++c)
+        for (int c = r; c < N; ++c)
           H[r+c*N] = (r == c);
       dcopy_(&N, &A[i*N], &iONE, &work[0], &iONE);
       for (int j = 0; j < i; ++j)
         work[j] = 0.;
       work[i] = 1.;
       t = -tau[i];
-      dger_(&N, &N, &t, &work[0], &iONE, &work[0], &iONE, &H[0], &N);
+      dsyr_("U", &N, &t, &work[0], &iONE, &H[0], &N);
 
       /* Multiply Q = Q*H_i */
       dsymm_("R", "U", &N, &N, &dONE, &H[0], &N, &Q[0], &N, &dZERO, &work[0], &N);
