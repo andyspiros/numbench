@@ -65,7 +65,7 @@ class BaseModule:
         t.files = self.files
         return t
     
-    def save_results(self, results, plottype='plot'):
+    def save_results(self, results, plottype='plot', ylabel="MFlops"):
         if not with_images:
             Print("Report generation skipped - missing libraries")
             return
@@ -119,7 +119,7 @@ class BaseModule:
                 if self.summary_only:
                     plt.legend(loc='best')
                 plt.xlabel('size')
-                plt.ylabel('MFlops')
+                plt.ylabel(ylabel)
                 plt.grid(True)
             fname = pjoin(cfg.reportdir, 'summary.png')
             plt.savefig(fname, format='png', bbox_inches='tight', \
@@ -136,7 +136,7 @@ class BaseModule:
                     plotf(x,y, label=impl, hold=True)
                 plt.legend(loc='best')
                 plt.xlabel('size')
-                plt.ylabel('MFlops')
+                plt.ylabel(ylabel)
                 plt.grid(True)
                 fname = pjoin(cfg.reportdir, test+".png")
                 plt.savefig(fname, format='png', bbox_inches='tight', \
@@ -181,9 +181,13 @@ class BaseTest:
         # 1. Run with no requires
         pfile = pc.GetFile(self.libname, self.impl, self.root)
         flags = pc.Run(pfile, self.root, False)
+        logfile = file(pjoin(self.logdir, 'pkg-config.log'), 'w')
+        print >> logfile, "File:", pfile
+        print >> logfile, "Result:", flags
         
         # 2. Get requires
         requires = pc.Requires(pfile)
+        print >> logfile, "Requires:", requires
         
         # 3.Substitute requires and add flags
         for r in requires:
@@ -192,6 +196,8 @@ class BaseTest:
                 flags += ' ' + pc.Run(pfile)
             else:
                 flags += ' ' + pc.Run(r)
+        print >> logfile, "Third run:", flags
+        logfile.close()
         
         return shlex.split(flags)
     

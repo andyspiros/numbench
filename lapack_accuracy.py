@@ -1,5 +1,5 @@
-import sys, os, shlex
 import subprocess as sp
+import shlex, os
 from os.path import join as pjoin
 
 from benchutils import mkdir, run_cmd
@@ -8,40 +8,58 @@ from htmlreport import HTMLreport
 import basemodule
 import benchconfig as cfg
 
-
-class BTLBase(basemodule.BaseModule):
+class Module(basemodule.BaseModule):
     
-    def _parse_args(self, args):
+    def _initialize(self):
+        self.libname = 'lapack'
+        self.avail=['lu_decomp', 'cholesky', 'svd_decomp', 'qr_decomp', \
+                    'syev', 'stev']
+    
+    def _parse_args(self, args):     
+        # Parse arguments
+        tests = []
+        for i in args:
+            if i in self.avail:
+                tests.append(i)
+                continue
+            raise Exception("Argument not recognized: " + i)
+        
+        # Sort tests
+        self.tests = [i for i in self.avail if i in tests]
+        
+        # If no test is specified, then do everything
+        if len(self.tests) == 0:
+            self.tests = self.avail
+         
         # Generate list of dat (result) files, relative to the testdir
-        self.files = [pjoin('bench_%s_%s.dat' % (op, self.libname)) \
+        self.files = [pjoin('accuracy_%s_%s.dat' % (op, self.libname)) \
           for op in self.tests]
+        
+    @staticmethod
+    def _testClass():
+        return LAPACK_accuracyTest
+
     
     def save_results(self, results):
-        basemodule.BaseModule.save_results(self, results, 'semilogx')     
+        basemodule.BaseModule.save_results(self, results, 'plot', \
+          'Relative error')
+            
+class LAPACK_accuracyTest(basemodule.BaseTest):
+    
+    compileenv = {}
+    runenv = {}
         
-    
-class BTLTest(basemodule.BaseTest):
-    
     def _compileTest(self):
         self.compileenv = {}
-        self.runenv = {}
         
-        # Includes
-        includes = [pjoin(cfg.btldir, i) for i in \
-        ('actions', 'generic_bench', 'generic_bench/utils', 'libs/STL') + \
-        tuple(self._btl_includes())] + [pjoin(self.root, 'usr/include')]
-        
-        # Libraries
-        libraries = ['rt']
-        
-        # Libdirs
+        # Flags and envvars lists
+        includes = [pjoin(self.root, 'usr/include'),
+                    pjoin(cfg.curdir, 'accuracy'),
+                    pjoin(cfg.btldir, 'libs', 'LAPACK'),
+                    pjoin(cfg.btldir, 'generic_bench', 'utils')]
+        libraries = []
         libdirs = [self.libdir]
-        
-        # Defines
-        defines = ['NDEBUG'] + self._btl_defines()
-        defines = self._btl_defines()
-        
-        # Flags
+        defines = ['NDEBUG']
         flags = []
         
         ## Interpret flags        
@@ -62,14 +80,9 @@ class BTLTest(basemodule.BaseTest):
         self.compileenv['LIBRARY_PATH'] = ':'.join(libdirs)
         self.compileenv['LD_LIBRARY_PATH'] = ':'.join(libdirs)
         self.runenv['LD_LIBRARY_PATH'] = ':'.join(libdirs)
-        # PATH
-        envpath = ':'.join([pjoin(self.root, l) for l in ('bin', 'usr/bin')])
-        if (os.environ.has_key('PATH')):
-            envpath += ':' + os.environ['PATH']
-        self.compileenv['PATH'] = envpath
-        self.runenv['PATH'] = envpath
         
         exe = pjoin(self.testdir, "test")
+        source = "accuracy/lapack/main_lapack.cpp"
     
         # Retrieve compiler
         cxx = 'g++'
@@ -80,7 +93,7 @@ class BTLTest(basemodule.BaseTest):
             cxx = os.environ['CXX']
         
         # Form command line arguments
-        args = [cxx, pjoin(cfg.btldir, self._btl_source()), '-o', exe]
+        args = [cxx, source, '-o', exe]
         args += ['-I'+I for I in includes]
         args += ['-l'+l for l in libraries]
         args += ['-L'+L for L in libdirs]
@@ -101,45 +114,37 @@ class BTLTest(basemodule.BaseTest):
         logfile.close()
         return proc.returncode, exe, logfile.name
     
-    def _executeTest(self, exe, preargs=[]):
+    
+    def _executeTest(self, exe):
         # Log dynamic link
         lddlogfile = file(pjoin(self.logdir, 'ldd.log'), 'w')
         sp.Popen(['ldd', '-v', exe], stdout=lddlogfile, env=self.runenv).wait()
         
         # Open pipe
-        logfile = file(pjoin(self.logdir, 'btlrun.log'), 'w')
-        args = preargs + [exe] + list(self.tests)
-        logfile.write(' '.join( \
-          [n + '="'+v+'"' for n,v in self.runenv.items()]  ) + ' ')
+        logfile = file(pjoin(self.logdir, 'run.log'), 'w')
+        args = [exe] + self.tests
+        logfile.write(' '.join([n+'='+v for n,v in self.runenv.items()]) + ' ')
         logfile.write(' '.join(args) + '\n')
         logfile.write(80*'-' + '\n')
-        proc = sp.Popen(args, bufsize=1, stdout=sp.PIPE, stderr=sp.PIPE, 
+        proc = sp.Popen(args, bufsize=1, stdout=sp.PIPE, stderr=logfile, 
           env=self.runenv, cwd=self.testdir)
         
         # Interpret output
+        Print.down()
         while True:
-            # Each operation test begins with a line on stderr
-            errline = proc.stderr.readline()
-            if not errline:
+            line = proc.stdout.readline()
+            if not line:
                 break
-            logfile.write(errline)
-            resfile = errline.split()[-1]
-            testname = resfile[6:-5-len(self.libname)]
-            Print(resfile)
-            
-            # 100 different sizes for each operation test
-            Print.down()
-            for i in xrange(100):
-                outline = proc.stdout.readline()
-                # If the line is void, something gone wrong
-                if not outline:
-                    Print.up()
-                    Print('Execution error')
-                    return 1
-                logfile.write(outline)
-                Print(outline.strip())
-            Print.up()
+            logfile.write(line)
+            if len(line.strip()) == 0:
+                continue
+            if line[0] != ' ':
+                Print.up()
+                Print(line.strip())
+                Print.down()
+            else:
+                Print(line[1:-1])
+        Print.up()
         logfile.close()
         proc.wait()
-        Print("Execution finished with return code " + str(proc.returncode))
         return proc.returncode

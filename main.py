@@ -24,8 +24,11 @@ try:
     mod = tmp.Module(sys.argv[3:])
     del tmp
     cfg.makedirs()
-except ImportError, IndexError:
+except ImportError as e:
     print e
+    print_usage()
+    exit(1)
+except IndexError:
     print_usage()
     exit(1)
   
@@ -84,27 +87,6 @@ used at compile-time as dictionary (it can just be a void one).
 After the tests every successful tested item will contain the item "result",
 which can contain any type of data and will be used for the final report.
 """
-#tests = {
-#    "reference-gfortran" : {
-#        "package" : ('sci-libs', 'blas-reference', '3.3.1', 'r1'),
-#        "env" : {'FC' : 'gfortran'}
-#    },
-#         
-#    "eigen-gcc" : {
-#        "package" : ('dev-cpp', 'eigen', '3.0.0', 'r1'),
-#        "env" : {'CXX' : 'g++', 'CXXFLAGS' : '-O2'}
-#    },
-#         
-#    "eigen-icc" : {
-#        "package" : ('dev-cpp', 'eigen', '3.0.0', 'r1'),
-#        "env" : {'CXX' : 'icc', 'CXXFLAGS' : '-O3'}
-#    },
-#
-#    "reference-ifort" : {
-#        "package" : ('sci-libs', 'blas-reference', '3.3.1', 'r1'),
-#        "env" : {'FC' : 'ifort'}
-#    }
-#}
 
 
 """
@@ -126,6 +108,8 @@ cfg.tests = tests_from_input(input)
 # Write summary
 print 80*'='
 print "The following tests will be run:"
+print "-------------------------------"
+print
 for tname, ttest in cfg.tests.items():
     print "Test: " + tname
     if ttest['descr'] is not None:
@@ -158,27 +142,43 @@ for tn,(name,test) in enumerate(cfg.tests.items(),1):
     Print.down()
     package = normalize_cpv(test['package'])
     archive = pjoin(pkgdir, package+".tbz2")
-    Print("Emerging package %s" % package)
     if os.path.exists(archive):
         Print("Package already emerged - skipping")
     else:
         try:
+            # Emerge dependencies
+            Print("Emerging dependencies")
+            install_dependencies( \
+              test['package'], root=root, pkgdir=pkgdir, \
+              logdir=tlogdir)
+            
+            # Emerge pacakge
+            Print("Emerging package %s" % package)
             logfile = pjoin(tlogdir, 'emerge.log')
-            Print("(Run 'tail -f " + logfile + " | less' on another terminal" \
+            Print("(Run 'tail -f " + logfile + "' on another terminal" \
               + " to see the progress)")
             install_package( \
               test['package'], env=test['env'], root=root, pkgdir=pkgdir, \
               logfile=logfile
               )
+#            archives.append(archive)
+            
             # Unpack the archive onto the given root directory
-            os.path.exists(root) or os.makedirs(root)
-            tarcmd = ['tar', 'xjf', archive, '-C', root]
-            logfile = file(pjoin(tlogdir, 'tar.log'), 'w')
-            tarp = sp.Popen(tarcmd, stdout=logfile, stderr=sp.STDOUT)
-            tarp.wait()
-            logfile.close()
-            if tarp.returncode != 0:
-                raise InstallException(tarcmd, logfile.name)
+#            Print("Unpacking packages")
+#            logfile = pjoin(tlogdir, 'tar.log')
+#            Print("(Run 'tail -f " + logfile + "' on another terminal" \
+#              + " to see the progress)")
+#            logfile = file(logfile, 'w')
+#            tarcmds = [['tar', 'xvjf', a, '-C', root] for a in archives]
+#            os.path.exists(root) or os.makedirs(root)
+#            tarcmd = ['tar', 'xjf', archive, '-C', root]
+#            for c in tarcmds:
+#                logfile.write(' '.join(c) + '\n' + 80*'-' + '\n')
+#                tarp = sp.Popen(c, stdout=sp.PIPE, stderr=sp.STDOUT)
+#                logfile.write(tarp.communicate()[0])
+#                logfile.write('\n\n' + 80*'#' + '\n\n')
+#                if tarp.returncode != 0:
+#                    raise InstallException(tarcmd, logfile.name)
                 
         except InstallException as e:
             Print("Package %s failed to emerge" % package)

@@ -1,5 +1,5 @@
 testdescr = {
-# (C)BLAS             
+# (C)BLAS
 'axpy' : 'y = a*x + y',
 'axpby' : 'y = a*x + b*y',
 'rot': 'Apply Givens rotation',
@@ -19,11 +19,21 @@ testdescr = {
 'least_squares': 'Least squares solution',
 'lu_decomp': 'LU-decomposition',
 'cholesky': 'Cholesky decomposition',
+'svd_decomp': 'SVD-decomposition',
+'qr_decomp': 'QR-decomposition',
+'syev': 'Diagonalization of a symmetric matrix',
+'stev': 'Diagonalization of a tridiagonal matrix',
 'symm_ev': 'Symmetric Eigenvalue computation',
 
 # FFTW
 'FFTW_1D_Forward_Measure': 'FFTW 1D Forward (Measure)',
 'FFTW_1D_Backward_Measure': 'FFTW 1D Backward (Measure)',
 'FFTW_1D_Forward_Estimate': 'FFTW 1D Forward (Estimate)',
-'FFTW_1D_Backward_Estimate': 'FFTW 1D Backward (Estimate)'
+'FFTW_1D_Backward_Estimate': 'FFTW 1D Backward (Estimate)',
+
+# METIS
+'pmetis-8': 'Graph partitioning using pmetis - 8 partitions',
+'kmetis-8': 'Graph partitioning using kmetis - 8 partitions',
+'pmetis-64': 'Graph partitioning using pmetis - 64 partitions',
+'kmetis-64': 'Graph partitioning using kmetis - 64 partitions',
 }
