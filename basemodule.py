@@ -181,9 +181,13 @@ class BaseTest:
         # 1. Run with no requires
         pfile = pc.GetFile(self.libname, self.impl, self.root)
         flags = pc.Run(pfile, self.root, False)
+        logfile = file(pjoin(self.logdir, 'pkg-config.log'), 'w')
+        print >> logfile, "File:", pfile
+        print >> logfile, "Result:", flags
         
         # 2. Get requires
         requires = pc.Requires(pfile)
+        print >> logfile, "Requires:", requires
         
         # 3.Substitute requires and add flags
         for r in requires:
@@ -192,6 +196,8 @@ class BaseTest:
                 flags += ' ' + pc.Run(pfile)
             else:
                 flags += ' ' + pc.Run(r)
+        print >> logfile, "Third run:", flags
+        logfile.close()
         
         return shlex.split(flags)
     

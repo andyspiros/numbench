@@ -62,7 +62,7 @@ class PBLASTest(btlbase.BTLTest):
     
     @staticmethod
     def _btl_includes():
-        return ["libs/BLAS", "libs/BLACS", "libs/PBLAS", "libs/STL"]
+        return ["libs/"+i for i in ("BLAS", "LAPACK", "BLACS", "PBLAS", "STL")]
     
     def _btl_defines(self):
         return ["PBLASNAME="+self.libname]
