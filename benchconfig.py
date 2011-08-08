@@ -32,6 +32,7 @@ if needsinitialization:
         testsdir = "/var/tmp/benchmarks/tests/"
         rootsdir = "/var/tmp/benchmarks/roots/"
         pkgsdir = "/var/cache/benchmarks/packages/"
+        
         reportdirb = "/var/cache/benchmarks/reports/"
         logdirb = "/var/log/benchmarks/"+modname+"_"+time.strftime('%Y-%m-%d')
     else:
@@ -41,6 +42,10 @@ if needsinitialization:
         reportdirb = os.environ['HOME'] + "/.benchmarks/reports/"
         logdirb = pjoin(os.environ['HOME'], ".benchmarks/log",
                         modname + "_" + time.strftime('%Y-%m-%d'))
+    
+    bu.mkdir(testsdir)
+    bu.mkdir(rootsdir)
+    bu.mkdir(pkgsdir)
     
     # Report directory
     reportdirb += modname + "_" + time.strftime('%Y-%m-%d')

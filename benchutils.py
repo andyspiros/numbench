@@ -1,8 +1,5 @@
 import os, sys
-from os.path import join as pjoin, basename, dirname
 import subprocess as sp
-import benchconfig as cfg
-import benchpkgconfig as pc
 
 def mkdir(dir):
     if not os.path.exists(dir):

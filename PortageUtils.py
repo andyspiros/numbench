@@ -8,6 +8,35 @@ class InstallException(Exception):
     def __init__(self, command, logfile):
         self.command = command
         self.logfile = logfile
+        
+def _getEnv(root='/', envAdds={}):
+    denv = os.environ.copy()
+
+    #PATH
+    denv['PATH'] = ':'.join([pjoin(root, i) for i in ('bin', 'usr/bin')])
+    if os.environ.has_key('PATH'):
+        denv['PATH'] += ':' + os.environ['PATH']
+    denv['ROOTPATH'] = denv['PATH']
+    #LIBRARY_PATH
+    denv['LIBRARY_PATH'] = ':'.join([pjoin(root, i) for i in \
+      ('usr/lib', 'usr/lib64', 'usr/lib32')])
+    if os.environ.has_key('LIBRARY_PATH'):
+        denv['LIBRARY_PATH'] += ':' + os.environ['LIBRARY_PATH']
+    #LD_LIBRARY_PATH
+    denv['LD_LIBRARY_PATH'] = ':'.join([pjoin(root, i) for i in \
+      ('usr/lib', 'usr/lib64', 'usr/lib32')])
+    if os.environ.has_key('LD_LIBRARY_PATH'):
+        denv['LD_LIBRARY_PATH'] += ':' + os.environ['LD_LIBRARY_PATH']
+    #INCLUDE_PATH
+    denv['INCLUDE_PATH'] = ':'.join([pjoin(root, i) for i in ('usr/include',)])
+    if os.environ.has_key('INCLUDE_PATH'):
+        denv['INCLUDE_PATH'] += ':' + os.environ['INCLUDE_PATH']
+        
+    # Adds
+    for k,v in envAdds.items():
+        denv[k] = v
+    
+    return denv
 
 def available_packages(pattern):
     """Returns a list of packages matching the given pattern.
@@ -51,9 +80,7 @@ def install_dependencies(package, env={}, root='/',
         logdir = "/var/log/benchmarks/.unordered"
     
     # Adjust environment
-    denv = os.environ
-    for k,v in env.items():
-        denv[k] = v
+    denv = _getEnv(root, dict(PKGDIR=pkgdir))
     
     # Retrieve dependencies
     deps = get_dependencies(package, denv, False)
@@ -83,31 +110,10 @@ def install_package(package, env={}, root='/', pkgdir='usr/portage/packages',
     The function has no return value and raises an exception in case of building
     or emerging failure. Note: dependencies will NOT be emerged!
     """
-    
-    # Adjust environment
-    denv = os.environ.copy()
-    for k,v in env.items():
-        denv[k] = v
-    denv['PKGDIR'] = pkgdir    
-    #PATH
-    denv['PATH'] = ':'.join([pjoin(root, i) for i in ('bin', 'usr/bin')])
-    if os.environ.has_key('PATH'):
-        denv['PATH'] += ':' + os.environ['PATH']
-    denv['ROOTPATH'] = denv['PATH']
-    #LIBRARY_PATH
-    denv['LIBRARY_PATH'] = ':'.join([pjoin(root, i) for i in \
-      ('usr/lib', 'usr/lib64', 'usr/lib32')])
-    if os.environ.has_key('LIBRARY_PATH'):
-        denv['LIBRARY_PATH'] += ':' + os.environ['LIBRARY_PATH']
-    #LD_LIBRARY_PATH
-    denv['LD_LIBRARY_PATH'] = ':'.join([pjoin(root, i) for i in \
-      ('usr/lib', 'usr/lib64', 'usr/lib32')])
-    if os.environ.has_key('LD_LIBRARY_PATH'):
-        denv['LD_LIBRARY_PATH'] += ':' + os.environ['LD_LIBRARY_PATH']
-    #INCLUDE_PATH
-    denv['INCLUDE_PATH'] = ':'.join([pjoin(root, i) for i in ('usr/include',)])
-    if os.environ.has_key('INCLUDE_PATH'):
-        denv['INCLUDE_PATH'] += ':' + os.environ['INCLUDE_PATH']
+    envAdds = env.copy()
+    envAdds['PKGDIR'] = pkgdir
+    denv = _getEnv(root, envAdds)
+    del envAdds
     
     # Retrieve package string
     pkg = normalize_cpv(package)
