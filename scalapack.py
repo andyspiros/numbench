@@ -37,10 +37,10 @@ class Module(btlbase.BTLBase):
         
     @staticmethod
     def _testClass():
-        return PBLASTest
+        return ScaLAPACKTest
 
 
-class PBLASTest(btlbase.BTLTest):    
+class ScaLAPACKTest(btlbase.BTLTest):    
 #    def __init__(self, *args, **kwargs):
 #        os.environ['CXX'] = 'mpic++'
 #        btlbase.BTLTest.__init__(self, *args, **kwargs)
