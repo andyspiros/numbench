@@ -3,10 +3,13 @@ import subprocess as sp
 import shlex
 
 class Module(btlbase.BTLBase):
-    def _initialize(self):
-        self.libname = "lapack"
-        self.avail = ['general_solve', 'least_squares', 'lu_decomp', \
+    
+    libname = "lapack"
+    avail = ['general_solve', 'least_squares', 'lu_decomp', \
           'cholesky', 'qr_decomp', 'svd_decomp', 'syev', 'stev', 'symm_ev']
+    
+    def _initialize(self):
+        pass
     
     def _parse_args(self, args):     
         # Parse arguments

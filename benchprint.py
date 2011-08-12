@@ -12,8 +12,7 @@ if needsinitialization:
         def __init__(self, logfile, maxlevel=10):
             self._level = 0
             self._maxlevel = maxlevel
-            bu.mkdir(dirname(logfile))
-            self._logfile = file(logfile, 'w')
+            self._logfile = logfile
         
         def __call__(self, arg):
             if self._level > self._maxlevel:
@@ -21,14 +20,18 @@ if needsinitialization:
                 
             if self._level <= 0:
                 print str(arg)
-                print >> self._logfile, str(arg)
-                self._logfile.flush()
+                bu.mkdir(dirname(logfile))
+                logfile = file(self._logfile, 'a')
+                print >> logfile, str(arg)
+                logfile.close()
                 return
                 
             printstr = (self._level-1)*"  " + "-- " + str(arg)
             if self._level <= self._maxlevel-1:
-                print >> self._logfile, printstr
-                self._logfile.flush()
+                bu.mkdir(dirname(logfile))
+                logfile = file(self._logfile, 'a')
+                print >> logfile, printstr
+                logfile.close()
             print printstr
             
         def up(self, n=1):

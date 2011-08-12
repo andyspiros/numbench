@@ -7,9 +7,20 @@ from benchprint import Print
 from htmlreport import HTMLreport
 import basemodule
 import benchconfig as cfg
+from testdescr import testdescr
 
 
 class BTLBase(basemodule.BaseModule):
+    
+    @classmethod
+    def printHelp(cls):
+        basemodule.BaseModule.printHelp()
+        
+        print "Tests:"
+        for i in cls.avail:
+            print "   " + i + ":"
+            print "     " + testdescr[i]
+            print
     
     def _parse_args(self, args):
         # Generate list of dat (result) files, relative to the testdir

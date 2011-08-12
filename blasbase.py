@@ -3,13 +3,20 @@ import subprocess as sp
 import shlex
 from os.path import join as pjoin
 
-class BLASBase(btlbase.BTLBase):
-    def _initialize(self):
-        self.avail1 = ['axpy', 'axpby', 'rot']
-        self.avail2 = ['matrix_vector','atv','symv', 'ger', 'syr2',
+avail1 = ['axpy', 'axpby', 'rot']
+avail2 = ['matrix_vector','atv','symv', 'ger', 'syr2',
           'trisolve_vector']
-        self.avail3 = ['matrix_matrix', 'aat', 'trisolve_matrix', 'trmm']
-        self.avail = self.avail1 + self.avail2 + self.avail3
+avail3 = ['matrix_matrix', 'aat', 'trisolve_matrix', 'trmm']
+
+class BLASBase(btlbase.BTLBase):
+    
+    avail1 = avail1
+    avail2 = avail2
+    avail3 = avail3
+    avail = avail1 + avail2 + avail3
+        
+    def _initialize(self):
+        pass
     
     def _parse_args(self, args):     
         # Parse arguments
