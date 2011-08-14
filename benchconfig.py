@@ -43,10 +43,6 @@ if needsinitialization:
         logdirb = pjoin(os.environ['HOME'], ".benchmarks/log",
                         modname + "_" + time.strftime('%Y-%m-%d'))
     
-    bu.mkdir(testsdir)
-    bu.mkdir(rootsdir)
-    bu.mkdir(pkgsdir)
-    
     # Report directory
     reportdirb += modname + "_" + time.strftime('%Y-%m-%d')
     if os.path.exists(reportdirb):

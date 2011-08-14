@@ -45,6 +45,19 @@ class BaseModule:
                 passargs += [i]
         
         self._parse_args(passargs)
+    
+    @classmethod
+    def printHelp(cls):
+        print "Usage: numbench " + cfg.modulename + " [options] [tests]"
+        print
+        print "Generic options:"
+        print "   -s -summary"
+        print "      Generate a summary image that contains all tests results"
+        print "      and show it on the HTML report page."
+        print
+        print "   -S -summary-only"
+        print "      Only generate the summary image and skip all other plots."
+        print
         
     # Alternatives-2 version
     def get_impls(self, root):
