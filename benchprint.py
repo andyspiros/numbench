@@ -20,7 +20,7 @@ if needsinitialization:
                 
             if self._level <= 0:
                 print str(arg)
-                bu.mkdir(dirname(logfile))
+                bu.mkdir(dirname(self._logfile))
                 logfile = file(self._logfile, 'a')
                 print >> logfile, str(arg)
                 logfile.close()
@@ -28,7 +28,7 @@ if needsinitialization:
                 
             printstr = (self._level-1)*"  " + "-- " + str(arg)
             if self._level <= self._maxlevel-1:
-                bu.mkdir(dirname(logfile))
+                bu.mkdir(dirname(self._logfile))
                 logfile = file(self._logfile, 'a')
                 print >> logfile, printstr
                 logfile.close()
