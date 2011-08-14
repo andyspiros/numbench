@@ -1,0 +1,119 @@
+.TH NUMBENCH "1" "August 2011" "Gentoo" "User Commands"
+.SH NAME
+numbench \- Benchmarking tool for Gentoo
+.SH SYNOPSIS
+.B numbench
+module conffile [\fIoptions\fR]
+
+.B numbench
+module [\fI-h|--help\fR]
+
+.SH DESCRIPTION
+.PP
+numbench is a tool for compiling and benchmarking numerical
+libraries. It is useful to find out the implementations of common
+libraries that run faster on the machine and are more accurate.
+The script makes use of the portage features in order to download,
+compile, install and test the packages.
+
+.SS Modules
+.IX Subsection "Modules"
+.PP
+The following modules are available:
+
+.RS
+.B blas
+\- Test BLAS implementations
+
+.B cblas
+\- Test CBLAS implementations
+
+.B lapack
+\- Test LAPACK implementations
+
+.B scalapack
+\- Test the ScaLAPACK libary
+
+.B blas_accuracy
+\- Test BLAS implementations for accuracy
+
+.B lapack_accuracy
+\- Test LAPACK implementations for accuracy
+
+.B fftw
+\- Test the FFTW libary
+
+.B metis
+\- Test the METIS tools
+.RE
+
+.PP
+More information about each module is available through the command:
+.B numbench module --help
+
+.SS Configuration file
+.IX Subsection "Configuration file"
+
+.PP
+In order to run a test, a configuration file has to be provided.
+Each line of this file defines a package that is to be tested.
+It is possible to test different versions of the same package, or
+even to test many times the same package with different compile-time
+environment; for each different version or environment, a different
+line has to be written.
+
+.PP
+Each line begins with an identification token of the test. This
+identification can contain any characters, but it is recommended
+that it only contains alphanumeric digits, the period . , the minus
+sign - and the underscore _ .
+After the identification word, the package has to be provided. The
+package specification should be fully provided, in the usual
+category/package-version[-revision] format. For instance
+sci-libs/lapack-reference-3.3.1-r1. However, the script will try to
+choose the best package in case of lacking information.
+After the package, the environment has to be specified. In order
+to do that, the user has to use the KEY=VALUE format. If the value
+contains a whitespace, the single or double quoting marks have to be
+used. The following are two valid configuration lines that define
+the tests for the sci-libs/atlas package with different compilers
+and CFLAGS:
+
+.RS
+atlas-gcc sci-libs/atlas-3.9.46 CC=gcc CFLAGS=-O2
+
+atlas-gcc-4.6.1 sci-libs/atlas-3.9.46 CC=gcc-4.6.1 CFLAGS="-O3 -march=native"
+.RE
+
+.PP
+Variables that affect the emerge process, such as USE, can be used
+and are effective.
+More configuration options are available. As each package can
+install many implementations of the same library (for instance, the
+sci-libs/atlas package installs the serial version and the
+parallelized version with threads or openmp, depending on the USE
+flags), each implementation is tested; but if you do not want to
+test a specific implementation, you can mask it by adding to the
+configuration line the string '-implementation' (without quoting
+marks); then the script will skip the implementation. The following
+is an example where the 32-bit implementations of the acml are
+skipped:
+
+.RS
+acml sci-libs/acml-4.4.0 -acml32-gfortran -acml32-gfortran-openmp
+.RE
+
+.PP
+The last configuration option that can be used is for libraries that
+internally use other libraries. For example, most LAPACK
+implementations lie on BLAS and/or CBLAS implementations. It is
+possible to make the tested LAPACK implementation use a specific
+BLAS implementation through the 'blas:implementation' (without
+quotation marks) format. For instance, the following line
+defines a test where the atlas LAPACK implementation uses the
+openblas library as BLAS and CBLAS (openblas has to be installed for
+this to work):
+
+.RS
+atlas sci-libs/atlas-3.9.46 blas:openblas
+.RE
