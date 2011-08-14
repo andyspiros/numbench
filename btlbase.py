@@ -137,6 +137,7 @@ class BTLTest(basemodule.BaseTest):
                     Print('Execution error')
                     return 1
                 logfile.write(outline)
+		logfile.flush()
                 Print(outline.strip())
             Print.up()
         logfile.close()
