@@ -14,7 +14,7 @@ if needsinitialization:
             self._maxlevel = maxlevel
             self._logfile = logfile
         
-        def __call__(self, arg):
+        def __call__(self, arg='\n'):
             if self._level > self._maxlevel:
                 return
                 

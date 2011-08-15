@@ -114,15 +114,11 @@ def tests_from_input(input):
             else:
                 e_0, e_1 = var.split('=', 1)
                 env[e_0] = e_1
-        avail = available_packages(spl[1])
-        if len(avail) > 1:
-            for n,p in enumerate(avail):
-                tests[spl[0]+"_%02i"%n] = {'package':p , 'env':env, \
-                  'skip':skip, 'changes':change, 'descr':descr}
-        elif len(avail) == 1:
-            tests[spl[0]] = {'package':avail[0] , 'env':env, 'skip':skip, \
+        try:
+            avail = available_packages(spl[1])[-1]
+            tests[spl[0]] = {'package':avail , 'env':env, 'skip':skip, \
               'changes':change, 'descr':descr}
-        else:
+        except:
             sys.stderr.write('Error: package ' + spl[1] + ' not found\n')
     return tests
 
@@ -237,8 +233,11 @@ for tn,(name,test) in enumerate(cfg.tests.items(),1):
     Print.down()
     package = normalize_cpv(test['package'])
     archive = pjoin(pkgdir, package+".tbz2")
+    test['pkgdir'] = pkgdir
+    test['archive'] = archive
     if os.path.exists(archive):
         Print("Package already emerged - skipping")
+        test['emergesuccess'] = True
     else:
         try:
             # Emerge dependencies
@@ -256,26 +255,10 @@ for tn,(name,test) in enumerate(cfg.tests.items(),1):
               test['package'], env=test['env'], root=root, pkgdir=pkgdir, \
               logfile=logfile
               )
-#            archives.append(archive)
-            
-            # Unpack the archive onto the given root directory
-#            Print("Unpacking packages")
-#            logfile = pjoin(tlogdir, 'tar.log')
-#            Print("(Run 'tail -f " + logfile + "' on another terminal" \
-#              + " to see the progress)")
-#            logfile = file(logfile, 'w')
-#            tarcmds = [['tar', 'xvjf', a, '-C', root] for a in archives]
-#            os.path.exists(root) or os.makedirs(root)
-#            tarcmd = ['tar', 'xjf', archive, '-C', root]
-#            for c in tarcmds:
-#                logfile.write(' '.join(c) + '\n' + 80*'-' + '\n')
-#                tarp = sp.Popen(c, stdout=sp.PIPE, stderr=sp.STDOUT)
-#                logfile.write(tarp.communicate()[0])
-#                logfile.write('\n\n' + 80*'#' + '\n\n')
-#                if tarp.returncode != 0:
-#                    raise InstallException(tarcmd, logfile.name)
+            test['emergesuccess'] = True
                 
         except InstallException as e:
+            test['emergesuccess'] = False
             Print("Package %s failed to emerge" % package)
             Print("Error log: " + e.logfile)
             Print.up()
@@ -319,3 +302,28 @@ for (name,test) in cfg.tests.items():
             results[(name, impl)] = test['results'][impl]
 
 mod.save_results(results)
+
+
+Print._level = 0
+Print()
+# Print instructions
+for name,test in cfg.tests.items():
+    if not test['emergesuccess']:
+        continue
+    printstr = "Instructions for " + name + ":"
+    Print(printstr)
+    Print(len(printstr)*'-')
+    Print.down()
+    Print("# PKGDIR=" + test['pkgdir'] + " emerge -K '=" + \
+          normalize_cpv(test['package']) + "'")
+    try:
+        for impl in test['implementations']:
+            Print("Implementation " + impl + ":")
+            Print.down()
+            mod.instructionsFor(impl)
+            Print.up()
+    except:
+        pass
+        
+    Print.up()
+    Print()

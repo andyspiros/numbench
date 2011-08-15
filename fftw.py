@@ -32,6 +32,10 @@ class Module(btlbase.BTLBase):
     @staticmethod
     def get_impls(root):
         return ['fftw', 'fftw_threads']
+        
+    def instructionsFor(self, impl):
+        Print("Use command 'pkg-config --cflags --libs " + impl + \
+              "' when compiling")
     
     @staticmethod
     def _testClass():

@@ -69,6 +69,10 @@ class BaseModule:
             return []
         else:
             return [i.split()[0] for i in output.split('\n')] 
+        
+    # Alternatives-2 version
+    def instructionsFor(self, impl):
+        Print("# eselect " + self.libname + " set " + impl)
            
     def getTest(self, root, impl, testdir, logdir):
         TestClass = self._testClass()

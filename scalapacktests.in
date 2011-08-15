@@ -1,0 +1,2 @@
+reference sci-libs/scalapack-1.8.0 FFLAGS="-march=native"
+reference-O3 sci-libs/scalapack-1.8.0 FFLAGS="-march=native -O3"

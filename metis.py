@@ -40,6 +40,9 @@ class Module(basemodule.BaseModule):
     @staticmethod
     def get_impls(*args, **kwargs):
         return ('metis',)
+        
+    def instructionsFor(self, impl):
+        Print("Nothing to do")
     
     def save_results(self, results):
         basemodule.BaseModule.save_results(self, results, 'loglog', 'Seconds')
