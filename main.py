@@ -10,17 +10,10 @@ def print_usage():
 
 def print_help():
     print "Usage: numbench module conffile [options]"
-    print "       numbench module [-h|--help]"
-    print
-    print "numbench is a tool for compiling and benchmarking numerical"
-    print "libraries. It is useful to find out the implementations of common"
-    print "libraries that run faster on the machine and are more accurate."
-    print "The script makes use of the portage features in order to download,"
-    print "compile, install and test the packages"
-    print
+    print "       numbench [ -h | --help ]"
+    print "       numbench module [ -h | --help ]"
     print
     print "Modules:"
-    print "The following modules are available:"
     print "   blas - Test BLAS implementations"
     print "   cblas - Test CBLAS implementations"
     print "   lapack - Test LAPACK implementations"
@@ -32,62 +25,6 @@ def print_help():
     print
     print "More information about a module is available through the command:"
     print "  numbench module --help"
-    print
-    print
-    print "Config file:"
-    print "In order to run a test, a configuration file has to be provided."
-    print "Each line of this file defines a package that is to be tested."
-    print "It is possible to test different versions of the same package, or"
-    print "even to test many times the same package with different compile-time"
-    print "environment; for each different version or environment, a different"
-    print "line has to be written."
-    print
-    print "Each line begins with an identification token of the test. This"
-    print "identification can contain any characters, but it is recommended"
-    print "that it only contains alphanumeric digits, the period . , the minus"
-    print "sign - and the underscore _ ."
-    print "After the identification word, the package has to be provided. The"
-    print "package specification should be fully provided, in the usual"
-    print "category/package-version[-revision] format. For instance"
-    print "sci-libs/lapack-reference-3.3.1-r1. However, the script will try to"
-    print "choose the best package in case of lacking information."
-    print "After the package, the environment has to be specified. In order"
-    print "to do that, the user has to use the KEY=VALUE format. If the value"
-    print "contains a whitespace, the single or double quoting marks have to be"
-    print "used. The following are two valid configuration lines that define"
-    print "the tests for the sci-libs/atlas package with different compilers"
-    print "and CFLAGS:"
-    print
-    print "atlas-gcc sci-libs/atlas-3.9.46 CC=gcc CFLAGS=-O2"
-    print "atlas-gcc-4.6.1 sci-libs/atlas-3.9.46 CC=gcc-4.6.1",
-    print "CFLAGS=\"-O3 -march=native\""
-    print
-    print "Variables that affect the emerge process, such as USE, can be used"
-    print "and are effective."
-    print "More configuration options are available. As each package can"
-    print "install many implementations of the same library (for instance, the"
-    print "sci-libs/atlas package installs the serial version and the"
-    print "parallelized version with threads or openmp, depending on the USE"
-    print "flags), each implementation is tested; but if you do not want to"
-    print "test a specific implementation, you can mask it by adding to the"
-    print "configuration line the string '-implementation' (without quoting"
-    print "marks); then the script will skip the implementation. The following"
-    print "is an example where the 32-bit implementations of the acml are"
-    print "skipped:"
-    print
-    print "acml sci-libs/acml-4.4.0 -acml32-gfortran -acml32-gfortran-openmp"
-    print
-    print "The last configuration option that can be used is for libraries that"
-    print "internally use other libraries. For example, most LAPACK"
-    print "implementations lie on BLAS and/or CBLAS implementations. It is"
-    print "possible to make the tested LAPACK implementation use a specific"
-    print "BLAS implementation through the 'blas:implementation' (without"
-    print "quotation marks) format. For instance, the following line"
-    print "defines a test where the atlas LAPACK implementation uses the"
-    print "openblas library as BLAS and CBLAS (openblas has to be installed for"
-    print "this to work):"
-    print
-    print "atlas sci-libs/atlas-3.9.46 blas:openblas"
     
 def tests_from_input(input):
     tests = {}
@@ -122,7 +59,17 @@ def tests_from_input(input):
             sys.stderr.write('Error: package ' + spl[1] + ' not found\n')
     return tests
 
+
+##########################
+# HERE BEGINS THE SCRIPT #
+##########################
+
 import benchconfig as cfg
+
+# If no argument is given, print the help
+if (len(sys.argv) < 2):
+    print_help()
+    exit(0)
 
 
 # Import the desired module or print help and exit
@@ -288,13 +235,7 @@ for tn,(name,test) in enumerate(cfg.tests.items(),1):
     print
     
 
-# Reports will be saved in cfg.reportdir
-
-# Results are reordered:
-# results
-# |-(name1, impl1) -> resultobject11
-# |-(name1, impl2) -> resultobject12
-# |-(name2, impl1) -> resultobject21        
+# Save the results (first re-order them)     
 results = {}
 for (name,test) in cfg.tests.items():
     if test.has_key('implementations'):
