@@ -112,13 +112,13 @@ class BTLTest(basemodule.BaseTest):
         logfile.close()
         return proc.returncode, exe, logfile.name
     
-    def _executeTest(self, exe, preargs=[]):
+    def _executeTest(self, exe, logfile, preargs=[]):
         # Log dynamic link
         lddlogfile = file(pjoin(self.logdir, 'ldd.log'), 'w')
         sp.Popen(['ldd', '-v', exe], stdout=lddlogfile, env=self.runenv).wait()
         
         # Open pipe
-        logfile = file(pjoin(self.logdir, 'btlrun.log'), 'w')
+        logfile = file(logfile, 'w')
         args = preargs + [exe] + list(self.tests)
         logfile.write(' '.join( \
           [n + '="'+v+'"' for n,v in self.runenv.items()]  ) + ' ')

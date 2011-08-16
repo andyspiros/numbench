@@ -259,7 +259,7 @@ class BaseTest:
         
         # Run test
         logfile = pjoin(self.logdir, name+"_run.log")
-        retcode = self._executeTest(exe)
+        retcode = self._executeTest(exe, logfile=logfile)
         if retcode != 0:
             Print("Test failed")
             Print("See log: " + logfile)

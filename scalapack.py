@@ -53,8 +53,9 @@ class ScaLAPACKTest(btlbase.BTLTest):
               + " run the scalapack tests.")
         return shlex.split(out)[1:] + btlbase.BTLTest._get_flags(self)
     
-    def _executeTest(self, exe):
-        btlbase.BTLTest._executeTest(self, exe, ['mpirun', '-n', str(numproc)])
+    def _executeTest(self, exe, logfile):
+        btlbase.BTLTest._executeTest(self, exe, logfile, \
+          ['mpirun', '-n', str(numproc)])
     
     @staticmethod
     def _btl_source():

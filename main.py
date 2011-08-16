@@ -166,6 +166,9 @@ for tname, ttest in cfg.tests.items():
     print
 print 80*'='
 print
+print "The logs will be available in the directory " + cfg.logdir
+print "The results will be available in the directory " + cfg.reportdir
+print
 
 for tn,(name,test) in enumerate(cfg.tests.items(),1):
     Print._level = 0

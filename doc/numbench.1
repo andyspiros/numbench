@@ -122,3 +122,23 @@ atlas sci-libs/atlas-3.9.46 blas:openblas
 Some examples of configuration files are available in the directory
 /usr/share/numbench/samples. Please refer to those files to see some detailed
 working configuration files.
+
+
+.SS Logs
+
+.PP
+A complete set of log is saved during the execution of the script. The script
+itself will print at the beginning the directory where the logs are saved.
+In the directory you will find the file main.log, which contains everything
+that is written to the terminal and a directory for each test which is defined
+in the configuration file. Each of them contains the log of the emerge process
+(if any) and a directory for each implementation found, which in turn contains
+a log for the pkg-config process, one for the compilation of the test suite,
+one that checks whether the linking is correct and finally the test suit
+execution log.
+
+.PP
+The logs are present only if the related process has been performed. For
+instance, no log is available for the emerge process if the package was already
+compiled. Please refer to the main.log file to see which processes have been
+skipped.

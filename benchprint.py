@@ -15,30 +15,28 @@ if needsinitialization:
             self._logfile = logfile
         
         def __call__(self, arg='\n'):
-            if self._level > self._maxlevel:
-                return
-                
-            if self._level <= 0:
-                print str(arg)
-                bu.mkdir(dirname(self._logfile))
-                logfile = file(self._logfile, 'a')
-                print >> logfile, str(arg)
-                logfile.close()
-                return
-                
-            printstr = (self._level-1)*"  " + "-- " + str(arg)
-            if self._level <= self._maxlevel-1:
-                bu.mkdir(dirname(self._logfile))
-                logfile = file(self._logfile, 'a')
-                print >> logfile, printstr
-                logfile.close()
-            print printstr
+            printstr = str(arg)
+            if self._level > 0:
+                printstr = (self._level-1)*"  " + "-- " + printstr
+            
+            # Print to logfile
+            bu.mkdir(dirname(self._logfile))
+            logfile = file(self._logfile, 'a')
+            print >> logfile, str(arg)
+            logfile.close()
+            
+            # Print to terminal
+            if self._level <= self._maxlevel:
+                print printstr
             
         def up(self, n=1):
             self._level = max(self._level-n, 0)
         
         def down(self, n=1):
             self._level = max(self._level+n, 0)
+            
+    # Initialize main Print object ("static")
     Print = _Print(pjoin(cfg.logdir, 'main.log'), 3)
+
 
 initialized = True
