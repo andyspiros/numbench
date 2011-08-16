@@ -12,7 +12,11 @@ except NameError:
 
 if needsinitialization:
     isroot = os.getuid() == 0
-    modname = sys.argv[1]
+    
+    try:
+        modname = sys.argv[1]
+    except:
+        modname = ''
     
     # Script directories
     curdir = os.path.abspath('.')
