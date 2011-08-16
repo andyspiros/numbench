@@ -54,7 +54,7 @@ class LAPACK_accuracyTest(basemodule.BaseTest):
         
         # Flags and envvars lists
         includes = [pjoin(self.root, 'usr/include'),
-                    pjoin(cfg.curdir, 'accuracy'),
+                    pjoin(cfg.btldir, 'accuracy'),
                     pjoin(cfg.btldir, 'libs', 'LAPACK'),
                     pjoin(cfg.btldir, 'generic_bench', 'utils')]
         libraries = []
@@ -82,7 +82,7 @@ class LAPACK_accuracyTest(basemodule.BaseTest):
         self.runenv['LD_LIBRARY_PATH'] = ':'.join(libdirs)
         
         exe = pjoin(self.testdir, "test")
-        source = "accuracy/lapack/main_lapack.cpp"
+        source = pjoin(cfg.btldir, "accuracy/lapack/main_lapack.cpp")
     
         # Retrieve compiler
         cxx = 'g++'

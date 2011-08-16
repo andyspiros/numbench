@@ -77,7 +77,7 @@ class BLAS_accuracyTest(basemodule.BaseTest):
         self.runenv['LD_LIBRARY_PATH'] = ':'.join(libdirs)
         
         exe = pjoin(self.testdir, "test")
-        source = "accuracy/main_blas.cpp"
+        source = pjoin(cfg.btldir, "accuracy/main_blas.cpp")
     
         # Retrieve compiler
         cxx = 'g++'
