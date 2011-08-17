@@ -93,7 +93,7 @@ try:
     # Normal run: import module
     cfg.inputfile = os.path.abspath(sys.argv[2])
     os.chdir(cfg.scriptdir)
-    tmp = __import__(sys.argv[1], fromlist = ['Module'])
+    tmp = __import__('numbench.'+sys.argv[1], fromlist = ['Module'])
     mod = tmp.Module(sys.argv[3:])
     del tmp
     cfg.makedirs()
