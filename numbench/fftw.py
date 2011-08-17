@@ -8,7 +8,10 @@ class Module(btlbase.BTLBase):
           "FFTW_1D_Backward_Measure", "FFTW_1D_Backward_Estimate",
           
           "FFTW_2D_Forward_Measure", "FFTW_2D_Forward_Estimate",
-          "FFTW_2D_Backward_Measure", "FFTW_2D_Backward_Estimate"
+          "FFTW_2D_Backward_Measure", "FFTW_2D_Backward_Estimate",
+          
+          "FFTW_3D_Forward_Measure", "FFTW_3D_Forward_Estimate",
+          "FFTW_3D_Backward_Measure", "FFTW_3D_Backward_Estimate"
         )
     
     def _parse_args(self, args):     
