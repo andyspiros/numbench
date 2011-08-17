@@ -80,6 +80,7 @@ def tests_from_input(input):
 import benchconfig as cfg
 import benchchilds
 
+
 # If no argument is given, print the help
 if (len(sys.argv) < 2):
     print_help()
@@ -98,16 +99,15 @@ try:
     
     # Print module help
     if (sys.argv[2] in ('-h', '--help')):
-        os.chdir(cfg.scriptdir)
         cfg.inputfile = ''
-        tmp = __import__(cfg.modulename, fromlist = ['Module'])
+        tmp = __import__('numbench.'+cfg.modulename, fromlist = ['Module'])
         tmp.Module.printHelp()
         exit(0)
     
     # Normal run: import module
     cfg.inputfile = os.path.abspath(sys.argv[2])
     os.chdir(cfg.scriptdir)
-    tmp = __import__(sys.argv[1], fromlist = ['Module'])
+    tmp = __import__('numbench.'+cfg.modulename, fromlist = ['Module'])
     mod = tmp.Module(sys.argv[3:])
     del tmp
     cfg.makedirs()
@@ -182,7 +182,8 @@ for tname, ttest in cfg.tests.items():
     Print()
 Print(80*'=')
 Print()
-Print("The script is located in the directory" + cfg.scriptdir)
+Print("The script is located in the directory " + cfg.scriptdir)
+Print("The script is run from the directory " + os.path.realpath('.'))
 Print("The BTL is located in the directory " + cfg.btldir)
 Print("The logs will be available in the directory " + cfg.logdir)
 Print("The results will be available in the directory " + cfg.reportdir)
