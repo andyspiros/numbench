@@ -93,7 +93,7 @@ try:
     # Normal run: import module
     cfg.inputfile = os.path.abspath(sys.argv[2])
     os.chdir(cfg.scriptdir)
-    tmp = __import__('numbench.'+sys.argv[1], fromlist = ['Module'])
+    tmp = __import__(sys.argv[1], fromlist = ['Module'])
     mod = tmp.Module(sys.argv[3:])
     del tmp
     cfg.makedirs()
@@ -144,31 +144,34 @@ input = file(cfg.inputfile).read()
 cfg.tests = tests_from_input(input)
 
 # Write summary
-print 80*'='
-print "The following tests will be run:"
-print "-------------------------------"
-print
+Print._level = 0
+Print(80*'=')
+Print("The following tests will be run:")
+Print("-------------------------------")
+Print()
 for tname, ttest in cfg.tests.items():
-    print "Test: " + tname
+    Print("Test: " + tname)
     if ttest['descr'] is not None:
-        print " - Description: " + ttest['descr']
-    print " - Package: " + normalize_cpv(ttest['package'])
+        Print(" - Description: " + ttest['descr'])
+    Print(" - Package: " + normalize_cpv(ttest['package']))
     if len(ttest['env']) != 0:
-        print " - Environment: " + \
-          ' '.join([n+'="'+v+'"' for n,v in ttest['env'].items()])
+        Print(" - Environment: " + \
+          ' '.join([n+'="'+v+'"' for n,v in ttest['env'].items()]))
     if len(ttest['skip']) != 0:
-        print " - Skip implementations: " + ' '.join(ttest['skip'])
+        Print(" - Skip implementations: " + ' '.join(ttest['skip']))
     if len(ttest['changes']) != 0:
-        print " - Dependency specifications:",
+        Print(" - Dependency specifications:",)
         for c_0, c_1 in ttest['changes'].items():
-            print c_0 + ':' + c_1,
-        print
-    print
-print 80*'='
-print
-print "The logs will be available in the directory " + cfg.logdir
-print "The results will be available in the directory " + cfg.reportdir
-print
+            Print(c_0 + ':' + c_1, '')
+        Print()
+    Print()
+Print(80*'=')
+Print()
+Print("The script is located in the directory" + cfg.scriptdir)
+Print("The BTL is located in the directory " + cfg.btldir)
+Print("The logs will be available in the directory " + cfg.logdir)
+Print("The results will be available in the directory " + cfg.reportdir)
+Print()
 
 for tn,(name,test) in enumerate(cfg.tests.items(),1):
     Print._level = 0

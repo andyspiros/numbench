@@ -22,7 +22,7 @@ if needsinitialization:
             # Print to logfile
             bu.mkdir(dirname(self._logfile))
             logfile = file(self._logfile, 'a')
-            print >> logfile, str(arg)
+            print >> logfile, printstr
             logfile.close()
             
             # Print to terminal
