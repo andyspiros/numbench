@@ -30,6 +30,14 @@ testdescr = {
 'FFTW_1D_Backward_Measure': 'FFTW 1D Backward (Measure)',
 'FFTW_1D_Forward_Estimate': 'FFTW 1D Forward (Estimate)',
 'FFTW_1D_Backward_Estimate': 'FFTW 1D Backward (Estimate)',
+'FFTW_2D_Forward_Measure': 'FFTW 2D Forward (Measure)',
+'FFTW_2D_Backward_Measure': 'FFTW 2D Backward (Measure)',
+'FFTW_2D_Forward_Estimate': 'FFTW 2D Forward (Estimate)',
+'FFTW_2D_Backward_Estimate': 'FFTW 2D Backward (Estimate)',
+'FFTW_3D_Forward_Measure': 'FFTW 3D Forward (Measure)',
+'FFTW_3D_Backward_Measure': 'FFTW 3D Backward (Measure)',
+'FFTW_3D_Forward_Estimate': 'FFTW 3D Forward (Estimate)',
+'FFTW_3D_Backward_Estimate': 'FFTW 3D Backward (Estimate)',
 
 # METIS
 'pmetis-8': 'Graph partitioning using pmetis - 8 partitions',

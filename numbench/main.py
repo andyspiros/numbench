@@ -1,8 +1,21 @@
 #! /usr/bin/env python2
 
-import os, sys, shlex, time
+import os, sys, signal, shlex, time
 from os.path import join as pjoin
 import subprocess as sp
+
+# Set the signal handler
+def close(*args):
+    load.close()
+    benchchilds.terminate()
+    Print._level = 0
+    Print()
+    Print(80*'-')
+    Print("INTERRUPT TRIGGERED")
+    Print("Exiting")
+    exit(0)
+signal.signal(signal.SIGINT, close)
+    
 
 def print_usage():
     print "Usage: numbench [blas|cblas|lapack|scalapack|fftw|metis|" + \
@@ -65,6 +78,7 @@ def tests_from_input(input):
 ##########################
 
 import benchconfig as cfg
+import benchchilds
 
 # If no argument is given, print the help
 if (len(sys.argv) < 2):
@@ -108,6 +122,7 @@ except IndexError:
   
 from PortageUtils import *
 from benchprint import Print
+import benchload as load
 
 
 
@@ -240,6 +255,8 @@ for tn,(name,test) in enumerate(cfg.tests.items(),1):
     Print.up()
     print
     
+
+load.close()
 
 # Save the results (first re-order them)     
 results = {}

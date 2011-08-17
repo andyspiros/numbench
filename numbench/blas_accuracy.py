@@ -7,6 +7,7 @@ from benchprint import Print
 from htmlreport import HTMLreport
 import basemodule
 import benchconfig as cfg
+import benchchilds
 
 class Module(basemodule.BaseModule):
     
@@ -123,6 +124,7 @@ class BLAS_accuracyTest(basemodule.BaseTest):
         logfile.write(80*'-' + '\n')
         proc = sp.Popen(args, bufsize=1, stdout=sp.PIPE, stderr=sp.PIPE, 
           env=self.runenv, cwd=self.testdir)
+        benchchilds.append(proc)
         
         # Interpret output
         Print.down()

@@ -7,6 +7,7 @@ from benchprint import Print
 from htmlreport import HTMLreport
 import basemodule
 import benchconfig as cfg
+import benchchilds
 from testdescr import testdescr
 
 
@@ -126,6 +127,7 @@ class BTLTest(basemodule.BaseTest):
         logfile.write(80*'-' + '\n')
         proc = sp.Popen(args, bufsize=1, stdout=sp.PIPE, stderr=sp.PIPE, 
           env=self.runenv, cwd=self.testdir)
+        benchchilds.append(proc)
         
         # Interpret output
         while True:
@@ -138,9 +140,11 @@ class BTLTest(basemodule.BaseTest):
             testname = resfile[6:-5-len(self.libname)]
             Print(resfile)
             
-            # 100 different sizes for each operation test
+            # Many different sizes for each operation test
             Print.down()
-            for i in xrange(100):
+            cur = 0
+            tot = 1
+            while cur != tot:
                 outline = proc.stdout.readline()
                 # If the line is void, something gone wrong
                 if not outline:
@@ -148,8 +152,15 @@ class BTLTest(basemodule.BaseTest):
                     Print('Execution error')
                     return 1
                 logfile.write(outline)
-		logfile.flush()
-                Print(outline.strip())
+                logfile.flush()
+                
+                # Interpret line
+                outline = outline.strip()
+                (cur, tot) = shlex.split(outline)[-1][1:-1].split('/')
+                cur = int(cur); tot = int(tot)
+                Print(outline)
+                
+                
             Print.up()
         logfile.close()
         proc.wait()

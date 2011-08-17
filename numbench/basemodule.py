@@ -10,6 +10,7 @@ from benchutils import mkdir, run_cmd
 from benchprint import Print
 import benchpkgconfig as pc
 from testdescr import testdescr
+import benchload as load
 
 try:
     if not locals().has_key('initialized'):
@@ -219,6 +220,7 @@ class BaseTest:
         return shlex.split(flags)
     
     def run_test(self, changes={}):
+        load.start()
         self.changes = changes
         
         # Convenient renames and definition of report files
@@ -267,5 +269,6 @@ class BaseTest:
         Print("Test successful")
                 
         # Return
+        load.stop()
         return self._generateResults()
     
