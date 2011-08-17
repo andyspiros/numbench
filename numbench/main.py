@@ -175,7 +175,7 @@ for tname, ttest in cfg.tests.items():
     if len(ttest['skip']) != 0:
         Print(" - Skip implementations: " + ' '.join(ttest['skip']))
     if len(ttest['changes']) != 0:
-        Print(" - Dependency specifications:",)
+        Print(" - Dependency substitutions:", '')
         for c_0, c_1 in ttest['changes'].items():
             Print(c_0 + ':' + c_1, '')
         Print()

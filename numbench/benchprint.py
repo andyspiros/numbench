@@ -14,20 +14,20 @@ if needsinitialization:
             self._maxlevel = maxlevel
             self._logfile = logfile
         
-        def __call__(self, arg='\n'):
-            printstr = str(arg)
+        def __call__(self, arg='', end='\n'):
+            printstr = str(arg) + end
             if self._level > 0:
                 printstr = (self._level-1)*"  " + "-- " + printstr
             
             # Print to logfile
             bu.mkdir(dirname(self._logfile))
             logfile = file(self._logfile, 'a')
-            print >> logfile, printstr
+            print >> logfile, printstr,
             logfile.close()
             
             # Print to terminal
             if self._level <= self._maxlevel:
-                print printstr
+                print printstr,
             
         def up(self, n=1):
             self._level = max(self._level-n, 0)
