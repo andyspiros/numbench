@@ -66,7 +66,10 @@ def get_dependencies(package, env={}, split=False):
     pkg = normalize_cpv(package)
     cmd = ['emerge', '--ignore-default-opts', '='+pkg, '-poq']
     proc = sp.Popen(cmd, stdout=sp.PIPE, stderr=sp.PIPE, env=env)
-    lines = proc.communicate()[0].strip().split('\n')
+    output =  proc.communicate()[0]
+    if proc.returncode != 0:
+        return []
+    lines = output.strip().split('\n')
     if not lines[0]:
         return []
     if split:
