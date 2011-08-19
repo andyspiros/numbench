@@ -11,14 +11,16 @@ class Module(btlbase.BTLBase):
     def _initialize(self):
         pass
     
-    def _parse_args(self, args):     
+    def _parse_args(self, args):
+        passargs = []
+        
         # Parse arguments
         tests = []
         for i in args:
             if i in self.avail:
                 tests.append(i)
                 continue
-            raise Exception("Argument not recognized: " + i)
+            passargs.append(i)
         
         # Sort tests
         self.tests = [i for i in self.avail if i in tests]
@@ -28,7 +30,7 @@ class Module(btlbase.BTLBase):
             self.tests = ['lu_decomp', 'cholesky', 'qr_decomp', 'svd_decomp',\
                           'syev', 'stev']
         
-        btlbase.BTLBase._parse_args(self, args)
+        btlbase.BTLBase._parse_args(self, passargs)
     
     @staticmethod
     def _testClass():

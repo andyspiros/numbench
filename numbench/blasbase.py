@@ -18,7 +18,8 @@ class BLASBase(btlbase.BTLBase):
     def _initialize(self):
         pass
     
-    def _parse_args(self, args):     
+    def _parse_args(self, args):
+        passargs = []
         # Parse arguments
         tests = []
         for i in args:
@@ -34,7 +35,7 @@ class BLASBase(btlbase.BTLBase):
             if i in self.avail:
                 tests.append(i)
                 continue
-            raise Exception("Argument not recognized: " + i)
+            passargs.append(i)
         
         # Sort tests
         self.tests = [i for i in self.avail if i in tests]
@@ -44,7 +45,7 @@ class BLASBase(btlbase.BTLBase):
             self.tests = ['axpy', 'matrix_vector', \
               'trisolve_vector', 'matrix_matrix']
         
-        btlbase.BTLBase._parse_args(self, args)
+        btlbase.BTLBase._parse_args(self, passargs)
         
     @staticmethod
     def _testClass():

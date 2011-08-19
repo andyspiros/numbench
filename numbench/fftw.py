@@ -16,13 +16,15 @@ class Module(btlbase.BTLBase):
         )
     
     def _parse_args(self, args):
+        passargs = []
+        
         # Parse arguments
         tests = []
         for i in args:
             if i in self.avail:
                 tests.append(i)
                 continue
-            raise Exception("Argument not recognized: " + i)
+            passargs.append(i)
         
         # Sort tests
         self.tests = [i for i in self.avail if i in tests]
@@ -31,7 +33,7 @@ class Module(btlbase.BTLBase):
         if len(self.tests) == 0:
             self.tests = self.avail
         
-        btlbase.BTLBase._parse_args(self, args)
+        btlbase.BTLBase._parse_args(self, passargs)
         
     @staticmethod
     def get_impls(root):

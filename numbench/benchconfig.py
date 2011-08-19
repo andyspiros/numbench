@@ -44,8 +44,7 @@ if needsinitialization:
         rootsdir = os.environ['HOME'] + "/.benchmarks/roots/"
         pkgsdir = os.environ['HOME'] + "/.benchmarks/packages/"
         reportdirb = os.environ['HOME'] + "/.benchmarks/reports/"
-        logdirb = pjoin(os.environ['HOME'], ".benchmarks/log",
-                        modname + "_" + time.strftime('%Y-%m-%d'))
+        logdirb = pjoin(os.environ['HOME'], ".benchmarks/log/")
     
     # Report directory
     reportdirb += modname + "_" + time.strftime('%Y-%m-%d')
@@ -61,6 +60,7 @@ if needsinitialization:
     del reportdirb
     
     # Logs directory
+    logdirb += modname + "_" + time.strftime('%Y-%m-%d')
     if os.path.exists(logdirb):
         n = 1
         while True:
@@ -78,6 +78,13 @@ def makedirs():
     bu.mkdir(pkgsdir)
     bu.mkdir(reportdir)
     bu.mkdir(logdir)
+    
+def purgedirs():
+    bu.rmdir(rootsdir)
+    bu.rmdir(testsdir)
+    bu.rmdir(pkgsdir)
+    bu.rmdir(pjoin(reportdir, '..'))
+    bu.rmdir(pjoin(logdir, '..'))
     
     
     

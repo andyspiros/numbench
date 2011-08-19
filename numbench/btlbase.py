@@ -10,7 +10,6 @@ import benchconfig as cfg
 import benchchilds
 from testdescr import testdescr
 
-
 class BTLBase(basemodule.BaseModule):
     
     @classmethod
@@ -27,6 +26,12 @@ class BTLBase(basemodule.BaseModule):
         # Generate list of dat (result) files, relative to the testdir
         self.files = [pjoin('bench_%s_%s.dat' % (op, self.libname)) \
           for op in self.tests]
+        
+        for i in args:
+            if i[:2] == '-N':
+                BTLTest.N = i[2:]
+                continue
+            raise Exception("Argument not recognized: " + i)
     
     def save_results(self, results):
         basemodule.BaseModule.save_results(self, results, 'semilogx')     
@@ -121,6 +126,8 @@ class BTLTest(basemodule.BaseTest):
         # Open pipe
         logfile = file(logfile, 'w')
         args = preargs + [exe] + list(self.tests)
+        if self.N is not None:
+            args.append('-N' + self.N)
         logfile.write(' '.join( \
           [n + '="'+v+'"' for n,v in self.runenv.items()]  ) + ' ')
         logfile.write(' '.join(args) + '\n')

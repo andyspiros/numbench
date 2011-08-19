@@ -26,6 +26,10 @@ def print_help():
     print "       numbench [ -h | --help ]"
     print "       numbench module [ -h | --help ]"
     print
+    print "Options:"
+    print "   [ -p | --purge ] - Remove old results, logs, tests and packages"
+    print "   [ -h | --help ] - Display an help message"
+    print
     print "Modules:"
     print "   blas - Test BLAS implementations"
     print "   cblas - Test CBLAS implementations"
@@ -142,11 +146,23 @@ try:
         exit(0)
     
     # Normal run: import module
+    
+    # Catch command-line arguments
+    passargs = []
+    purge = False
+    for v in sys.argv[3:]:
+        if v in ('-p', '--purge'):
+            purge = True
+        else:
+            passargs.append(v)
+    
     cfg.inputfile = os.path.abspath(sys.argv[2])
     os.chdir(cfg.scriptdir)
     tmp = __import__('numbench.'+cfg.modulename, fromlist = ['Module'])
-    mod = tmp.Module(sys.argv[3:])
+    mod = tmp.Module(passargs)
     del tmp
+    if purge:
+        cfg.purgedirs()
     cfg.makedirs()
     
 except ImportError as e:

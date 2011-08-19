@@ -8,7 +8,9 @@ class Module(btlbase.BTLBase):
         self.avail = ['axpy', 'matrix_vector', 'lu_decomp', 'cholesky',
           'qr_decomp', 'svd_decomp', 'symm_ev']
     
-    def _parse_args(self, args):     
+    def _parse_args(self, args):
+        passargs = []
+        
         # Parse arguments
         tests = []
         skip = 0
@@ -24,7 +26,7 @@ class Module(btlbase.BTLBase):
             if a in self.avail:
                 tests.append(a)
                 continue
-            raise Exception("Argument not recognized: " + a)
+            passargs.append(a)
         
         # Sort tests
         self.tests = [i for i in self.avail if i in tests]
@@ -33,7 +35,7 @@ class Module(btlbase.BTLBase):
         if len(self.tests) == 0:
             self.tests = self.avail
         
-        btlbase.BTLBase._parse_args(self, args)
+        btlbase.BTLBase._parse_args(self, passargs)
         
     @staticmethod
     def _testClass():

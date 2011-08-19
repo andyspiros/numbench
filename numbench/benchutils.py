@@ -1,4 +1,4 @@
-import os, sys, string, random
+import os, sys, shutil, string, random
 import subprocess as sp
 
 __all__ = ['mkdir', 'tmpfile', 'run_cmd']
@@ -6,6 +6,11 @@ __all__ = ['mkdir', 'tmpfile', 'run_cmd']
 def mkdir(dir):
     if not os.path.exists(dir):
         os.makedirs(dir)
+        
+def rmdir(dir):
+    if os.path.isdir(dir):
+        shutil.rmtree(dir, True)
+        
     
 def tmpfile(dir="/var/tmp"):
     """Returns the path of a free temporary file within the given directory."""
