@@ -88,6 +88,22 @@ atlas-gcc-4.6.1 sci-libs/atlas-3.9.46 CC=gcc-4.6.1 CFLAGS="-O3 -march=native"
 .PP
 Variables that affect the emerge process, such as USE, can be used
 and are effective.
+Another possibility to set the environment used during the emerge process is
+writing a bash script that uses the export directives. These files have to be
+specified added to the line with a leading @ mark. More files can be specified;
+in this case the latter files override the variables in case of collisions;
+the environment variables that are specified on the configuration line override
+the variables set through files in case of collisions. The files can be
+specified with both a relative path or an absolute one. The following examples
+show this feature:
+
+.RS
+atlas-gcc sci-libs/atlas-3.9.46 @envforatlas.sh @envforgcc
+
+atlas-gcc sci-libs/atlas-3.9.46 @envforatlas.sh CC=gcc-4.6.1 CFLAGS="-O3"
+.RE
+
+.PP
 More configuration options are available. As each package can
 install many implementations of the same library (for instance, the
 sci-libs/atlas package installs the serial version and the

@@ -86,7 +86,9 @@ def tests_from_input(input):
                 
             # if @file: read bash script and set env
             elif var[0] == '@':
-                fileenv = readEnvFile(pjoin(cfg.curdir, var[1:]))
+                fileenvNew = readEnvFile(pjoin(cfg.curdir, var[1:]))
+                fileenv = dict( fileenv.items() + fileenvNew.items() )
+                del fileenvNew
             
             # Otherwise, assume key=value syntax
             else:
