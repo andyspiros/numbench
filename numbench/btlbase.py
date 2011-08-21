@@ -39,6 +39,8 @@ class BTLBase(basemodule.BaseModule):
     
 class BTLTest(basemodule.BaseTest):
     
+    N = None
+    
     def _compileTest(self):
         self.compileenv = {}
         self.runenv = {}
