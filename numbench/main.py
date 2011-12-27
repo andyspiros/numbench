@@ -33,7 +33,7 @@ def close(*args):
     Print("Exiting")
     exit(0)
 signal.signal(signal.SIGINT, close)
-    
+
 
 def print_usage():
     print "Usage: numbench [blas|cblas|lapack|scalapack|fftw|metis|" + \
@@ -60,7 +60,7 @@ def print_help():
     print
     print "More information about a module is available through the command:"
     print "  numbench module --help"
-    
+
 def readEnvFile(fname):
     """Reads a bash file with void environment and returns the environment
     at the end of the execution."""
@@ -68,13 +68,13 @@ def readEnvFile(fname):
       shell=True, stdout=sp.PIPE, env={})
     lines = proc.stdout.read().split('\n')[:-1]
     env = dict([l.split('=', 1) for l in lines])
-    
+
     for k in ('SHLVL', 'PWD', '_'):
         if env.has_key(k):
             del env[k]
     return env
-    
-    
+
+
 def tests_from_input(input):
     tests = {}
     for line in input.split('\n'):
@@ -89,37 +89,37 @@ def tests_from_input(input):
         change = {}
         descr = None
         fileenv = {}
-        
+
         # Interpret arguments
         for var in spl[2:]:
-            
+
             # if begins with '-': skip implementation
             if var[0] == '-':
                 skip.append(var[1:])
-                
+
             # if key:value, substitute pkg-config dependency
             elif ':' in var and not '=' in var:
                 c_0, c_1 = var.split(':', 1)
                 change[c_0] = c_1
-                
+
             # if descr|text set description (for future use)
             elif var[:6] == 'descr|':
                 descr = var[6:]
-                
+
             # if @file: read bash script and set env
             elif var[0] == '@':
                 fileenvNew = readEnvFile(pjoin(cfg.curdir, var[1:]))
                 fileenv = dict( fileenv.items() + fileenvNew.items() )
                 del fileenvNew
-            
+
             # Otherwise, assume key=value syntax
             else:
                 e_0, e_1 = var.split('=', 1)
                 env[e_0] = e_1
-                
+
         # Set environment (argument overrides bash file)
         env = dict( fileenv.items() + env.items() )
-        
+
         try:
             # Insert test
             avail = available_packages(spl[1])[-1]
@@ -153,18 +153,18 @@ try:
     if (sys.argv[1] in ('-h', '--help')):
         print_help()
         exit(0);
-    
+
     cfg.modulename = sys.argv[1]
-    
+
     # Print module help
     if (sys.argv[2] in ('-h', '--help')):
         cfg.inputfile = ''
         tmp = __import__('numbench.'+cfg.modulename, fromlist = ['Module'])
         tmp.Module.printHelp()
         exit(0)
-    
+
     # Normal run: import module
-    
+
     # Catch command-line arguments
     passargs = []
     purge = False
@@ -173,7 +173,7 @@ try:
             purge = True
         else:
             passargs.append(v)
-    
+
     cfg.inputfile = os.path.abspath(sys.argv[2])
     os.chdir(cfg.scriptdir)
     tmp = __import__('numbench.'+cfg.modulename, fromlist = ['Module'])
@@ -182,7 +182,7 @@ try:
     if purge:
         cfg.purgedirs()
     cfg.makedirs()
-    
+
 except ImportError as e:
     print e
     print_usage()
@@ -190,10 +190,9 @@ except ImportError as e:
 except IndexError:
     print_usage()
     exit(1)
-  
+
 from PortageUtils import *
 from benchprint import Print
-import benchload as load
 
 
 
@@ -220,7 +219,7 @@ Every line contains a configuration and will be an entry in the tests
 dictionary; the line has to contain:
 - an identification string
 - a package description, which can, but does not must to, contain a version
-- a list of environment variables separated by means of spaces 
+- a list of environment variables separated by means of spaces
 """
 if not os.path.exists(cfg.inputfile):
     sys.stderr.write("File not found: " + cfg.inputfile)
@@ -263,12 +262,12 @@ Print()
 for tn,(name,test) in enumerate(cfg.tests.items(),1):
     Print._level = 0
     Print("BEGIN TEST %i - %s" % (tn, name))
-    
+
     pkgdir = pjoin(cfg.pkgsdir, name)
     root = pjoin(cfg.rootsdir, name)
     tlogdir = pjoin(cfg.logdir, name)
     os.path.exists(tlogdir) or os.makedirs(tlogdir)
-    
+
     # Emerge package
     Print.down()
     package = normalize_cpv(test['package'])
@@ -285,7 +284,7 @@ for tn,(name,test) in enumerate(cfg.tests.items(),1):
             install_dependencies( \
               test['package'], root=root, pkgdir=pkgdir, \
               logdir=tlogdir)
-            
+
             # Emerge pacakge
             Print("Emerging package %s" % package)
             logfile = pjoin(tlogdir, 'emerge.log')
@@ -296,7 +295,7 @@ for tn,(name,test) in enumerate(cfg.tests.items(),1):
               logfile=logfile
               )
             test['emergesuccess'] = True
-                
+
         except InstallException as e:
             test['emergesuccess'] = False
             Print("Package %s failed to emerge" % package)
@@ -305,11 +304,11 @@ for tn,(name,test) in enumerate(cfg.tests.items(),1):
             print
             continue
     Print("Package emerged")
-    
+
     # Find implementations
     impls = [i for i in mod.get_impls(root) if not i in test['skip']]
     test['implementations'] = impls
-    
+
     # Test every implementation
     test['results'] = {}
     if len(impls) == 0:
@@ -317,20 +316,18 @@ for tn,(name,test) in enumerate(cfg.tests.items(),1):
     for impl in impls:
         Print("Testing " + impl)
         Print.down()
-        
+
         # Run the test suite
         testdir = os.path.join(cfg.testsdir, name, impl)
         t = mod.getTest(root, impl, testdir, logdir=tlogdir)
         test['results'][impl] = t.run_test(test['changes'])
         Print.up()
-            
+
     Print.up()
     print
-    
 
-load.close()
 
-# Save the results (first re-order them)     
+# Save the results (first re-order them)
 results = {}
 for (name,test) in cfg.tests.items():
     if test.has_key('implementations'):
@@ -360,6 +357,6 @@ for name,test in cfg.tests.items():
             Print.up()
     except:
         pass
-        
+
     Print.up()
     Print()
