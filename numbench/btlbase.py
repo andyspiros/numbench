@@ -24,7 +24,7 @@ from benchprint import Print
 from htmlreport import HTMLreport
 import basemodule
 import benchconfig as cfg
-import benchchilds
+import benchchildren
 from testdescr import testdescr
 
 class BTLBase(basemodule.BaseModule):
@@ -153,7 +153,7 @@ class BTLTest(basemodule.BaseTest):
         logfile.write(80*'-' + '\n')
         proc = sp.Popen(args, bufsize=1, stdout=sp.PIPE, stderr=sp.PIPE, 
           env=self.runenv, cwd=self.testdir)
-        benchchilds.append(proc)
+        benchchildren.append(proc)
         
         # Interpret output
         while True:

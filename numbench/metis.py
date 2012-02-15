@@ -23,7 +23,7 @@ import basemodule
 import benchconfig as cfg
 from benchutils import mkdir
 from benchprint import Print
-import benchchilds
+import benchchildren
 
 inputsdir = pjoin(cfg.testsdir, 'metis-input')
 mkdir(inputsdir)
@@ -135,7 +135,7 @@ class MetisTest:
                 logname = pjoin(self.logdir, t + '_%i.log' % size)
                 cmd = [exe, inputfile, parts]
                 pr = sp.Popen(cmd, stdout=sp.PIPE, stderr=sp.STDOUT, env=env)
-                benchchilds.append(pr)
+                benchchildren.append(pr)
                 lines = pr.communicate()[0].split('\n')
                 
                 # Interpret output

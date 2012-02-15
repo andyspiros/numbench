@@ -18,32 +18,37 @@
 import commands as cmd
 import subprocess as sp
 import os, portage, shlex
-from os.path import join as pjoin
+from os.path import join as pjoin, dirname
 import benchutils
 
 class InstallException(Exception):
-    def __init__(self, command, logfile):
+    def __init__(self, package, command, logfile):
+        self.package = package
         self.command = command
         self.logfile = logfile
         
 def _getEnv(root='/', envAdds={}):
-    denv = os.environ.copy()
+    #denv = os.environ.copy()
+    denv = {}
 
     #PATH
     denv['PATH'] = ':'.join([pjoin(root, i) for i in ('bin', 'usr/bin')])
     if os.environ.has_key('PATH'):
         denv['PATH'] += ':' + os.environ['PATH']
     denv['ROOTPATH'] = denv['PATH']
+    
     #LIBRARY_PATH
     denv['LIBRARY_PATH'] = ':'.join([pjoin(root, i) for i in \
       ('usr/lib', 'usr/lib64', 'usr/lib32')])
     if os.environ.has_key('LIBRARY_PATH'):
         denv['LIBRARY_PATH'] += ':' + os.environ['LIBRARY_PATH']
+    
     #LD_LIBRARY_PATH
     denv['LD_LIBRARY_PATH'] = ':'.join([pjoin(root, i) for i in \
       ('usr/lib', 'usr/lib64', 'usr/lib32')])
     if os.environ.has_key('LD_LIBRARY_PATH'):
         denv['LD_LIBRARY_PATH'] += ':' + os.environ['LD_LIBRARY_PATH']
+    
     #INCLUDE_PATH
     denv['INCLUDE_PATH'] = ':'.join([pjoin(root, i) for i in ('usr/include',)])
     if os.environ.has_key('INCLUDE_PATH'):
@@ -55,7 +60,7 @@ def _getEnv(root='/', envAdds={}):
     
     return denv
 
-def available_packages(pattern):
+def availablePackages(pattern):
     """Returns a list of packages matching the given pattern.
     
     The packages are returned as (category, package, version, revision) tuple.
@@ -72,14 +77,14 @@ def normalize_cpv(cpv):
             cpv_[-1]
             cpv = cpv_
         except:
-            cpv = available_packages(cpv)[-1]
+            cpv = availablePackages(cpv)[-1]
     if cpv[-1] != 'r0':
         return '%s/%s-%s-%s' % cpv
     else:
         return '%s/%s-%s' % cpv[:-1]
         
     
-def get_dependencies(package, env={}, split=False):
+def getDependencies(package, env={}, split=False):
     pkg = normalize_cpv(package)
     cmd = ['emerge', '--ignore-default-opts', '='+pkg, '-poq']
     proc = sp.Popen(cmd, stdout=sp.PIPE, stderr=sp.PIPE, env=env)
@@ -94,24 +99,23 @@ def get_dependencies(package, env={}, split=False):
     else:
         return [shlex.split(l.strip())[-1] for l in lines]
 
-def install_dependencies(package, env={}, root='/', 
-                         pkgdir='usr/portage/packages', logdir=None):
-    if logdir is None:
-        logdir = "/var/log/benchmarks/.unordered"
-    
+
+def installDependencies(test):
     # Adjust environment
-    denv = _getEnv(root, dict(PKGDIR=pkgdir))
+    denv = _getEnv(test['root'], dict(PKGDIR=test['pkgdir']))
     
     # Retrieve dependencies
-    deps = get_dependencies(package, denv, False)
+    deps = getDependencies(test['package'], denv, False)
     
     for i,d in enumerate(deps):
-        logfile = pjoin(logdir, 'emergedep_%i.log' % i)
-        install_package(d, env, root, pkgdir, logfile)
+        logfile = pjoin(test['logdir'], 'emergedep_%i.log' % i)
+        installPackage(test, package=d, env=test['dependenv'], logfile=logfile)
 
 
-def install_package(package, env={}, root='/', pkgdir='usr/portage/packages',
-                    logfile=None):
+#def installPackage(package, env={}, root='/', pkgdir='usr/portage/packages',
+#                    logfile=None):
+def installPackage(test, package=None, env=None, logfile=None):
+    # TODO: rewrite docstring
     """Emerge a package in the given root.
     
     package is the package to be emerged. It has to be a tuple
@@ -130,45 +134,46 @@ def install_package(package, env={}, root='/', pkgdir='usr/portage/packages',
     The function has no return value and raises an exception in case of building
     or emerging failure. Note: dependencies will NOT be emerged!
     """
+    if package is None:
+        package = test['package']
+    if env is None:
+        env = test['emergeenv']
+    if logfile is None:
+        logfile = pjoin(test['logdir'], 'emerge.log')
+    
     envAdds = env.copy()
-    envAdds['PKGDIR'] = pkgdir
-    denv = _getEnv(root, envAdds)
+    envAdds['PKGDIR'] = test['pkgdir']
+    denv = _getEnv(test['root'], envAdds)
     del envAdds
     
     # Retrieve package string
     pkg = normalize_cpv(package)
     
     # Execute emerge command and log the results
-    if logfile is not None:
-        fout = file(logfile, 'w')
-        fout.flush()
-    else:
-        fout = sp.PIPE
+    benchutils.mkdir(dirname(logfile))
+    fout = file(logfile, 'w')
     cmd = ['emerge', '--ignore-default-opts', '-OB', '=' + pkg]
     p = sp.Popen(cmd, env=denv, stdout=fout, stderr=sp.STDOUT)
     p.wait()
     
     if p.returncode != 0:
         # In case of error, print the whole emerge command
-        raise InstallException(' '.join(cmd), logfile)
+        raise InstallException(p, ' '.join(cmd), logfile)
+    
+    fout.write('\n\n' + 80*'#' + '\n\n')
     
     # Unpack package onto root
-    benchutils.mkdir(pkgdir)
-    benchutils.mkdir(root)
-    archive = pjoin(pkgdir, pkg+'.tbz2')
-    tarcmd = ['tar', 'xjvf', archive, '-C', root]
-    cl = ' '.join(tarcmd)
-    if logfile is not None:
-        fout.write('\n\n' + 80*'#' + '\n\n')
-        fout.write(cl + '\n' + 80*'-' + '\n')
+    benchutils.mkdir(test['root'])
+    tarcmd = ['tar', 'xjvf', test['archive'], '-C', test['root']]
+    fout.write(' '.join(tarcmd) + '\n' + 80*'-' + '\n')
     p = sp.Popen(tarcmd, stdout=fout, stderr=sp.STDOUT)
     p.wait()
     if p.returncode != 0:
         # In case of error, print the whole emerge command
-        raise InstallException(cl, logfile)
+        raise InstallException(pkg, ' '.join(tarcmd), logfile)
     
-    if logfile is not None:
-        fout.close()
+    # Close, return
+    fout.close()
     
 if __name__ == '__main__':
     # Just a test

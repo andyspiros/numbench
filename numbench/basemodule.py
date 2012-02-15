@@ -17,7 +17,7 @@
 #
 from os.path import join as pjoin, basename, dirname
 import subprocess as sp
-import shlex, os
+import shlex, os, sys
 import shutil as shu
 
 import benchconfig as cfg
@@ -25,15 +25,14 @@ from htmlreport import HTMLreport
 import basemodule
 from benchutils import mkdir, run_cmd
 from benchprint import Print
-import benchpkgconfig as pc
+import utils.benchpkgconfig as pc
 from testdescr import testdescr
-import benchload as load
 
 try:
     if not locals().has_key('initialized'):
         initialized = True
-	import matplotlib
-	matplotlib.use('Agg')
+        import matplotlib
+        matplotlib.use('Agg')
         import matplotlib.pyplot as plt
         import numpy as np
         with_images = True
@@ -214,30 +213,29 @@ class BaseTest:
     # Alternatives-2 version with pkg-config
     def _get_flags(self):
         # 1. Run with no requires
-        pfile = pc.GetFile(self.libname, self.impl, self.root)
-        flags = pc.Run(pfile, self.root, False)
+        pfile = pc.getFile(self.libname, self.impl, self.root)
+        flags = pc.run(pfile, self.root, False)
         logfile = file(pjoin(self.logdir, 'pkg-config.log'), 'w')
         print >> logfile, "File:", pfile
         print >> logfile, "Result:", flags
         
         # 2. Get requires
-        requires = pc.Requires(pfile)
+        requires = pc.requires(pfile)
         print >> logfile, "Requires:", requires
         
         # 3.Substitute requires and add flags
         for r in requires:
             if r in self.changes.keys():
-                pfile = pc.GetFile(r, self.changes[r])
-                flags += ' ' + pc.Run(pfile)
+                pfile = pc.getFile(r, self.changes[r])
+                flags += ' ' + pc.run(pfile)
             else:
-                flags += ' ' + pc.Run(r)
+                flags += ' ' + pc.run(r)
         print >> logfile, "Third run:", flags
         logfile.close()
         
         return shlex.split(flags)
     
     def run_test(self, changes={}):
-        load.start()
         self.changes = changes
         
         # Convenient renames and definition of report files
@@ -286,6 +284,5 @@ class BaseTest:
         Print("Test successful")
                 
         # Return
-        load.stop()
         return self._generateResults()
     
