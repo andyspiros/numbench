@@ -15,26 +15,44 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
+from os.path import join as pjoin, exists
 import numbench.utils.btl as btl
+from numbench.benchprint import Print
 
-def reportConf():
+def reportConf(*args):
     return {'type':'semilogx', 'xlabel':'size', 'ylabel':'MFlops'}
 
-def runTest(test, btlconfig):
-    
+
+def runTest(self, test, btlconfig):
+    # Check if results already exist
+    tmpres = dict( \
+      [(i, pjoin(btlconfig['testdir'], "bench_"+i+"_"+self.libname)) \
+      for i in btlconfig['tests']])
+
+    if all([exists(i) for i in tmpres.values()]):
+        Print("Results exist - skipping run")
+        return tmpres
+
+    # Compile test suite
     ret = btl.compileTest(test, btlconfig)
     if ret != 0:
-        print "Compilation failed with code:", ret
+        Print("Compilation failed with code: %i" % ret)
+        return None
     else:
-        print "Compilation successful"
-    
+        Print("Compilation successful")
+
+    # Run test suite
     ret, result = btl.runTest(test, btlconfig)
     if ret != 0:
-        print "Execution failed with code:", ret
+        Print("Execution failed with code: %i" % ret)
+        Print("The results will be incomplete")
+        # TODO: remove this if possible (return incomplete results)
+        return None
     else:
-        print "Execution successful"
-        
+        Print("Execution successful")
+
     return result
+
 
 def getTests(self):
     return self.tests

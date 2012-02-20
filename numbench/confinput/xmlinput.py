@@ -90,18 +90,19 @@ def parseConf(fname):
 
     for t in testNodes:
         tid = t.getAttribute('id')
-        
+
         # Get description
         descr = None
         if len(t.getElementsByTagName('descr')) != 0:
             descr = t.getElementsByTagName('descr')[0].firstChild.data
-        
+
         # Get package
         pkg = portage.catpkgsplit(
           t.getElementsByTagName('pkg')[0].firstChild.data)
         normPkg = pu.normalize_cpv(pkg)
 
         # Skip implementations
+        # TODO: add regexp
         skip = [i.firstChild.data for i in t.getElementsByTagName('skip')]
 
         # Requirements
@@ -114,7 +115,7 @@ def parseConf(fname):
         emergeenv = getEnvFromNode(t, 'emergeenv')
         compileenv = getEnvFromNode(t, 'compileenv')
         runenv = getEnvFromNode(t, 'runenv')
-        
+
         # Adjust PATH
         if runenv.has_key('PATH'):
             runenv['PATH'] += ':' + os.environ['PATH']
@@ -128,12 +129,12 @@ def parseConf(fname):
           normalizedPackage = normPkg,
           skip = skip,
           requires = requires,
-          
+
           dependenv = dependenv,
           emergeenv = emergeenv,
           compileenv = compileenv,
           runenv = runenv,
-          
+
           pkgdir = pjoin(cfg.pkgsdir, tid),
           archive = pjoin(cfg.pkgsdir, tid, normPkg+'.tbz2'),
           root = pjoin(cfg.rootsdir, tid),

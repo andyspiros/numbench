@@ -18,20 +18,14 @@
 import sys, os, time, subprocess as sp
 from os.path import join as pjoin
 
-try:
-    needsinitialization = not initialized #@UndefinedVariable
-except NameError:
-    needsinitialization = True
-
-
-if needsinitialization:
+if not locals().has_key('initialized'):
     initialized = True
-    
+
     isroot = os.getuid() == 0
-    
+
     modulename = sys.argv[1]
     inputfile = os.path.realpath(sys.argv[2])
-    
+
     # Script directories
     curdir = os.path.abspath('.')
     scriptdir = os.path.dirname(os.path.realpath(__file__))
@@ -39,7 +33,7 @@ if needsinitialization:
         btldir = os.environ['BTLDIR']
     else:
         btldir = '/usr/include/btl'
-    
+
     # Library directory (lib vs. lib32 vs. lib64)
     libdir = sp.Popen \
       ('ABI=$(portageq envvar ABI); echo `portageq envvar LIBDIR_$ABI`', \
@@ -50,38 +44,30 @@ if needsinitialization:
         libdir = '/usr/' + libdir
     while libdir[0] == '/':
         libdir = libdir[1:]
-        
+
+    # Parse arguments
+    passargs = sys.argv[3:]
+    for i,a in enumerate(passargs):
+        if a in ('-d', '--directory'):
+            basedir = passargs[i+1]
+            passargs = passargs[:i] + passargs[i+2:]
+            break
+
     # Storage directories
-    basedirb = pjoin(os.environ['HOME'], '.numbench') \
-               + '/run_' + modulename + '_' + time.strftime('%Y-%m-%d')
-    if os.path.exists(basedirb):
-        n = 1
-        while True:
-            basedir = basedirb + "_%i" % n
-            if not os.path.exists(basedir):
-                break
-            n += 1
-    else:
-        basedir = basedirb
-    del basedirb
-    
+    if not locals().has_key('basedir'):
+        basedirb = pjoin(os.environ['HOME'], '.numbench') \
+                + '/run_' + modulename + '_' + time.strftime('%Y-%m-%d')
+        if os.path.exists(basedirb):
+            n = 1
+            while True:
+                basedir = basedirb + "_%i" % n
+                if not os.path.exists(basedir):
+                    break
+                n += 1
+        else:
+            basedir = basedirb
+        del basedirb
+
     testsdir, rootsdir, pkgsdir, reportdir, logdir = tuple([pjoin(basedir, i) \
       for i in ('tests', 'roots', 'packages', 'report', 'log')])
-    
-    
-#def makedirs():
-#    bu.mkdir(rootsdir)
-#    bu.mkdir(testsdir)
-#    bu.mkdir(pkgsdir)
-#    bu.mkdir(reportdir)
-#    bu.mkdir(logdir)
-#    
-#def purgedirs():
-#    bu.rmdir(rootsdir)
-#    bu.rmdir(testsdir)
-#    bu.rmdir(pkgsdir)
-#    bu.rmdir(pjoin(reportdir, '..'))
-#    bu.rmdir(pjoin(logdir, '..'))
-    
-    
-    
+

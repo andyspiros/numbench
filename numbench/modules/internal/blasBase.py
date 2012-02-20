@@ -31,11 +31,11 @@ defaultTests = ('axpy', 'matrix_vector', 'trisolve_vector', 'matrix_matrix')
 def init(self, args):
     passargs = []
     tests = []
-    
+
     if len(args) == 0:
         self.tests = defaultTests
         return
-    
+
     for i in args:
         if i == '1':
             tests += avail1
@@ -47,7 +47,7 @@ def init(self, args):
             tests += avail3
             continue
         passargs.append(i)
-        
+
     self.tests = btl.selectTests(availableTests, passargs+tests)
 
 
@@ -67,10 +67,10 @@ def runTest(self, test, implementation):
       flags = alt.getFlags(test, self.libname, implementation),
       tests = self.tests
     )
-    
-    return btlBase.runTest(test, btlconfig)
-    
-getTests  btlBase.getTests
+
+    return btlBase.runTest(self, test, btlconfig)
+
+getTests = btlBase.getTests
 reportConf = btlBase.reportConf
-    
+
 reportConf = btlBase.reportConf

@@ -201,7 +201,7 @@ def runTest(test, btlconfig):
         
         resfile = errline.split()[-1]
         operation = resfile.split('_', 1)[-1].rsplit('_', 1)[0]
-        result[operation] = resfile
+        result[operation] = pjoin(btlconfig['testdir'], resfile)
         Print(operation + " -> " + resfile)
         
         

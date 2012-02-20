@@ -49,8 +49,8 @@ def runTest(self, test, implementation):
       flags = alt.getFlags(test, self.libname, implementation),
       tests = self.tests
     )
-    
-    return btlBase.runTest(test, btlconfig)
-    
+
+    return btlBase.runTest(self, test, btlconfig)
+
 getTests  btlBase.getTests
 reportConf = btlBase.reportConf

@@ -67,7 +67,7 @@ def loadModule(modulename):
 #    except ImportError as e:
 #        sys.stderr.write('Module ' + modulename + ' not found')
 #        exit(1)
-    
+
     return tmp
 
 
@@ -120,37 +120,37 @@ Print("-------------------------------")
 Print()
 for tname, ttest in cfg.tests.items():
     Print("Test: " + tname)
-    
+
     if ttest['descr'] is not None:
         Print(" - Description: " + ttest['descr'])
-    
+
     Print(" - Package: " + ttest['normalizedPackage'])
-    
+
     if len(ttest['dependenv']) != 0:
         Print(" - Dependencies emerge environment: " + \
           ' '.join([n+'="'+v+'"' for n,v in ttest['dependenv'].items()]))
-    
+
     if len(ttest['emergeenv']) != 0:
         Print(" - Emerge environment: " + \
           ' '.join([n+'="'+v+'"' for n,v in ttest['emergeenv'].items()]))
-    
+
     if len(ttest['compileenv']) != 0:
         Print(" - Suite compile-time environment: " + \
           ' '.join([n+'="'+v+'"' for n,v in ttest['compileenv'].items()]))
-    
+
     if len(ttest['runenv']) != 0:
         Print(" - Suite run-time environment: " + \
           ' '.join([n+'="'+v+'"' for n,v in ttest['runenv'].items()]))
-        
+
     if len(ttest['skip']) != 0:
         Print(" - Skip implementations: " + ' '.join(ttest['skip']))
-        
+
     if len(ttest['requires']) != 0:
         Print(" - Pkg-config requirements substitutions:", '')
         for c_0, c_1 in ttest['requires'].items():
             Print(c_0 + ':' + c_1, '')
         Print()
-        
+
     Print()
 Print(80*'=')
 Print()
@@ -196,6 +196,7 @@ for tn,(name,test) in enumerate(cfg.tests.items(),1):
     Print("Package emerged")
 
     # Find implementations
+    # TODO: check for regexps
     impls = [i for i in mod.getImplementations(test) if not i in test['skip']]
     test['implementations'] = impls
 
@@ -210,7 +211,7 @@ for tn,(name,test) in enumerate(cfg.tests.items(),1):
         test['results'][impl] = mod.runTest(test, impl)
         Print.up()
     # All implementations tested
-    
+
     Print.up()
     print
 
