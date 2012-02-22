@@ -105,7 +105,7 @@ def parseConf(fname):
         skip = []
         skipre = []
         for s in t.getElementsByTagName('skip'):
-            if not s.hasAtribute('type') or s.getAttribute('type') == 'glob':
+            if not s.hasAttribute('type') or s.getAttribute('type') == 'glob':
                 skip.append(s.firstChild.data)
             elif s.getAttribute('type') == 'regexp':
                 skipre.append(s.firstChild.data)

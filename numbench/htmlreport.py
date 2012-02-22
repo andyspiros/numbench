@@ -63,7 +63,8 @@ h1, h2, .plot, .descr, .info {
         self.content += title + "</h1>"
         date = time.strftime('%Y-%m-%d, %I:%M %p')
         self.content += '<p class="info">Generated on ' + date + '</p>'
-        
+
+        # Information regarding the CPU
         cpuinfo = file('/proc/cpuinfo', 'r').readlines()
         cpu = None
         for l in cpuinfo:
@@ -71,7 +72,8 @@ h1, h2, .plot, .descr, .info {
                 cpu = l.split(':',1)[1].strip()
         if cpu:
             self.content += '<p class="info">CPU: ' + cpu + '</p>'
-        
+            
+        # Information regarding the memory
         meminfo = file('/proc/meminfo', 'r').readlines()
         mem = None
         for l in meminfo:
@@ -79,7 +81,8 @@ h1, h2, .plot, .descr, .info {
                 mem = l.split(':',1)[1].strip()
         if mem:
             self.content += '<p class="info">Total memory: ' + mem + '</p>'
-        
+
+        # Input file
         self.content += '<div class="inputfile">Input file: ' + \
           '<a href="%s">%s</a>' % (basename(inputfile), cfg.inputfile) + \
           '<pre>%s</pre></div>' % xmlescape(file(cfg.inputfile, 'r').read())

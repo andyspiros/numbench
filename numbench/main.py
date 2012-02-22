@@ -147,6 +147,9 @@ for tname, ttest in cfg.tests.items():
     if len(ttest['skip']) != 0:
         Print(" - Skip implementations: " + ' '.join(ttest['skip']))
 
+    if len(ttest['skipre']) != 0:
+        Print(" - Skip implementations (regular expressions): " + ' '.join(ttest['skipre']))
+
     if len(ttest['requires']) != 0:
         Print(" - Pkg-config requirements substitutions:", '')
         for c_0, c_1 in ttest['requires'].items():

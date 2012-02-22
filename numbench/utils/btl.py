@@ -215,7 +215,7 @@ def runTest(test, btlconfig):
             if not outline:
                 Print.up()
                 Print('Execution error')
-                return 1
+                return 1, None
             logfs.write(outline)
             logfs.flush()
             

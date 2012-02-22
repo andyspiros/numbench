@@ -16,6 +16,7 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
 from os.path import join as pjoin, basename
+from shutil import copy as fcopy, copytree
 import numpy as np
 
 import benchconfig as cfg
@@ -68,7 +69,8 @@ def saveReport():
         for tid,test in cfg.tests.items():
             if test.has_key('implementations'):
                 for impl in test['implementations']:
-                    if test['results'][impl].has_key(operation):
+                    res = test['results'][impl]
+                    if res and res.has_key(operation):
                         resultsFile = test['results'][impl][operation]
                         x,y = np.loadtxt(resultsFile, unpack=True)
                         plotf(x, y, label=tid+'/'+impl, hold=True)
@@ -85,6 +87,11 @@ def saveReport():
     # Close HTML file
     html.close()
     Print('HTML report generated: ' + htmlfname)
+
+    # Copy input and logs
+    inputdest = pjoin(cfg.reportdir, basename(cfg.inputfile))
+    fcopy(cfg.inputfile, inputdest)
+    copytree(cfg.logdir, pjoin(cfg.reportdir, 'log'))
 
 
 # Initialize module
