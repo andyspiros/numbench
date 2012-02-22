@@ -208,7 +208,7 @@ def runTest(test, btlconfig):
         # Many different sizes for each operation test
         Print.down()
         cur = 0
-        tot = 1
+        tot = 100
         while cur != tot:
             outline = proc.stdout.readline()
             # If the line is void, something gone wrong
@@ -221,8 +221,12 @@ def runTest(test, btlconfig):
             
             # Interpret line
             outline = outline.strip()
-            (cur, tot) = shlex.split(outline)[-1][1:-1].split('/')
-            cur = int(cur); tot = int(tot)
+            try:
+                (cur, tot) = shlex.split(outline)[-1][1:-1].split('/')
+                cur = int(cur)
+                tot = int(tot)
+            except:
+                cur += 1
             Print(outline)
             
             

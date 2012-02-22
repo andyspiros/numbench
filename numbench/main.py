@@ -1,7 +1,7 @@
 #! /usr/bin/env python2
 
 #=====================================================
-# Copyright (C) 2011 Andrea Arteaga <andyspiros@gmail.com>
+# Copyright (C) 2011-2012 Andrea Arteaga <andyspiros@gmail.com>
 #=====================================================
 #
 # This program is free software; you can redistribute it and/or
@@ -89,6 +89,8 @@ if sys.argv[2] in ('-h', '--help'):
 ## BEGIN THE TRUE SCRIPT
 
 # Import the packages
+import re
+from fnmatch import fnmatch
 from os.path import join as pjoin
 import benchconfig as cfg, benchutils as bu, confinput
 from benchprint import Print
@@ -196,8 +198,23 @@ for tn,(name,test) in enumerate(cfg.tests.items(),1):
     Print("Package emerged")
 
     # Find implementations
-    # TODO: check for regexps
-    impls = [i for i in mod.getImplementations(test) if not i in test['skip']]
+    impls = []
+    for i in mod.getImplementations(test):
+        skip = False
+        
+        for s in test['skip']:
+            if fnmatch(i, s):
+                skip = True
+                break
+        
+        for s in test['skipre']:
+            if re.search(s, i) != None:
+                skip = True
+                break
+        
+        if not skip:
+            impls.append(i)
+                
     test['implementations'] = impls
 
     # Test every implementation

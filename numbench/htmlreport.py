@@ -1,5 +1,5 @@
 #=====================================================
-# Copyright (C) 2011 Andrea Arteaga <andyspiros@gmail.com>
+# Copyright (C) 2011-2012 Andrea Arteaga <andyspiros@gmail.com>
 #=====================================================
 #
 # This program is free software; you can redistribute it and/or
@@ -17,6 +17,7 @@
 #
 import time
 from os.path import join as pjoin, basename
+from xml.sax.saxutils import escape as xmlescape
 
 import benchconfig as cfg
 
@@ -81,7 +82,7 @@ h1, h2, .plot, .descr, .info {
         
         self.content += '<div class="inputfile">Input file: ' + \
           '<a href="%s">%s</a>' % (basename(inputfile), cfg.inputfile) + \
-          '<pre>%s</pre></div>' % file(cfg.inputfile, 'r').read()
+          '<pre>%s</pre></div>' % xmlescape(file(cfg.inputfile, 'r').read())
           
         self.content += '<div class="log">Logs: <a href="log">%s</a></div>' \
           % cfg.logdir

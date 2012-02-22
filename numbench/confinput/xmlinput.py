@@ -1,5 +1,5 @@
 import xml.dom.minidom
-import os, portage, types
+import sys, os, portage, types
 import subprocess as sp
 from os.path import join as pjoin, dirname as pdirname, realpath as prealpath
 
@@ -102,8 +102,16 @@ def parseConf(fname):
         normPkg = pu.normalize_cpv(pkg)
 
         # Skip implementations
-        # TODO: add regexp
-        skip = [i.firstChild.data for i in t.getElementsByTagName('skip')]
+        skip = []
+        skipre = []
+        for s in t.getElementsByTagName('skip'):
+            if not s.hasAtribute('type') or s.getAttribute('type') == 'glob':
+                skip.append(s.firstChild.data)
+            elif s.getAttribute('type') == 'regexp':
+                skipre.append(s.firstChild.data)
+            else:
+                sys.stderr.write('Error in configuration file: skip type ' \
+                  + s.getAttribute('type') + ' not supported')
 
         # Requirements
         requires = {}
@@ -128,6 +136,7 @@ def parseConf(fname):
           package = pkg,
           normalizedPackage = normPkg,
           skip = skip,
+          skipre = skipre,
           requires = requires,
 
           dependenv = dependenv,

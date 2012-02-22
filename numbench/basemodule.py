@@ -243,7 +243,6 @@ class BaseTest:
         root = self.root
         testdir = self.testdir
         self.files = [pjoin(testdir,f) for f in self.files]
-        env = {} # TODO: remove this
         if cfg.libdir[0] == '/':
             libdir = root+cfg.libdir
         else:
