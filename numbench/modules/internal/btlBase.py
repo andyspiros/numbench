@@ -26,7 +26,7 @@ def reportConf(*args):
 def runTest(self, test, btlconfig):
     # Check if results already exist
     tmpres = dict( \
-      [(i, pjoin(btlconfig['testdir'], "bench_"+i+"_"+self.libname)) \
+      [(i, pjoin(btlconfig['testdir'], 'bench_'+i+'_'+self.libname+'.dat')) \
       for i in btlconfig['tests']])
 
     if all([exists(i) for i in tmpres.values()]):

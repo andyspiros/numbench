@@ -1,10 +1,13 @@
 <tests>
+
+<!--
     <test id="reference">
         <pkg>sci-libs/blas-reference-20120215-r1</pkg>
         <emergeenv>
             <var name="FFLAGS">-O3</var>
         </emergeenv>
     </test>
+-->
 
 <!--
     <test id="atlas">

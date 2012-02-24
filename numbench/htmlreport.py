@@ -91,7 +91,7 @@ h1, h2, .plot, .descr, .info {
     def addFig(self, title, image, descr='', alt='', width=None):
         self.content += '<div class="fig">'
         self.content += '<h2>' + title + '</h2>'
-        if descr.strip() != '': 
+        if descr.strip() != '':
             self.content += '<p class="descr">' + descr + '</p>'
         self.content += '<div class="plot">'
         self.content += '<a href="' + image + '">' 

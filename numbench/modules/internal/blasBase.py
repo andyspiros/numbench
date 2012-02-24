@@ -32,10 +32,6 @@ def init(self, args):
     passargs = []
     tests = []
 
-    if len(args) == 0:
-        self.tests = defaultTests
-        return
-
     for i in args:
         if i == '1':
             tests += avail1
@@ -49,6 +45,8 @@ def init(self, args):
         passargs.append(i)
 
     self.tests = btl.selectTests(availableTests, passargs+tests)
+    if len(self.tests) == 0:
+        self.tests = defaultTests
 
 
 def getImplementations(self, test):
