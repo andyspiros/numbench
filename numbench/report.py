@@ -17,7 +17,7 @@
 #
 from os.path import join as pjoin, basename
 import sys, numpy as np
-from shutil import rmtree
+from shutil import copy as fcopy, copytree, rmtree
 
 import benchconfig as cfg
 import benchutils as bu
