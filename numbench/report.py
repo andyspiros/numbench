@@ -108,6 +108,10 @@ def saveReport():
         fname = pjoin(cfg.reportdir, imgpath)
         p.savePlot(fname)
         html.addFig(testdescr[operation], image=imgpath)
+        
+    # Copy logs and input file
+    copytree(cfg.logdir, pjoin(cfg.reportdir, 'log'))
+    fcopy(cfg.inputfile, pjoin(cfg.reportdir, basename(cfg.inputfile)));
 
     # Close HTML file
     html.close()
