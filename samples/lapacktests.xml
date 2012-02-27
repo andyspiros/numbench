@@ -1,0 +1,38 @@
+<tests>
+
+    <test id="reference-mkl">
+        <pkg>sci-libs/lapack-reference-3.4.0_p20120215-r1</pkg>
+        <emergeenv>
+            <var name="FFLAGS">-O3</var>
+        </emergeenv>
+        <required name="blas">mkl64-intel</required>
+    </test>
+
+    <test id="reference-openblas">
+        <pkg>sci-libs/lapack-reference-3.4.0_p20120215-r1</pkg>
+        <emergeenv>
+            <var name="FFLAGS">-O3</var>
+        </emergeenv>
+        <required name="blas">openblas</required>
+    </test>
+
+    <test id="atlas">
+        <pkg>sci-libs/atlas-3.9.68</pkg>
+        <emergeenv>
+            <var name="USE">threads</var>
+        </emergeenv>
+    </test>
+
+    <test id="mkl">
+        <pkg>sci-libs/mkl-10.3.7.256</pkg>
+        <skip>mkl32*</skip>
+        <skip>*int64*</skip>
+        <skip>*openmp</skip>
+        <skip>*dynamic*</skip>
+    </test>
+
+    <test id="acml">
+        <pkg>sci-libs/acml-5.1.0</pkg>
+    </test>
+
+</tests>

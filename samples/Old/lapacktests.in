@@ -1,0 +1,5 @@
+# Testing different implementations of LAPACK
+reference_eigen sci-libs/lapack-reference-3.3.1-r1 blas:eigen
+reference_openblas sci-libs/lapack-reference-3.3.1-r1 blas:openblas-threads
+#atlas sci-libs/atlas-3.9.46
+acml sci-libs/acml-4.4.0-r1 -acml32-gfortran -acml32-gfortran-openmp -acml64-gfortran-openmp

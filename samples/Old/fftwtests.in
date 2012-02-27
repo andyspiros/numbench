@@ -1,0 +1,5 @@
+# Testing FFTW with different gcc versions and enabling vectorization
+
+gcc-4.6.1 sci-libs/fftw-3.2.2-r1 CC=gcc-4.6.1 CFLAGS="-O3 -march=native -msse2 -msse3 -mssse3 -msse4.1 -msse4.2"
+gcc-4.5.2 sci-libs/fftw-3.2.2-r1 CC=gcc-4.5.2 CFLAGS="-O3 -march=native -msse2 -msse3 -mssse3 -msse4.1 -msse4.2"
+gcc-4.3.6 sci-libs/fftw-3.2.2-r1 CC=gcc-4.3.6 CFLAGS="-O3 -march=native -msse2 -msse3 -mssse3 -msse4.1 -msse4.2"

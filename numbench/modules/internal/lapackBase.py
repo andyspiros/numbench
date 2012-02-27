@@ -27,10 +27,9 @@ defaultTests = ('lu_decomp', 'cholesky', 'qr_decomp', 'svd_decomp', 'syev')
 
 
 def init(self, args):
-    if len(args) == 0:
+    self.tests = btl.selectTests(availableTests, args)
+    if len(self.tests) == 0:
         self.tests = defaultTests
-    else:
-        self.tests = btl.selectTests(availableTests, args)
 
 
 def getImplementations(self, test):
@@ -52,5 +51,5 @@ def runTest(self, test, implementation):
 
     return btlBase.runTest(self, test, btlconfig)
 
-getTests  btlBase.getTests
+getTests = btlBase.getTests
 reportConf = btlBase.reportConf

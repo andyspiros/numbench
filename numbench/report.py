@@ -97,8 +97,10 @@ def saveReport():
         for tid,test in cfg.tests.items():
             if test.has_key('implementations'):
                 for impl in test['implementations']:
-                    if test['results'][impl].has_key(operation):
-                        resultsFile = test['results'][impl][operation]
+                    
+                    implres = test['results'][impl]
+                    if implres and implres.has_key(operation):
+                        resultsFile = implres[operation]
                         x,y = np.loadtxt(resultsFile, unpack=True)
                         p.addPlot(x, y, tid+'/'+impl)
 
