@@ -49,7 +49,7 @@ if not locals().has_key('initialized'):
     passargs = sys.argv[3:]
     for i,a in enumerate(passargs):
         if a in ('-d', '--directory'):
-            basedir = passargs[i+1]
+            basedir = pjoin(curdir, passargs[i+1])
             passargs = passargs[:i] + passargs[i+2:]
             break
 

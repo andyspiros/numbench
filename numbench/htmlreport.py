@@ -22,7 +22,7 @@ from xml.sax.saxutils import escape as xmlescape
 import benchconfig as cfg
 
 class HTMLreport:
-    def __init__(self, fname, title="Benchmarks report", \
+    def __init__(self, fname, title='Benchmarks report', \
                   inputfile=pjoin(cfg.reportdir, basename(cfg.inputfile))):
         self.fname = fname
         self.content = """
@@ -60,7 +60,7 @@ h1, h2, .plot, .descr, .info {
 <body>
 <h1>
 """
-        self.content += title + "</h1>"
+        self.content += title + '</h1>'
         date = time.strftime('%Y-%m-%d, %I:%M %p')
         self.content += '<p class="info">Generated on ' + date + '</p>'
 
@@ -106,7 +106,7 @@ h1, h2, .plot, .descr, .info {
         self.content += '</div><hr />'
         
     def close(self):
-        self.content += "</body></html>"
+        self.content += '</body></html>'
         f = file(self.fname, 'w')
         f.write(self.content)
         f.close()
