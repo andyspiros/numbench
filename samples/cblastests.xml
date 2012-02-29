@@ -1,0 +1,41 @@
+<tests>
+
+    <test id="reference">
+        <pkg>sci-libs/cblas-reference-20110218</pkg>
+        <emergeenv>
+            <var name="FFLAGS">-O3</var>
+        </emergeenv>
+    </test>
+
+    <test id="atlas">
+        <pkg>sci-libs/atlas-3.9.68</pkg>
+        <emergeenv>
+            <var name="USE">threads</var>
+        </emergeenv>
+    </test>
+
+    <test id="openblas">
+        <pkg>sci-libs/openblas-9999</pkg>
+        <emergeenv>
+            <var name="TARGET">NEHALEM</var>
+            <var name="FFLAGS">-O3</var>
+            <var name="CFLAGS">-O3</var>
+            <var name="USE">incblas</var>
+        </emergeenv>
+    </test>
+
+    <test id="mkl">
+        <pkg>sci-libs/mkl-10.3.7.256</pkg>
+        <skip>mkl32*</skip>
+        <skip>*int64*</skip>
+        <skip>*openmp</skip>
+    </test>
+
+    <test id="gsl">
+        <pkg>sci-libs/gsl-1.15-r2</pkg>
+        <emergeenv>
+            <var name="CFLAGS">-O3</var>
+        </emergeenv>
+    </test>
+
+</tests>
