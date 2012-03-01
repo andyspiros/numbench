@@ -92,13 +92,10 @@ if sys.argv[2] in ('-h', '--help'):
 import re
 from fnmatch import fnmatch
 from os.path import join as pjoin
-import benchconfig as cfg, benchutils as bu, confinput
-from benchprint import Print
-import PortageUtils as pu
-import report
 
-#from PortageUtils import \
-#  normalize_cpv, install_dependencies, install_package, InstallException
+import benchconfig as cfg, confinput, report
+from utils import benchutils as bu, portageutils as pu
+from benchprint import Print
 
 
 # Parse the configuration file
@@ -109,7 +106,6 @@ if not os.path.exists(cfg.inputfile):
 cfg.tests = confinput.parseInput(cfg.inputfile)
 
 # Import the module
-#os.chdir(cfg.scriptdir)
 mod = loadModule(cfg.modulename).Module(sys.argv[3:])
 cfg.mod = mod
 

@@ -19,7 +19,7 @@ import commands as cmd
 import subprocess as sp
 import os, portage, shlex
 from os.path import join as pjoin, dirname
-import benchutils
+from utils import benchutils as bu
 
 class InstallException(Exception):
     def __init__(self, package, command, logfile):
@@ -150,7 +150,7 @@ def installPackage(test, package=None, env=None, logfile=None):
     pkg = normalize_cpv(package)
 
     # Execute emerge command and log the results
-    benchutils.mkdir(dirname(logfile))
+    bu.mkdir(dirname(logfile))
     fout = file(logfile, 'w')
     cmd = ['emerge', '--ignore-default-opts', '-OB', '=' + pkg]
     p = sp.Popen(cmd, env=denv, stdout=fout, stderr=sp.STDOUT)
@@ -164,7 +164,7 @@ def installPackage(test, package=None, env=None, logfile=None):
 
     # Unpack package onto root
     archive = pjoin(test['pkgdir'], pkg+'.tbz2')
-    benchutils.mkdir(test['root'])
+    bu.mkdir(test['root'])
     tarcmd = ['tar', 'xjvf', archive, '-C', test['root']]
     fout.write(' '.join(tarcmd) + '\n' + 80*'-' + '\n')
     p = sp.Popen(tarcmd, stdout=fout, stderr=sp.STDOUT)

@@ -4,7 +4,7 @@ import subprocess as sp
 from os.path import join as pjoin, dirname as pdirname, realpath as prealpath
 
 from .. import benchconfig as cfg
-from .. import PortageUtils as pu
+from ..utils import portageutils as pu
 
 
 def readFile(fs):

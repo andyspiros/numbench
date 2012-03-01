@@ -15,7 +15,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-from .. import benchchildren, benchutils as bu, benchconfig as cfg
+from .. import benchchildren, benchconfig as cfg
+from ..utils import benchutils as bu
 from ..benchprint import Print
 
 from os.path import join as pjoin, dirname
@@ -25,7 +26,6 @@ import shlex, subprocess as sp
 btlincludes = ('actions','generic_bench','generic_bench/utils','libs/STL')
 btllibraries = ('rt',)
 btldefines = ('NDEBUG',)
-
 
 
 def compileTest(test, btlconfig):

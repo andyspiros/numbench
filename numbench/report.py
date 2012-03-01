@@ -20,7 +20,7 @@ import sys, numpy as np
 from shutil import copy as fcopy, copytree, rmtree
 
 import benchconfig as cfg
-import benchutils as bu
+from utils import benchutils as bu
 from htmlreport import HTMLreport
 from testdescr import testdescr
 from benchprint import Print

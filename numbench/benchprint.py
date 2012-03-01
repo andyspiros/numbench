@@ -22,7 +22,8 @@ except NameError:
 
 
 if needsinitialization:
-    import benchconfig as cfg, benchutils as bu
+    import benchconfig as cfg
+    from utils import benchutils as bu
     from os.path import dirname, join as pjoin
 
     class _Print:
