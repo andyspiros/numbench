@@ -30,26 +30,26 @@ def runTest(self, test, btlconfig):
       for i in btlconfig['tests']])
 
     if all([exists(i) for i in tmpres.values()]):
-        Print("Results exist - skipping run")
+        Print('Results exist - skipping run')
         return tmpres
 
     # Compile test suite
     ret = btl.compileTest(test, btlconfig)
     if ret != 0:
-        Print("Compilation failed with code: %i" % ret)
+        Print('Compilation failed with code: %i' % ret)
         return None
     else:
-        Print("Compilation successful")
+        Print('Compilation successful')
 
     # Run test suite
     ret, result = btl.runTest(test, btlconfig)
     if ret != 0:
-        Print("Execution failed with code: %i" % ret)
-        Print("The results will be incomplete")
+        Print('Execution failed with code: %i' % ret)
+        Print('The results will be incomplete')
         # TODO: remove this if possible (return incomplete results)
         return None
     else:
-        Print("Execution successful")
+        Print('Execution successful')
 
     return result
 

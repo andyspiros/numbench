@@ -1,0 +1,31 @@
+<tests>
+    
+    <test id="fftw-O0">
+        <pkg>sci-libs/fftw-3.3-r2</pkg>
+        <emergeenv>
+            <var name="CFLAGS">-O0</var>
+        </emergeenv>
+    </test>
+    
+    <test id="fftw-O1">
+        <pkg>sci-libs/fftw-3.3-r2</pkg>
+        <emergeenv>
+            <var name="CFLAGS">-O1</var>
+        </emergeenv>
+    </test>
+    
+    <test id="fftw-O2">
+        <pkg>sci-libs/fftw-3.3-r2</pkg>
+        <emergeenv>
+            <var name="CFLAGS">-O2</var>
+        </emergeenv>
+    </test>
+    
+    <test id="fftw-O3">
+        <pkg>sci-libs/fftw-3.3-r2</pkg>
+        <emergeenv>
+            <var name="CFLAGS">-O3</var>
+        </emergeenv>
+    </test>
+
+</tests>
