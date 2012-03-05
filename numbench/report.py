@@ -21,7 +21,7 @@ from shutil import copy as fcopy, copytree, rmtree
 
 import benchconfig as cfg
 from utils import benchutils as bu
-from htmlreport import HTMLreport
+from reports.html import ReportFile as HTMLreport
 from testdescr import testdescr
 from benchprint import Print
 

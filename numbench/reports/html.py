@@ -21,7 +21,7 @@ from xml.sax.saxutils import escape as xmlescape
 
 import benchconfig as cfg
 
-class HTMLreport:
+class ReportFile:
     def __init__(self, fname, title='Benchmarks report', \
                   inputfile=pjoin(cfg.reportdir, basename(cfg.inputfile))):
         self.fname = fname

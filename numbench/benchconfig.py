@@ -39,11 +39,9 @@ if not locals().has_key('initialized'):
       ('ABI=$(portageq envvar ABI); echo `portageq envvar LIBDIR_$ABI`', \
       stdout=sp.PIPE, shell=True).communicate()[0].strip()
     if not libdir:
-        libdir = '/usr/lib'
+        libdir = 'usr/lib'
     else:
-        libdir = '/usr/' + libdir
-    while libdir[0] == '/':
-        libdir = libdir[1:]
+        libdir = 'usr/' + libdir
 
     # Parse arguments
     passargs = sys.argv[3:]
