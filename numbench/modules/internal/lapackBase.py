@@ -40,11 +40,11 @@ def runTest(self, test, implementation):
     # Set up btlconfig
     btlconfig = dict (
       source = 'libs/LAPACK/main.cpp',
-      exe = pjoin(test['testdir'], implementation, "test"),
+      exe = pjoin(test['testdir'], implementation, 'test'),
       logdir = pjoin(test['logdir'], implementation),
       testdir = pjoin(test['testdir'], implementation),
       btlincludes = ('libs/BLAS', 'libs/LAPACK'),
-      defines = ("LAPACKNAME="+self.libname, ),
+      defines = ('LAPACKNAME='+self.libname, ),
       flags = alt.getFlags(test, self.libname, implementation),
       tests = self.tests
     )

@@ -19,7 +19,7 @@ import commands as cmd
 import subprocess as sp
 import os, portage, shlex
 from os.path import join as pjoin, dirname
-from utils import benchutils as bu
+import benchutils as bu
 
 class InstallException(Exception):
     def __init__(self, package, command, logfile):

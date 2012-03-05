@@ -18,8 +18,8 @@
 import internal.blasBase as base
 
 class Module:
-    libname = "blas"
-    descr = "Test module for BLAS implementations"
+    libname = 'blas'
+    descr = 'Test module for BLAS implementations'
 
     __init__ = base.init
     getImplementations = base.getImplementations

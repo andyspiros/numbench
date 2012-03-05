@@ -18,8 +18,8 @@
 import internal.lapackBase as base
 
 class Module:
-    libname = "lapack"
-    descr = "Test module for LAPACK implementations"
+    libname = 'lapack'
+    descr = 'Test module for LAPACK implementations'
 
     __init__ = base.init
     getImplementations = base.getImplementations
