@@ -162,7 +162,10 @@ def compileTest(test, btlconfig):
 
 
 def runTest(test, btlconfig):
+    # Set runtime environment
     runenv = btlconfig['runenv']
+    if not runenv.has_key('BTL_CONFIG'):
+        runenv['BTL_CONFIG'] = '--real'
     
     # Check linking
     logfs = file(pjoin(btlconfig['logdir'], 'btlLinking.log'), 'w')
@@ -173,9 +176,9 @@ def runTest(test, btlconfig):
     # Prepare arguments
     args = (btlconfig['exe'],) + tuple(btlconfig['tests'])
     if btlconfig.has_key('preargs'):
-        args = btlconfig['preargs'] + args
+        args = tuple(btlconfig['preargs']) + args
     if btlconfig.has_key('postargs'):
-        args = args + btlconfig['postargs']
+        args = args + tuple(btlconfig['postargs'])
     
     # Open log
     logfs = file(pjoin(btlconfig['logdir'], "btlRun.log"), 'w')

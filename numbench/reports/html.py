@@ -19,7 +19,7 @@ import time
 from os.path import join as pjoin, basename
 from xml.sax.saxutils import escape as xmlescape
 
-import benchconfig as cfg
+from .. import benchconfig as cfg
 
 class ReportFile:
     def __init__(self, fname, title='Benchmarks report', \
