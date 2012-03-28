@@ -1,4 +1,4 @@
-.TH NUMBENCH "1" "August 2011" "Gentoo" "User Commands"
+.TH NUMBENCH "1" "March 2012" "Gentoo" "User Commands"
 .SH NAME
 numbench \- Benchmarking tool for Gentoo
 .SH SYNOPSIS
@@ -56,89 +56,79 @@ More information about each module is available through the command:
 
 .PP
 In order to run a test, a configuration file has to be provided.
-Each line of this file defines a package that is to be tested.
-It is possible to test different versions of the same package, or
-even to test many times the same package with different compile-time
-environment; for each different version or environment, a different
-line has to be written.
+The configuration file is an XML document: the main tag has the name
+.I tests
+and it contains one ore more test case definitions within tags
+.I test
+. Each test has to specify an id within the corresponding argument and a
+package in a format understandable by Portage within the tag
+.I pkg.
+This package is supposed to contain (at least) an implementation that can
+be tested by numbench.
 
 .PP
-Each line begins with an identification token of the test. This
-identification can contain any characters, but it is recommended
-that it only contains alphanumeric digits, the period . , the minus
-sign - and the underscore _ .
-After the identification word, the package has to be provided. The
-package specification should be fully provided, in the usual
-category/package-version[-revision] format. For instance
-sci-libs/lapack-reference-3.3.1-r1. However, the script will try to
-choose the best package in case of lacking information.
-After the package, the environment has to be specified. In order
-to do that, the user has to use the KEY=VALUE format. If the value
-contains a whitespace, the single or double quoting marks have to be
-used. The following are two valid configuration lines that define
-the tests for the sci-libs/atlas package with different compilers
-and CFLAGS:
-
-.RS
-atlas-gcc sci-libs/atlas-3.9.46 CC=gcc CFLAGS=-O2
-
-atlas-gcc-4.6.1 sci-libs/atlas-3.9.46 CC=gcc-4.6.1 CFLAGS="-O3 -march=native"
-.RE
+Within each
+.I test
+tag up to four different environments can be tested. These are dependenv,
+emergeenv, compileenv and runenv. In order to specify an environment,
+create a tag with the same name, and add in this tag as many variable
+definitions as you desire. To define a variable it sufficient to create
+a tag
+.I var
+with the variable name in the argument "name" and the value as tag text.
 
 .PP
-Variables that affect the emerge process, such as USE, can be used
-and are effective.
-Another possibility to set the environment used during the emerge process is
-writing a bash script that uses the export directives. These files have to be
-specified added to the line with a leading @ mark. More files can be specified;
-in this case the latter files override the variables in case of collisions;
-the environment variables that are specified on the configuration line override
-the variables set through files in case of collisions. The files can be
-specified with both a relative path or an absolute one. The following examples
-show this feature:
+The following example shows a minimal configuration file for blas
+implementations, where the test "reference" is defined; the package
+sci-libs/blas-reference-20120215-r1 is required and an emergeenv environment
+with the variable FFLAGS equal to "-O3 -funroll-all-loops"
+is defined:
 
-.RS
-atlas-gcc sci-libs/atlas-3.9.46 @envforatlas.sh @envforgcc
-
-atlas-gcc sci-libs/atlas-3.9.46 @envforatlas.sh CC=gcc-4.6.1 CFLAGS="-O3"
-.RE
+  <tests>
+    <test id="reference">
+      <pkg>sci-libs/blas-reference-20120215-r1</pkg>
+      <emergeenv>
+        <var name="FFLAGS">-O3 -funroll-all-loops</var>
+  	  </emergeenv>
+    </test>
+  </tests>
 
 .PP
-More configuration options are available. As each package can
-install many implementations of the same library (for instance, the
-sci-libs/atlas package installs the serial version and the
-parallelized version with threads or openmp, depending on the USE
-flags), each implementation is tested; but if you do not want to
-test a specific implementation, you can mask it by adding to the
-configuration line the string '-implementation' (without quoting
-marks); then the script will skip the implementation. The following
-is an example where the 32-bit implementations of the acml are
-skipped:
-
-.RS
-acml sci-libs/acml-4.4.0 -acml32-gfortran -acml32-gfortran-openmp
-.RE
+The "dependenv" environment is used while emerging the dependencies of the
+package; the environment named "emergeenv" is used while emerging the package
+itself; "compileenv" is used when compiling the test program (if any) and
+"runenv" represents the environment within which the test program is run. The
+environments can also been specified through external files: if the argument
+"script" is given, its value must be the path of a script that exports the
+desired environment variables; at the end of the execution the environment is
+read and used. If the argument "file" is given, it must be the path of a text
+file containing key:value pairs, one on each line. If the argument "append" is
+given and its value is 1, the variables specified override the variables of
+the environment numbench is running in and this resulting environment is
+used.
 
 .PP
-The last configuration option that can be used is for libraries that
-internally use other libraries. For example, most LAPACK
-implementations lie on BLAS and/or CBLAS implementations. It is
-possible to make the tested LAPACK implementation use a specific
-BLAS implementation through the 'blas:implementation' (without
-quotation marks) format. For instance, the following line
-defines a test where the atlas LAPACK implementation uses the
-openblas library as BLAS and CBLAS (openblas has to be installed for
-this to work):
-
-.RS
-atlas sci-libs/atlas-3.9.46 blas:openblas
-.RE
+If the package installs more than one implementation, one or more of them can
+be skipped in order to reduce the required time. In order to skip one or more
+implementations, many tags "skip" can be created within a single "test" tag.
+The text value of these tags is intepreted as glob pattern. Regular expressions
+can be used: in this case it sufficient to add the argument "type" with value
+"regexp" to the "skip" tag.
 
 .PP
-Some examples of configuration files are available in the directory
-/usr/share/numbench/samples. Please refer to those files to see some detailed
-working configuration files.
+An useful feature of numbench is the ability of changing the implementation of
+a library used by a tested software. For example, most lapack implementations
+internally use a blas implementation just like other libraries or programs. You
+could decide to test the reference-lapack implementation with two different
+underlying blas implementations. In order to do that it is sufficient to create
+within the "test" tag a tag named "required", with an argument named "name"
+whose value is the generic name of the library (e.g. "blas"), and a text
+value corresponding to the specific name of the library to use (e.g. "eigen").
+The required implementation must be installed in the main system.
 
+.PP
+Examples of configuration files are available under /usr/share/numbench/samples
+and cover a wide range of possible test cases.
 
 .SS Logs
 
