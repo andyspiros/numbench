@@ -187,9 +187,15 @@ def runTest(test, btlconfig):
     logfs.flush()
     
     # Open pipe
-    proc = sp.Popen(args, bufsize=1, stdout=sp.PIPE, stderr=sp.PIPE, \
-                    env=runenv, cwd=btlconfig['testdir'])
-    benchchildren.append(proc)
+    try:
+        proc = sp.Popen(args, bufsize=1, stdout=sp.PIPE, stderr=sp.PIPE, \
+                        env=runenv, cwd=btlconfig['testdir'])
+        benchchildren.append(proc)
+    except OSError:
+        Print('Execution failed to start')
+        Print('Command line: ' + ' '.join(args))
+        return -1, None
+        
     
     result = {}
     

@@ -158,7 +158,7 @@ def installPackage(test, package=None, env=None, logfile=None):
 
     if p.returncode != 0:
         # In case of error, print the whole emerge command
-        raise InstallException(p, ' '.join(cmd), logfile)
+        raise InstallException(pkg, ' '.join(cmd), logfile)
 
     fout.write('\n\n' + 80*'#' + '\n\n')
 
