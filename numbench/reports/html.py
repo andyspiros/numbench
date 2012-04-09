@@ -15,8 +15,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-import time
-from os.path import join as pjoin, basename
+import os, time
+from os.path import join as pjoin, basename, exists
 from xml.sax.saxutils import escape as xmlescape
 
 from .. import benchconfig as cfg
@@ -81,6 +81,19 @@ h1, h2, .plot, .descr, .info {
                 mem = l.split(':',1)[1].strip()
         if mem:
             self.content += '<p class="info">Total memory: ' + mem + '</p>'
+            
+        # Information regarding the caches
+        cachedir = '/sys/devices/system/cpu/cpu0/cache'
+        if exists(cachedir):
+            self.content += '<p class="info">Caches:<br />'
+            for i in os.listdir(cachedir):
+                cdir = pjoin(cachedir, i)
+                ctxt = 'L' + file(pjoin(cdir, 'level')).read().strip()
+                ctxt += ' ' + file(pjoin(cdir, 'type')).read().strip()
+                ctxt += ': ' + file(pjoin(cdir, 'size')).read().strip()[:-1]
+                self.content += ctxt + ' kB<br />'
+            self.content += '</p>'
+                
 
         # Input file
         self.content += '<div class="inputfile">Input file: ' + \
