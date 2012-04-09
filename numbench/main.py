@@ -94,7 +94,7 @@ from fnmatch import fnmatch
 from os.path import join as pjoin
 
 import benchconfig as cfg, confinput, report
-from utils import benchutils as bu, portageutils as pu
+from utils import envread, benchutils as bu, portageutils as pu
 from benchprint import Print
 
 
@@ -215,6 +215,9 @@ for tn,(name,test) in enumerate(cfg.tests.items(),1):
             impls.append(i)
                 
     test['implementations'] = impls
+
+    # Automatically add environment
+    envread.envread(test)
 
     # Test every implementation
     test['results'] = {}
