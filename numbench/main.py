@@ -238,6 +238,10 @@ for tn,(name,test) in enumerate(cfg.tests.items(),1):
 # Save the results
 report.saveReport()
 
+# Clean up the directories
+if cfg.clean:
+    bu.rmdir(cfg.testsdir)
+    bu.rmdir(cfg.rootsdir)
 
 
 # TODO: reintroduce the instructions feature (and remove "exit)

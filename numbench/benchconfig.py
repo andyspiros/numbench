@@ -50,11 +50,19 @@ if not locals().has_key('initialized'):
             basedir = pjoin(curdir, passargs[i+1])
             passargs = passargs[:i] + passargs[i+2:]
             break
+            
+        if a in ('-c', '--clean'):
+            clean = True
+            passargs = passargs[:i] + passargs[i+1:]
+    
+    # Clean flag
+    if not locals().has_key('clean'):
+        clean = False
 
     # Storage directories
     if not locals().has_key('basedir'):
         basedirb = pjoin(os.environ['HOME'], '.numbench') \
-                + '/run_' + modulename + '_' + time.strftime('%Y-%m-%d')
+                + '/numbench_' + modulename + '_' + time.strftime('%Y-%m-%d')
         if os.path.exists(basedirb):
             n = 1
             while True:
