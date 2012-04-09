@@ -1,14 +1,14 @@
 <tests>
 
     <test id="reference-O3">
-        <pkg>sci-libs/scalapack-1.8.0</pkg>
+        <pkg>sci-libs/scalapack-2.0.1</pkg>
         <emergeenv>
             <var name="FFLAGS">-O3</var>
         </emergeenv>
     </test>
 
     <test id="reference-O1">
-        <pkg>sci-libs/scalapack-1.8.0</pkg>
+        <pkg>sci-libs/scalapack-2.0.1</pkg>
         <emergeenv>
             <var name="FFLAGS">-O1</var>
         </emergeenv>

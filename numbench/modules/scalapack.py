@@ -57,7 +57,7 @@ class Module:
         btlconfig = dict (
           CXX = 'mpic++',
           source = 'libs/PBLAS/main.cpp',
-          preargs = ('mpirun', '-np', self.numproc),
+          preargs = ('mpirun', '-np', str(self.numproc)),
           exe = pjoin(test['testdir'], implementation, 'test'),
           logdir = pjoin(test['logdir'], implementation),
           testdir = pjoin(test['testdir'], implementation),

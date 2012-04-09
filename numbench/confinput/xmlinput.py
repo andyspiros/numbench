@@ -125,6 +125,11 @@ def parseConf(fname):
         runenv = getEnvFromNode(t, 'runenv')
 
         # Adjust PATH
+        if compileenv.has_key('PATH'):
+            compileenv['PATH'] += ':' + os.environ['PATH']
+        else:
+            compileenv['PATH'] = os.environ['PATH']
+            
         if runenv.has_key('PATH'):
             runenv['PATH'] += ':' + os.environ['PATH']
         else:
