@@ -32,7 +32,7 @@ if not locals().has_key('initialized'):
     if os.environ.has_key('BTLDIR'):
         btldir = os.environ['BTLDIR']
     else:
-        btldir = '/usr/include/btl'
+        btldir = '/usr/include/numbench/btl'
 
     # Library directory (lib vs. lib32 vs. lib64)
     libdir = sp.Popen \

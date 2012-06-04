@@ -19,6 +19,7 @@
 #
 
 import os
+from os.path import isdir, join as pjoin
 from distutils.core import setup
 
 def recursiveGetPackage(pkg, directory):
@@ -34,12 +35,29 @@ setupdir = os.path.dirname(os.path.abspath(__file__))
 numdir = os.path.join(setupdir, 'numbench')
 
 
+def recursiveGetBTL(frompath, topath):
+    
+    ls = [i for i in os.listdir(frompath)]
+    dirs = [i for i in ls if isdir(pjoin(frompath, i))]
+    files = [pjoin(frompath, i) for i in ls if not i in dirs]
+    
+    ret = [(topath, files)]
+    
+    for d in dirs:
+        ret += recursiveGetBTL(pjoin(frompath, d), pjoin(topath, d))
+    
+    return ret
+            
+
+
 setup(name='Numbench',
-      version='1.0',
+      version='0.2',
       description='Numerical benchmarks for Gentoo',
       author='Andrea Arteaga',
       author_email='andyspiros@gmail.com',
-      url='http://soc.dev.gentoo.org/~spiros',
+      url='http://github.com/andyspiros/numbench',
+      license='GPL-2',
       packages=recursiveGetPackage('', numdir),
+      data_files=recursiveGetBTL('btl', 'include/numbench/btl')
      )
 
