@@ -32,6 +32,8 @@ void LAPACKFUNC(gesvd)(const char*, const char*, const int*, const int*, SCALAR*
 void LAPACKFUNC(syev)(const char*, const char*, const int*, SCALAR*, const int*, SCALAR*, SCALAR*, const int*, int*);
 void LAPACKFUNC(stev)(const char*, const int*, SCALAR*, SCALAR*, SCALAR*, const int*, SCALAR*, int*);
 
+void LAPACKFUNC(gels)(char*, int*, int*, int*, SCALAR*, int*, SCALAR*, int*, SCALAR*, int*, int*);
+
 #ifdef __cplusplus
 }
 #endif

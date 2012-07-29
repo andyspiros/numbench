@@ -17,6 +17,9 @@
 //
 #define LAPACKFUNC(NAME) CAT(CAT(SCALAR_PREFIX,NAME),_)
 
+#include "lapack_.hh"
+#include "blas.h"
+
 template<> class lapack_interface<SCALAR> : public c_interface_base<SCALAR>
 {
 public:
@@ -114,7 +117,6 @@ public:
 	static inline void stev(const gene_vector& D, const gene_vector& E, gene_vector& W, gene_matrix& V, const int& N)
 	{
 		int N0 = N;
-		int N1 = N-1;
 		LAPACKFUNC(copy)(&N0, D, &intone, W, &intone);
 		stl_vector E_(E, E+N-1), work(max(1, 2*N-2));
 

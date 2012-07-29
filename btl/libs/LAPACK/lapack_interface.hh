@@ -20,26 +20,7 @@
 
 #include <../BLAS/c_interface_base.h>
 #include <complex>
-#include "lapack.hh"
-
-extern "C" {
-#include "../BLAS/blas.h"
-
-//void sgesv_(int*, int*, float *, int*, int*, float *, int*, int*);
-//void dgesv_(int*, int*, double*, int*, int*, double*, int*, int*);
-
-void sgels_(char*, int*, int*, int*, float *, int*, float *, int*, float *, int*, int*);
-void dgels_(char*, int*, int*, int*, double*, int*, double*, int*, double*, int*, int*);
-
-//void sgetrf_(int*, int*, float *, int*, int*, int*);
-//void dgetrf_(int*, int*, double*, int*, int*, int*);
-
-//void spotrf_(char*, int*, float *, int*, int*);
-//void dpotrf_(char*, int*, double*, int*, int*);
-
-//void ssyev_(char*, char*, int*, float *, int*, float *, float *, int*, int*);
-//void dsyev_(char*, char*, int*, double*, int*, double*, double*, int*, int*);
-}
+//#include "lapack.hh"
 
 
 #define MAKE_STRING2(S) #S
@@ -65,13 +46,21 @@ static int zeroint = 0;
 
 #define SCALAR        float
 #define SCALAR_PREFIX s
-#include "lapack_interface_impl.hh"
+#ifdef LAPACKE_INTERFACE
+#  include "lapacke_interface_impl.hh"
+#else
+#  include "lapack_interface_impl.hh"
+#endif
 #undef SCALAR
 #undef SCALAR_PREFIX
 
 #define SCALAR        double
 #define SCALAR_PREFIX d
-#include "lapack_interface_impl.hh"
+#ifdef LAPACKE_INTERFACE
+#  include "lapacke_interface_impl.hh"
+#else
+#  include "lapack_interface_impl.hh"
+#endif
 #undef SCALAR
 #undef SCALAR_PREFIX
 
