@@ -44,7 +44,7 @@ def runTest(self, test, implementation):
       logdir = pjoin(test['logdir'], implementation),
       testdir = pjoin(test['testdir'], implementation),
       btlincludes = ('libs/BLAS', 'libs/LAPACK'),
-      defines = ('LAPACKNAME='+self.libname, ),
+      defines = ('LAPACKNAME='+self.libname, self.libname.upper()+"_INTERFACE"),
       flags = alt.getFlags(test, self.libname, implementation),
       tests = self.tests
     )
