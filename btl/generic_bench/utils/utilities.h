@@ -18,8 +18,8 @@
 
 /* ---  INFOS is always defined (without _DEBUG_): to be used for warnings, with release version --- */
 
-# define HEREWEARE cout<<flush ; cerr << __FILE__ << " [" << __LINE__ << "] : " << flush ;
-# define INFOS(chain) {HEREWEARE ; cerr << chain << endl ;}
+# define HEREWEARE cout<<flush ; cout << __FILE__ << " [" << __LINE__ << "] : " << flush ;
+# define INFOS(chain) {HEREWEARE ; cout << chain << endl ;}
 # define PYSCRIPT(chain) {cout<<flush ; cerr << "---PYSCRIPT--- " << chain << endl ;}
 
 /* --- To print date and time of compilation of current source on stdout --- */
@@ -40,7 +40,7 @@
 # error INFOS_COMPILATION already defined
 # endif
 # define INFOS_COMPILATION	{\
-					cerr << flush;\
+					cout << flush;\
 					cout << __FILE__ ;\
 					cout << " [" << __LINE__ << "] : " ;\
 					cout << "COMPILED with " << COMPILER ;\
