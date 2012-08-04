@@ -106,7 +106,7 @@ if not os.path.exists(cfg.inputfile):
 cfg.tests = confinput.parseInput(cfg.inputfile)
 
 # Import the module
-mod = loadModule(cfg.modulename).Module(sys.argv[3:])
+mod = loadModule(cfg.modulename).Module(cfg.passargs)
 cfg.mod = mod
 
 

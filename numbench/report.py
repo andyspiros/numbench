@@ -48,8 +48,8 @@ class Plotter:
         self.ylabel = conf.has_key('ylabel') and conf['ylabel'] or ''
         
         # Initialize markers
-        markers = ('-', '--', 'o', 'v', '^', 's', 'p', 'h', '*', '+', 'x', 'D')
-        colors = ('k', 'r', 'g', 'b')
+        markers = ('-', '--', 'v', '^', 'o', 's', 'p', 'h', '*', '+', 'x', 'D')
+        colors = ('k', 'r', 'g', 'b', 'c')
         self.linestyles = tuple([c+m for m in markers for c in colors])
         self.curstyle = 0
         
@@ -67,7 +67,8 @@ class Plotter:
         plt.xlabel(self.xlabel)
         plt.ylabel(self.ylabel)
         plt.grid(True)
-        plt.savefig(fname, format='png', bbox_inches='tight', transparent=True)
+        plt.savefig(fname, format=cfg.imageformat, \
+                    bbox_inches='tight', transparent=True)
         
 
 
@@ -104,7 +105,7 @@ def saveReport():
                         x,y = np.loadtxt(resultsFile, unpack=True)
                         p.addPlot(x, y, tid+'/'+impl)
 
-        imgpath = pjoin('images', operation+'.png')
+        imgpath = pjoin('images', operation+'.'+cfg.imageformat)
         fname = pjoin(cfg.reportdir, imgpath)
         p.savePlot(fname)
         html.addFig(testdescr[operation], image=imgpath)

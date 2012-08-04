@@ -44,20 +44,36 @@ if not locals().has_key('initialized'):
         libdir = 'usr/' + libdir
 
     # Parse arguments
-    passargs = sys.argv[3:]
-    for i,a in enumerate(passargs):
+    passargs = []
+    skipargs = 0
+    for i,a in enumerate(sys.argv[3:], 3):
+        if skipargs > 0:
+            skipargs -= 1
+            continue
+        
         if a in ('-d', '--directory'):
-            basedir = pjoin(curdir, passargs[i+1])
-            passargs = passargs[:i] + passargs[i+2:]
-            break
+            basedir = pjoin(curdir, sys.argv[i+1])
+            skipargs += 1
+            continue
             
         if a in ('-c', '--clean'):
             clean = True
-            passargs = passargs[:i] + passargs[i+1:]
+            continue
+        
+        if a in ('-i', '--imageformat'):
+            imageformat = sys.argv[i+1]
+            skipargs += 1
+            continue
+        
+        passargs.append(a)
     
     # Clean flag
     if not locals().has_key('clean'):
         clean = False
+        
+    # Image format
+    if not locals().has_key('imageformat'):
+        imageformat = 'svg'
 
     # Storage directories
     if not locals().has_key('basedir'):
