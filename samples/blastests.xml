@@ -1,56 +1,38 @@
 <tests>
 
-<!--
     <test id="reference">
-        <pkg>sci-libs/blas-reference-20120215-r1</pkg>
+        <pkg>sci-libs/blas-reference-20120423</pkg>
         <emergeenv>
             <var name="FFLAGS">-O3</var>
         </emergeenv>
     </test>
--->
 
     <test id="atlas">
-        <pkg>sci-libs/atlas-3.9.68</pkg>
+        <pkg>sci-libs/atlas-3.10.0</pkg>
         <emergeenv>
             <var name="USE">threads</var>
         </emergeenv>
     </test>
 
     <test id="eigen">
-        <pkg>dev-cpp/eigen-3.0.5</pkg>
+        <pkg>dev-cpp/eigen-3.1.1-r1</pkg>
         <emergeenv>
             <var name="CXXFLAGS">-O3</var>
         </emergeenv>
     </test>
 
     <test id="openblas">
-    <pkg>sci-libs/openblas-9999</pkg>
-    <emergeenv>
-        <var name="TARGET">NEHALEM</var>
-        <var name="FFLAGS">-O3</var>
-        <var name="CFLAGS">-O3</var>
-        <var name="USE">-openmp -threads</var>
-    </emergeenv>
-    </test>
-
-    <test id="openblas-8threads">
-    <pkg>sci-libs/openblas-9999</pkg>
-    <emergeenv>
-        <var name="TARGET">NEHALEM</var>
-        <var name="FFLAGS">-O3</var>
-        <var name="CFLAGS">-O3</var>
-        <var name="USE">threads</var>
-    </emergeenv>
-    <runenv>
-        <var name="OPENBLAS_NUM_THREADS">8</var>
-    </runenv>
+        <pkg>sci-libs/openblas-0.2.2</pkg>
+        <emergeenv>
+            <var name="FFLAGS">-O3</var>
+            <var name="CFLAGS">-O3</var>
+            <var name="USE">-openmp threads</var>
+        </emergeenv>
     </test>
 
     <test id="mkl">
-    <pkg>sci-libs/mkl-10.3.7.256</pkg>
-    <skip>mkl32*</skip>
-    <skip>*int64*</skip>
-    <skip>*openmp</skip>
+        <pkg>sci-libs/mkl-10.3.7.256</pkg>
+        <skip>mkl32*</skip>
     </test>
 
 </tests>

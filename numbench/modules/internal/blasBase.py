@@ -33,6 +33,9 @@ def init(self, args):
     tests = []
 
     for i in args:
+        if i == 'all':
+            tests += availableTests
+            continue
         if i == '1':
             tests += avail1
             continue
