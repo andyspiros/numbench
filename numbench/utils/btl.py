@@ -20,7 +20,7 @@ from ..utils import benchutils as bu
 from ..benchprint import Print
 
 from os.path import join as pjoin, dirname
-import shlex, subprocess as sp
+import os, re, shlex, subprocess as sp
 
 # BTL global flags
 btlincludes = ('actions','generic_bench','generic_bench/utils','libs/STL')
@@ -186,9 +186,13 @@ def runTest(test, btlconfig):
     logfs.write(3*'\n' + ' '.join(args) + 3*'\n')
     logfs.flush()
     
+    # Error log
+    errfname = pjoin(btlconfig['logdir'], "btlRun.err")
+    errfs = file(errfname, 'w')
+    
     # Open pipe
     try:
-        proc = sp.Popen(args, bufsize=1, stdout=sp.PIPE, stderr=sp.PIPE, \
+        proc = sp.Popen(args, bufsize=1, stdout=sp.PIPE, stderr=errfs, \
                         env=runenv, cwd=btlconfig['testdir'])
         benchchildren.append(proc)
     except OSError:
@@ -202,14 +206,25 @@ def runTest(test, btlconfig):
     # Interpret output
     Print('Begin execution')
     while True:
-        # Each operation test begins with a line on stderr
-        errline = proc.stderr.readline()
-        if not errline:
-            break
-        logfs.write(errline)
+        # Use regexps to see which operation is benchmarked now
+        linere = \
+          r'.*/bench.hh \[[0-9]*?] : starting (bench_(.*)_[a-zA-Z0-9]*.dat)'
+        operation = None
+        while operation is None:
+            line = proc.stdout.readline()
+            if not line:
+                break
+            
+            try:
+                resfile, operation = re.match(linere, line).groups()
+                logfs.write(line)
+            except:
+                pass
         
-        resfile = errline.split()[-1]
-        operation = resfile.split('_', 1)[-1].rsplit('_', 1)[0]
+        # Check is program is terminated
+        if operation is None:
+            break
+            
         result[operation] = pjoin(btlconfig['testdir'], resfile)
         Print(operation + " -> " + resfile)
         
@@ -242,6 +257,14 @@ def runTest(test, btlconfig):
         Print.up()
     proc.wait()
     Print("Execution finished with return code " + str(proc.returncode))
+    
+    # Close logs
+    logfs.close()
+    errp = errfs.tell()
+    errfs.close()
+    if errp == 0:
+        os.unlink(errfname)
+        
     
     # Close, return
     logfs.close()
