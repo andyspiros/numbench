@@ -18,12 +18,24 @@
 #define LAPACKEFUNC(NAME) CAT(LAPACKE_,CAT(SCALAR_PREFIX,NAME))
 #define BLASFUNC(NAME) CAT(CAT(SCALAR_PREFIX,NAME),_)
 
-#include "lapacke.h"
+//#include "lapacke.h"
 
+
+#define LAPACK_ROW_MAJOR 101
+#define LAPACK_COL_MAJOR 102
 
 // Define BLAS functions used by LAPACKE interface
 extern "C" {
     int BLASFUNC(copy) (int *, SCALAR*, int *, SCALAR*, int *);
+
+    int LAPACKEFUNC(gesv)(int, int, int, const SCALAR*, int, int*, SCALAR*, int);
+    int LAPACKEFUNC(gels)(int, char, int, int, int, SCALAR*, int, SCALAR*, int);
+    int LAPACKEFUNC(getrf)(int, int, int, SCALAR*, int, int*);
+	int LAPACKEFUNC(potrf)(int, char, int, SCALAR*, int);
+	int LAPACKEFUNC(geqrf)(int, int, int, SCALAR*, int, SCALAR*);
+	int LAPACKEFUNC(gesvd)(int, char, char, int, int, SCALAR*, int, SCALAR*, SCALAR*, int, SCALAR*, int, SCALAR*);
+	int LAPACKEFUNC(syev)(int, char, char, int, SCALAR*, int, SCALAR*);
+	int LAPACKEFUNC(stev)(int, char, int, SCALAR*, SCALAR*, SCALAR*, int);
 }
 
 template<> class lapack_interface<SCALAR> : public c_interface_base<SCALAR>
@@ -62,7 +74,7 @@ public:
 		BLASFUNC(copy)(&N2, X, &intone, C, &intone);
 		LAPACKEFUNC(potrf)(LAPACK_COL_MAJOR, 'L', N, C, N);
 	}
-	
+
 	static inline void qr_decomp(const gene_matrix& X, gene_matrix& QR, gene_vector& tau, const int& N)
 	{
 		int N2 = N*N;
@@ -97,5 +109,4 @@ public:
 	{
 		LAPACKEFUNC(syev)(LAPACK_COL_MAJOR, 'N', 'L', N, X, N, W);
 	}
-
 };

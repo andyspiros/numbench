@@ -4,8 +4,12 @@
         <pkg>sci-libs/lapacke-reference-3.4.1</pkg>
         <emergeenv>
             <var name="FFLAGS">-O3</var>
+	    <var name="ACCEPT_KEYWORDS">**</var>
         </emergeenv>
         <required name="blas">openblas-threads</required>
+	<runenv>
+	    <var name="LD_DEBUG">all</var>
+	</runenv>
     </test>
 
     <test id="mkl">
