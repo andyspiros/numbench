@@ -17,9 +17,11 @@
 #
 import commands as cmd
 import subprocess as sp
-import os, portage, shlex
+import os, shlex
 from os.path import join as pjoin, dirname
 import benchutils as bu
+
+from portage import catpkgsplit as cps #@UnresolvedImport
 
 class InstallException(Exception):
     def __init__(self, package, command, logfile):
@@ -55,7 +57,7 @@ def _getEnv(root='/', envAdds={}):
         denv['INCLUDE_PATH'] += ':' + os.environ['INCLUDE_PATH']
 
     # Adds
-    for k,v in envAdds.items():
+    for k, v in envAdds.items():
         denv[k] = v
 
     return denv
@@ -67,13 +69,13 @@ def availablePackages(pattern):
     No test for keywords or mask is performed. The function just returns
     every matching pattern in the portage tree and installed overlays.
     """
-    return [portage.catpkgsplit(l) \
+    return [cps(l)
       for l in cmd.getoutput('equery -q list -po ' + pattern).split()]
 
 def normalize_cpv(cpv):
     if type(cpv) == type(''):
         try:
-            cpv_ = portage.catpkgsplit(cpv)
+            cpv_ = cps(cpv)
             cpv_[-1]
             cpv = cpv_
         except:
@@ -86,16 +88,16 @@ def normalize_cpv(cpv):
 
 def getDependencies(package, env={}, split=False):
     pkg = normalize_cpv(package)
-    cmd = ['emerge', '--ignore-default-opts', '='+pkg, '-poq']
+    cmd = ['emerge', '--ignore-default-opts', '=' + pkg, '-poq']
     proc = sp.Popen(cmd, stdout=sp.PIPE, stderr=sp.PIPE, env=env)
-    output =  proc.communicate()[0]
+    output = proc.communicate()[0]
     if proc.returncode != 0:
         return []
     lines = output.strip().split('\n')
     if not lines[0]:
         return []
     if split:
-        return [portage.catpkgsplit(shlex.split(l.strip())[-1]) for l in lines]
+        return [cps(shlex.split(l.strip())[-1]) for l in lines]
     else:
         return [shlex.split(l.strip())[-1] for l in lines]
 
@@ -107,7 +109,7 @@ def installDependencies(test):
     # Retrieve dependencies
     deps = getDependencies(test['package'], denv, False)
 
-    for i,d in enumerate(deps):
+    for i, d in enumerate(deps):
         logfile = pjoin(test['logdir'], 'emergedep_%i.log' % i)
         installPackage(test, package=d, env=test['dependenv'], logfile=logfile)
 
@@ -160,13 +162,13 @@ def installPackage(test, package=None, env=None, logfile=None):
         # In case of error, print the whole emerge command
         raise InstallException(pkg, ' '.join(cmd), logfile)
 
-    fout.write('\n\n' + 80*'#' + '\n\n')
+    fout.write('\n\n' + 80 * '#' + '\n\n')
 
     # Unpack package onto root
-    archive = pjoin(test['pkgdir'], pkg+'.tbz2')
+    archive = pjoin(test['pkgdir'], pkg + '.tbz2')
     bu.mkdir(test['root'])
     tarcmd = ['tar', 'xjvf', archive, '-C', test['root']]
-    fout.write(' '.join(tarcmd) + '\n' + 80*'-' + '\n')
+    fout.write(' '.join(tarcmd) + '\n' + 80 * '-' + '\n')
     p = sp.Popen(tarcmd, stdout=fout, stderr=sp.STDOUT)
     p.wait()
     if p.returncode != 0:
@@ -175,9 +177,3 @@ def installPackage(test, package=None, env=None, logfile=None):
 
     # Close, return
     fout.close()
-
-if __name__ == '__main__':
-    # Just a test
-    from pprint import pprint
-
-    pprint(get_dependencies('sci-libs/blas-reference-3.3.1-r1'))

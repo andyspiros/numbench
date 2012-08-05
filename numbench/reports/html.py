@@ -22,8 +22,10 @@ from xml.sax.saxutils import escape as xmlescape
 from .. import benchconfig as cfg
 
 class ReportFile:
-    def __init__(self, fname, title='Benchmarks report', \
-                  inputfile=pjoin(cfg.reportdir, basename(cfg.inputfile))):
+    def __init__(self, fname, title='Benchmarks report', inputfile=None):
+        if inputfile is None:
+            inputfile = pjoin(cfg.reportdir, basename(cfg.inputfile))
+
         self.fname = fname
         self.content = """
 <html>

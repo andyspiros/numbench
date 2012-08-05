@@ -26,7 +26,7 @@ def close(*args):
     benchchildren.terminate()
     Print._level = 0
     Print()
-    Print(80*'-')
+    Print(80 * '-')
     Print("INTERRUPT TRIGGERED")
     Print("Exiting")
     exit(0)
@@ -39,21 +39,31 @@ def print_usage():
 
 
 def print_help():
-    print "Usage: numbench module conffile [options]"
+    print "Usage: numbench conffile [options]"
     print "       numbench [ -h | --help ]"
     print "       numbench module [ -h | --help ]"
     print
     print "Options:"
-    print "   [ -h | --help ] - Display an help message"
+    print "   [ -h | --help ] - Displays an help message."
+    print
+    print "   [ -d | --directory] dir - Stores the data in the given directory."
+    print "       If not given, a directory in ~/.numbench is chosen."
+    print
+    print "   [ -c | --clean] - Removes the temporary data."
+    print
+    print "   [ -i | --imageformat] format - Selects the given format for the"
+    print "       resulting images. Available are png, svg, eps, ps, pdf."
+    print "       Default is svg."
     print
     print "Modules:"
     print "   blas - Test BLAS implementations"
     print "   cblas - Test CBLAS implementations"
     print "   lapack - Test LAPACK implementations"
-    #print "   scalapack - Test the ScaLAPACK library"
+    print "   lapacke - Test LAPACK implementations"
+    print "   scalapack - Test the ScaLAPACK library"
     #print "   blas_accuracy - Test BLAS implementations for accuracy"
     #print "   lapack_accuracy - Test LAPACK implementations for accuracy"
-    #print "   fftw - Test the FFTW library"
+    print "   fftw - Test the FFTW library"
     #print "   metis - Test the METIS tools"
     print
     print "More information about a module is available through the command:"
@@ -61,7 +71,7 @@ def print_help():
 
 
 def loadModule(modulename):
-    tmp = __import__('numbench.modules.'+modulename, fromlist = ['Module'])
+    tmp = __import__('numbench.modules.' + modulename, fromlist=['Module'])
 #    try:
 #        tmp = __import__('numbench.modules.'+modulename, fromlist = ['Module'])
 #    except ImportError as e:
@@ -75,15 +85,16 @@ def loadModule(modulename):
 ## PRINT HELP IF NEEDED
 
 # If no argument or '-h' is given, print the help
-if len(sys.argv) < 3 or sys.argv[1] in ('-h', '--help'):
+if len(sys.argv) < 2 or sys.argv[1] in ('-h', '--help'):
     print_help()
     exit(0)
 
 # If requested, print the module help
-if sys.argv[2] in ('-h', '--help'):
-    tmp = loadModule(sys.argv[1])
-    tmp.Module.printHelp()
-    exit(0)
+# TODO: print module's help
+#if sys.argv[2] in ('-h', '--help'):
+#    tmp = loadModule(sys.argv[1])
+#    tmp.Module.printHelp()
+#    exit(0)
 
 
 ## BEGIN THE TRUE SCRIPT
@@ -93,26 +104,43 @@ import re
 from fnmatch import fnmatch
 from os.path import join as pjoin
 
-import benchconfig as cfg, confinput, report
+import benchconfig as cfg
+from xmlinput import Parser
 from utils import envread, benchutils as bu, portageutils as pu
-from benchprint import Print
+import benchprint
 
+## Set-up the run configuration
 
-# Parse the configuration file
+# Parse the arguments
+cfg.parseArguments()
+
+# Start configuration parser
 if not os.path.exists(cfg.inputfile):
     sys.stderr.write("File not found: " + cfg.inputfile)
     print_usage()
     exit(1)
-cfg.tests = confinput.parseInput(cfg.inputfile)
+parser = Parser(cfg.inputfile)
+
+# Get module name and arguments
+cfg.modulename = parser.getModuleName()
+cfg.moduleargs = parser.getModuleArguments()
+
+# Set-up directories
+cfg.setDirs()
+
+# Get test cases
+cfg.tests = parser.getTestCases()
+
+# Initialize print system
+Print = benchprint.initializePrint()
 
 # Import the module
-mod = loadModule(cfg.modulename).Module(cfg.passargs)
-cfg.mod = mod
+cfg.module = loadModule(cfg.modulename).Module(cfg.moduleargs)
 
 
-# Write summary
+## Write summary
 Print._level = 0
-Print(80*'=')
+Print(80 * '=')
 Print("The following tests will be run:")
 Print("-------------------------------")
 Print()
@@ -126,25 +154,26 @@ for tname, ttest in cfg.tests.items():
 
     if len(ttest['dependenv']) != 0:
         Print(" - Dependencies emerge environment: " + \
-          ' '.join([n+'="'+v+'"' for n,v in ttest['dependenv'].items()]))
+          ' '.join([n + '="' + v + '"' for n, v in ttest['dependenv'].items()]))
 
     if len(ttest['emergeenv']) != 0:
         Print(" - Emerge environment: " + \
-          ' '.join([n+'="'+v+'"' for n,v in ttest['emergeenv'].items()]))
+          ' '.join([n + '="' + v + '"' for n, v in ttest['emergeenv'].items()]))
 
     if len(ttest['compileenv']) != 0:
         Print(" - Suite compile-time environment: " + \
-          ' '.join([n+'="'+v+'"' for n,v in ttest['compileenv'].items()]))
+          ' '.join([n + '="' + v + '"' for n, v in ttest['compileenv'].items()]))
 
     if len(ttest['runenv']) != 0:
         Print(" - Suite run-time environment: " + \
-          ' '.join([n+'="'+v+'"' for n,v in ttest['runenv'].items()]))
+          ' '.join([n + '="' + v + '"' for n, v in ttest['runenv'].items()]))
 
     if len(ttest['skip']) != 0:
         Print(" - Skip implementations: " + ' '.join(ttest['skip']))
 
     if len(ttest['skipre']) != 0:
-        Print(" - Skip implementations (regular expressions): " + ' '.join(ttest['skipre']))
+        Print(" - Skip implementations (regular expressions): " + \
+              ' '.join(ttest['skipre']))
 
     if len(ttest['requires']) != 0:
         Print(" - Pkg-config requirements substitutions:", '')
@@ -153,7 +182,7 @@ for tname, ttest in cfg.tests.items():
         Print()
 
     Print()
-Print(80*'=')
+Print(80 * '=')
 Print()
 Print("The script is located in the directory " + cfg.scriptdir)
 Print("The script is run from the directory " + os.path.realpath('.'))
@@ -163,8 +192,8 @@ Print("The results will be available in the directory " + cfg.reportdir)
 Print()
 
 
-# Main iteration
-for tn,(name,test) in enumerate(cfg.tests.items(),1):
+## Main iteration
+for tn, (name, test) in enumerate(cfg.tests.items(), 1):
     Print._level = 0
     Print("BEGIN TEST %i - %s" % (tn, name))
 
@@ -198,22 +227,22 @@ for tn,(name,test) in enumerate(cfg.tests.items(),1):
 
     # Find implementations
     impls = []
-    for i in mod.getImplementations(test):
+    for i in cfg.module.getImplementations(test):
         skip = False
-        
+
         for s in test['skip']:
             if fnmatch(i, s):
                 skip = True
                 break
-        
+
         for s in test['skipre']:
             if re.search(s, i) != None:
                 skip = True
                 break
-        
+
         if not skip:
             impls.append(i)
-                
+
     test['implementations'] = impls
 
     # Automatically add environment
@@ -227,7 +256,7 @@ for tn,(name,test) in enumerate(cfg.tests.items(),1):
         # Run the test suite
         Print("Testing " + impl)
         Print.down()
-        test['results'][impl] = mod.runTest(test, impl)
+        test['results'][impl] = cfg.module.runTest(test, impl)
         Print.up()
     # All implementations tested
 
@@ -235,7 +264,10 @@ for tn,(name,test) in enumerate(cfg.tests.items(),1):
     print
 
 
+## End of execution
+
 # Save the results
+import report
 report.saveReport()
 
 # Clean up the directories
@@ -251,12 +283,12 @@ exit(0)
 Print._level = 0
 Print()
 # Print instructions
-for name,test in cfg.tests.items():
+for name, test in cfg.tests.items():
     if not test['emergesuccess']:
         continue
     printstr = "Instructions for " + name + ":"
     Print(printstr)
-    Print(len(printstr)*'-')
+    Print(len(printstr) * '-')
     Print.down()
     Print("# PKGDIR=" + test['pkgdir'] + " emerge -K '=" + \
           test['normalizedPackage'] + "'")
@@ -264,7 +296,7 @@ for name,test in cfg.tests.items():
         for impl in test['implementations']:
             Print("Implementation " + impl + ":")
             Print.down()
-            mod.instructionsFor(impl)
+            cfg.module.instructionsFor(impl)
             Print.up()
     except:
         pass

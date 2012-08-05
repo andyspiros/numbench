@@ -15,46 +15,43 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-try:
-    needsinitialization = not initialized
-except NameError:
-    needsinitialization = True
 
+import benchconfig as cfg
+from utils import benchutils as bu
+from os.path import dirname, join as pjoin
 
-if needsinitialization:
-    import benchconfig as cfg
-    from utils import benchutils as bu
-    from os.path import dirname, join as pjoin
+class _Print:
+    def __init__(self, logfile, maxlevel=10):
+        self._level = 0
+        self._maxlevel = maxlevel
+        self._logfile = logfile
 
-    class _Print:
-        def __init__(self, logfile, maxlevel=10):
-            self._level = 0
-            self._maxlevel = maxlevel
-            self._logfile = logfile
-        
-        def __call__(self, arg='', end='\n'):
-            printstr = str(arg) + end
-            if self._level > 0:
-                printstr = (self._level-1)*"  " + "-- " + printstr
-            
-            # Print to logfile
-            bu.mkdir(dirname(self._logfile))
-            logfile = file(self._logfile, 'a')
-            print >> logfile, printstr,
-            logfile.close()
-            
-            # Print to terminal
-            if self._level <= self._maxlevel:
-                print printstr,
-            
-        def up(self, n=1):
-            self._level = max(self._level-n, 0)
-        
-        def down(self, n=1):
-            self._level = max(self._level+n, 0)
-            
-    # Initialize main Print object ("static")
+    def __call__(self, arg='', end='\n'):
+        printstr = str(arg) + end
+        if self._level > 0:
+            printstr = (self._level - 1) * "  " + "-- " + printstr
+
+        # Print to logfile
+        bu.mkdir(dirname(self._logfile))
+        logfile = file(self._logfile, 'a')
+        print >> logfile, printstr,
+        logfile.close()
+
+        # Print to terminal
+        if self._level <= self._maxlevel:
+            print printstr,
+
+    def up(self, n=1):
+        self._level = max(self._level - n, 0)
+
+    def down(self, n=1):
+        self._level = max(self._level + n, 0)
+
+# Uninitialized object (wait for argument parsing, directories lookup,... )
+Print = None
+
+def initializePrint():
+    global Print
     Print = _Print(pjoin(cfg.logdir, 'main.log'), 3)
 
-
-initialized = True
+    return Print

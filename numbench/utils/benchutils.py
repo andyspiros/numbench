@@ -15,25 +15,25 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-import os, sys, shutil, string, random
+import os, shutil, string, random
 import subprocess as sp
 
 __all__ = ['mkdir', 'tmpfile', 'run_cmd']
 
-def mkdir(dir):
-    if not os.path.exists(dir):
-        os.makedirs(dir)
+def mkdir(directory):
+    if not os.path.exists(directory):
+        os.makedirs(directory)
         
-def rmdir(dir):
-    if os.path.isdir(dir):
-        shutil.rmtree(dir, True)
+def rmdir(directory):
+    if os.path.isdir(directory):
+        shutil.rmtree(directory, True)
         
     
-def tmpfile(dir="/var/tmp"):
+def tmpfile(directory="/var/tmp"):
     """Returns the path of a free temporary file within the given directory."""
     chars = string.letters + string.digits
     while True:
-        fname = os.path.join(dir, random.sample(chars, 10))
+        fname = os.path.join(directory, random.sample(chars, 10))
         if not os.path.exists(fname):
             return fname
     

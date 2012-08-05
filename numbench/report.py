@@ -42,26 +42,26 @@ class Plotter:
                 return
         else:
             self.plot = conf['type']
-        
+
         # Labels
         self.xlabel = conf.has_key('xlabel') and conf['xlabel'] or ''
         self.ylabel = conf.has_key('ylabel') and conf['ylabel'] or ''
-        
+
         # Initialize markers
         markers = ('-', '--', 'v', '^', 'o', 's', 'p', 'h', '*', '+', 'x', 'D')
         colors = ('k', 'r', 'g', 'b', 'c')
-        self.linestyles = tuple([c+m for m in markers for c in colors])
+        self.linestyles = tuple([c + m for m in markers for c in colors])
         self.curstyle = 0
-        
+
         # Open figure
-        plt.figure(figsize=(12,9), dpi=300)
-    
-    
+        plt.figure(figsize=(12, 9), dpi=300)
+
+
     def addPlot(self, x, y, label):
         style = self.linestyles[self.curstyle]
-        self.curstyle = (self.curstyle+1) % len(self.linestyles)
+        self.curstyle = (self.curstyle + 1) % len(self.linestyles)
         self.plotf(x, y, style, label=label, hold=True)
-    
+
     def savePlot(self, fname):
         plt.legend(loc='best')
         plt.xlabel(self.xlabel)
@@ -69,7 +69,7 @@ class Plotter:
         plt.grid(True)
         plt.savefig(fname, format=cfg.imageformat, \
                     bbox_inches='tight', transparent=True)
-        
+
 
 
 def saveReport():
@@ -90,26 +90,26 @@ def saveReport():
     htmlfname = pjoin(cfg.reportdir, 'index.html')
     html = HTMLreport(htmlfname)
 
-    for operation in cfg.mod.getTests():
-        
+    for operation in cfg.module.getTests():
+
         # Begin plot
-        p = Plotter(cfg.mod.reportConf())
-        
-        for tid,test in cfg.tests.items():
+        p = Plotter(cfg.module.reportConf())
+
+        for tid, test in cfg.tests.items():
             if test.has_key('implementations'):
                 for impl in test['implementations']:
-                    
+
                     implres = test['results'][impl]
                     if implres and implres.has_key(operation):
                         resultsFile = implres[operation]
-                        x,y = np.loadtxt(resultsFile, unpack=True)
-                        p.addPlot(x, y, tid+'/'+impl)
+                        x, y = np.loadtxt(resultsFile, unpack=True)
+                        p.addPlot(x, y, tid + '/' + impl)
 
-        imgpath = pjoin('images', operation+'.'+cfg.imageformat)
+        imgpath = pjoin('images', operation + '.' + cfg.imageformat)
         fname = pjoin(cfg.reportdir, imgpath)
         p.savePlot(fname)
         html.addFig(testdescr[operation], image=imgpath)
-        
+
     # Copy logs and input file
     copytree(cfg.logdir, pjoin(cfg.reportdir, 'log'))
     fcopy(cfg.inputfile, pjoin(cfg.reportdir, basename(cfg.inputfile)));
@@ -120,13 +120,13 @@ def saveReport():
 
 
 # Initialize module
+# Import matplotlib and use 'Agg' as backend
 try:
-    if not locals().has_key('initialized'):
+    if 'initialized' not in locals():
         initialized = True
         import matplotlib
         matplotlib.use('Agg')
         import matplotlib.pyplot as plt
-        import numpy as np
         with_images = True
 except ImportError:
     sys.stderr.write('Error: matplotlib and numpy are needed' + \

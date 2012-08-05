@@ -17,7 +17,7 @@
 #
 import os, shlex
 from os.path import isfile, join as pjoin
-from ..benchconfig import libdir
+from .. import benchconfig as cfg
 
 def transformPaths(root, value):
     paths = value.split(':')
@@ -33,7 +33,7 @@ def transformPaths(root, value):
 def envread(test):
     # Set default paths
     path = pjoin(test['root'], 'bin') + ':' +  pjoin(test['root'], 'usr/bin')
-    libpath = pjoin(test['root'], libdir)
+    libpath = pjoin(test['root'], cfg.libdir)
     addenv = dict( PATH=path, LIBRARY_PATH=libpath, LD_LIBRARY_PATH=libpath )
     
     # Merge environment

@@ -18,13 +18,77 @@
 import sys, os, time, subprocess as sp
 from os.path import join as pjoin
 
-if not locals().has_key('initialized'):
-    initialized = True
 
-    isroot = os.getuid() == 0
+# Arguments
+arguments = None
+inputfile = None
+clean = None
+imageformat = None
 
-    modulename = sys.argv[1]
-    inputfile = os.path.realpath(sys.argv[2])
+# Directories
+curdir = None
+scriptdir = None
+btldir = None
+libdir = None
+
+# Storage directories
+basedir = None
+testsdir = None
+rootsdir = None
+pkgsdir = None
+reportdir = None
+logdir = None
+
+# Module
+module = None
+modulename = None
+moduleargs = None
+
+# Other
+isroot = not os.getuid()
+tests = None
+
+
+def parseArguments():
+    global arguments, inputfile, clean, imageformat, basedir
+
+    arguments = []
+    clean = False
+    imageformat = 'svg'
+
+
+    skipargs = 0
+    for i, a in enumerate(sys.argv[1:], 1):
+        if skipargs > 0:
+            skipargs -= 1
+            continue
+
+        if a[0] != '-':
+            inputfile = os.path.realpath(a)
+            continue
+
+        if a in ('-d', '--directory'):
+            basedir = pjoin(curdir, sys.argv[i + 1])
+            skipargs += 1
+            continue
+
+        if a in ('-c', '--clean'):
+            clean = True
+            continue
+
+        if a in ('-i', '--imageformat'):
+            imageformat = sys.argv[i + 1]
+            skipargs += 1
+            continue
+
+        arguments.append(a)
+
+
+
+def setDirs():
+    global curdir, scriptdir, btldir, libdir, basedir
+    global testsdir, rootsdir, pkgsdir, reportdir, logdir
+
 
     # Script directories
     curdir = os.path.abspath('.')
@@ -43,42 +107,15 @@ if not locals().has_key('initialized'):
     else:
         libdir = 'usr/' + libdir
 
-    # Parse arguments
-    passargs = []
-    skipargs = 0
-    for i,a in enumerate(sys.argv[3:], 3):
-        if skipargs > 0:
-            skipargs -= 1
-            continue
-        
-        if a in ('-d', '--directory'):
-            basedir = pjoin(curdir, sys.argv[i+1])
-            skipargs += 1
-            continue
-            
-        if a in ('-c', '--clean'):
-            clean = True
-            continue
-        
-        if a in ('-i', '--imageformat'):
-            imageformat = sys.argv[i+1]
-            skipargs += 1
-            continue
-        
-        passargs.append(a)
-    
-    # Clean flag
-    if not locals().has_key('clean'):
-        clean = False
-        
-    # Image format
-    if not locals().has_key('imageformat'):
-        imageformat = 'svg'
-
     # Storage directories
-    if not locals().has_key('basedir'):
+    if basedir is None:
+        if modulename is None:
+            raise RuntimeError("Module is not defined")
+
         basedirb = pjoin(os.environ['HOME'], '.numbench') \
                 + '/numbench_' + modulename + '_' + time.strftime('%Y-%m-%d')
+
+        # Find suitable base directory
         if os.path.exists(basedirb):
             n = 1
             while True:
@@ -92,4 +129,3 @@ if not locals().has_key('initialized'):
 
     testsdir, rootsdir, pkgsdir, reportdir, logdir = tuple([pjoin(basedir, i) \
       for i in ('tests', 'roots', 'packages', 'report', 'log')])
-
