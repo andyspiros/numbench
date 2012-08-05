@@ -26,4 +26,3 @@ class Module:
     runTest = base.runTest
     getTests = base.getTests
     reportConf = base.reportConf
-    

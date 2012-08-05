@@ -26,22 +26,3 @@ class Module:
     runTest = base.runTest
     getTests = base.getTests
     reportConf = base.reportConf
-    
-    
-if __name__ == '__main__':
-    import os
-    import benchconfig as cfg
-    
-    
-#    m = Module(('1', 'matrix_matrix'))
-    m = Module(('lu_decomp', 'qr_decomp'))
-    mytest = dict(
-      root='/home/spiros/packages/sci-libs/lapackroot',
-      testdir='/home/spiros/tests/lapack-reference',
-      logdir='/home/spiros/tests/log/lapack-reference',
-      compileenv = {},
-      runenv = {'PATH':os.environ['PATH']}
-    )
-    cfg.libdir = 'usr/lib'
-    cfg.btldir = '/home/spiros/hg/btl'
-    print m.runTest(mytest, 'reference')

@@ -28,7 +28,7 @@ defaultTests = availableTests
 class Module:
     libname = 'scalapack'
     descr = 'Test module for ScaLAPACK implementations'
-    
+
     def __init__(self, args):
         passargs = []
         skip = 0
@@ -38,38 +38,38 @@ class Module:
                 skip -= 1
                 continue
             elif a in ('-n', '--numproc'):
-                self.numproc = int(args[i+1])
+                self.numproc = int(args[i + 1])
             else:
                 passargs.append(a)
-            
+
         self.tests = btl.selectTests(availableTests, args)
         if len(self.tests) == 0:
             self.tests = defaultTests
-            
+
     def getImplementations(self, test):
         return alt.getImplementations(test['root'], self.libname)
-        
+
     def runTest(self, test, implementation):
-        btlincludes = ['libs/'+i for i in \
+        btlincludes = ['libs/' + i for i in \
                        ('BLAS', 'LAPACK', 'BLACS', 'PBLAS', 'STL')]
-    
+
         # Set up btlconfig
         btlconfig = dict (
-          CXX = 'mpic++',
-          source = 'libs/PBLAS/main.cpp',
-          preargs = ('mpirun', '-np', str(self.numproc)),
-          exe = pjoin(test['testdir'], implementation, 'test'),
-          logdir = pjoin(test['logdir'], implementation),
-          testdir = pjoin(test['testdir'], implementation),
-          btlincludes = tuple(btlincludes),
-          defines = ('PBLASNAME='+self.libname, ),
-          flags = alt.getFlags(test, self.libname, implementation),
-          tests = self.tests
+          CXX='mpic++',
+          source='libs/PBLAS/main.cpp',
+          preargs=('mpirun', '-np', str(self.numproc)),
+          exe=pjoin(test['testdir'], implementation, 'test'),
+          logdir=pjoin(test['logdir'], implementation),
+          testdir=pjoin(test['testdir'], implementation),
+          btlincludes=tuple(btlincludes),
+          defines=('PBLASNAME=' + self.libname,),
+          flags=alt.getFlags(test, self.libname, implementation),
+          tests=self.tests
         )
 
         return btlBase.runTest(self, test, btlconfig)
 
     getTests = btlBase.getTests
     reportConf = btlBase.reportConf
-        
-        
+
+
