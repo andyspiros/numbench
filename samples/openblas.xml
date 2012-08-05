@@ -46,7 +46,7 @@
     </test>
 
 
-    <test id="openblas-clan-threads">
+    <test id="openblas-clang-threads">
         <pkg>sci-libs/openblas-0.2.2</pkg>
         <emergeenv>
             <var name="FC">clang</var>
@@ -62,6 +62,29 @@
         <emergeenv>
             <var name="FC">clang</var>
             <var name="CC">clang</var>
+            <var name="FFLAGS">-O3</var>
+            <var name="CFLAGS">-O3</var>
+            <var name="USE">openmp -threads</var>
+        </emergeenv>
+    </test>
+
+
+    <test id="openblas-ekopath-threads">
+        <pkg>sci-libs/openblas-0.2.2</pkg>
+        <emergeenv>
+            <var name="FC">pathf90</var>
+            <var name="CC">pathcc</var>
+            <var name="FFLAGS">-O3</var>
+            <var name="CFLAGS">-O3</var>
+            <var name="USE">-openmp threads</var>
+        </emergeenv>
+    </test>
+
+    <test id="openblas-ekopath-openmp">
+        <pkg>sci-libs/openblas-0.2.2</pkg>
+        <emergeenv>
+            <var name="FC">pathf90</var>
+            <var name="CC">pathcc</var>
             <var name="FFLAGS">-O3</var>
             <var name="CFLAGS">-O3</var>
             <var name="USE">openmp -threads</var>
