@@ -15,7 +15,11 @@ class Parser:
 
     def getModuleArguments(self):
         opTag = self._dom.getElementsByTagName('operations')[0]
-        return shlex.split(opTag.firstChild.data)
+        try:
+            args = shlex.split(opTag.firstChild.data)
+        except AttributeError:
+            args = ()
+        return args
 
     def getTestCases(self):
         testNodes = self._dom.getElementsByTagName('case')
@@ -50,7 +54,8 @@ class Parser:
             # Requirements
             requires = {}
             for i in t.getElementsByTagName('required'):
-                requires[i.getAttribute('name').strip()] = i.firstChild.data.strip()
+                requires[i.getAttribute('name').strip()] = \
+                  i.firstChild.data.strip()
 
             # Environments
             dependenv = self._getEnvFromNode(t, 'dependenv')
@@ -131,7 +136,8 @@ class Parser:
 
         # Check number of envs
         if len(envs) > 1:
-            errstr = "Error: no more than one " + envName + " element is allowed!"
+            errstr = "Error: no more than one " + envName + " element " \
+                     "is allowed!"
             raise Exception(errstr)
         elif len(envs) < 1:
             return {}

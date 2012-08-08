@@ -56,6 +56,8 @@ def parseArguments():
     clean = False
     imageformat = 'svg'
 
+    # Directories have not yet been set up
+    curdir = os.path.abspath('.')
 
     skipargs = 0
     for i, a in enumerate(sys.argv[1:], 1):
