@@ -1,38 +1,45 @@
-<tests>
+<numbench>
 
-    <test id="reference-mkl">
-        <pkg>sci-libs/lapack-reference-3.4.0_p20120215-r1</pkg>
-        <emergeenv>
-            <var name="FFLAGS">-O3</var>
-        </emergeenv>
-        <required name="blas">mkl64-intel</required>
-    </test>
+    <operations module="lapack">
+      general_solve
+      least_squares
+      lu_decomp
+      cholesky
+      qr_decomp
+      svd_decomp
+      syev
+      stev
+      symm_ev
+    </operations>
 
-    <test id="reference-openblas">
-        <pkg>sci-libs/lapack-reference-3.4.0_p20120215-r1</pkg>
-        <emergeenv>
-            <var name="FFLAGS">-O3</var>
-        </emergeenv>
-        <required name="blas">openblas</required>
-    </test>
+    <testcases>
 
-    <test id="atlas">
-        <pkg>sci-libs/atlas-3.9.68</pkg>
-        <emergeenv>
-            <var name="USE">threads</var>
-        </emergeenv>
-    </test>
+        <case id="reference-openblas">
+            <pkg>sci-libs/lapack-reference-3.4.1</pkg>
+            <emergeenv>
+                <var name="FFLAGS">-O3</var>
+            </emergeenv>
+            <required name="blas">openblas</required>
+        </case>
 
-    <test id="mkl">
-        <pkg>sci-libs/mkl-10.3.7.256</pkg>
-        <skip>mkl32*</skip>
-        <skip>*int64*</skip>
-        <skip>*openmp</skip>
-        <skip>*dynamic*</skip>
-    </test>
+        <case id="atlas">
+            <pkg>sci-libs/atlas-3.10.0</pkg>
+            <emergeenv>
+                <var name="USE">-threads openmp</var>
+            </emergeenv>
+        </case>
 
-    <test id="acml">
-        <pkg>sci-libs/acml-5.1.0</pkg>
-    </test>
+        <case id="mkl">
+            <pkg>sci-libs/mkl-10.3.7.256</pkg>
+            <skip>mkl32*</skip>
+            <skip>*gfortran*</skip>
+            <skip>*int64*</skip>
+        </case>
 
-</tests>
+        <case id="acml">
+            <pkg>sci-libs/acml-5.1.0</pkg>
+        </case>
+    
+    </testcases>
+
+</numbench>
