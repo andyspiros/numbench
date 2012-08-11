@@ -18,12 +18,25 @@
 import os
 from os.path import basename, dirname, realpath
 
+# List here the "stable" modules in a static and ordered list
+modnames = [
+  'blas',
+  'cblas',
+  'lapack',
+  'lapacke',
+  'scalapack',
+  'fftw'
+]
+
 
 class ModuleNotFoundException(RuntimeError):
     pass
 
 
 def getModulesNames():
+    return modnames
+
+def getAllModulesNames():
     files = os.listdir(dirname(realpath(__file__)))
     me = basename(__file__)
     modnames = []
@@ -31,7 +44,6 @@ def getModulesNames():
         if f[-3:] == '.py' and f != me:
             modnames.append(f[:-3])
     return modnames
-
 
 def loadModule(modname, args=None):
     if not modname in getModulesNames():
@@ -42,5 +54,5 @@ def loadModule(modname, args=None):
     args = args if type(args) == type('') else ' '.join(args)
 
     # Load the module
-    tmp = __import__(modname, fromlist=["Module"])
+    tmp = __import__('numbench.modules.' + modname, fromlist=["Module"])
     return tmp.Module(args)

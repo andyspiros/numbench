@@ -57,15 +57,6 @@ def print_help():
     for m in modnames:
         M = modules.loadModule(m)
         print "   %s - %s" % (m, M.descr)
-#    print "   blas - Test BLAS implementations"
-#    print "   cblas - Test CBLAS implementations"
-#    print "   lapack - Test LAPACK implementations"
-#    print "   lapacke - Test LAPACK implementations"
-#    print "   scalapack - Test the ScaLAPACK library"
-#    #print "   blas_accuracy - Test BLAS implementations for accuracy"
-#    #print "   lapack_accuracy - Test LAPACK implementations for accuracy"
-#    print "   fftw - Test the FFTW library"
-#    #print "   metis - Test the METIS tools"
     print
     print "More information about a module is available through the command:"
     print "  numbench module --help"
@@ -107,6 +98,12 @@ parser = Parser(cfg.inputfile)
 # Get module name and arguments
 cfg.modulename = parser.getModuleName()
 cfg.moduleargs = parser.getModuleArguments()
+
+# Check whether the given module exists
+if not cfg.modulename in modules.getAllModulesNames():
+    print "Error: module " + cfg.modulename + " does not exist.\n\n"
+    print_help()
+    exit(2)
 
 # Set-up directories
 cfg.setDirs()
