@@ -1,94 +1,98 @@
-<tests>
+<numbench>
 
-    <test id="openblas-gcc-threads">
-        <pkg>sci-libs/openblas-0.2.2</pkg>
-        <emergeenv>
-            <var name="FC">gfortran</var>
-            <var name="CC">gcc</var>
-            <var name="FFLAGS">-O3</var>
-            <var name="CFLAGS">-O3</var>
-            <var name="USE">-openmp threads</var>
-        </emergeenv>
-    </test>
+    <operations module="blas">axpy matrix_vector matrix_matrix aat</operations>
 
-    <test id="openblas-gcc-openmp">
-        <pkg>sci-libs/openblas-0.2.2</pkg>
-        <emergeenv>
-            <var name="FC">gfortran</var>
-            <var name="CC">gcc</var>
-            <var name="FFLAGS">-O3</var>
-            <var name="CFLAGS">-O3</var>
-            <var name="USE">openmp -threads</var>
-        </emergeenv>
-    </test>
+    <testcases>
+        <case id="openblas-gcc-threads">
+            <pkg>sci-libs/openblas-0.2.2</pkg>
+            <emergeenv>
+                <var name="FC">gfortran</var>
+                <var name="CC">gcc</var>
+                <var name="FFLAGS">-O3</var>
+                <var name="CFLAGS">-O3</var>
+                <var name="USE">-openmp threads</var>
+            </emergeenv>
+        </case>
 
+        <case id="openblas-gcc-openmp">
+            <pkg>sci-libs/openblas-0.2.2</pkg>
+            <emergeenv>
+                <var name="FC">gfortran</var>
+                <var name="CC">gcc</var>
+                <var name="FFLAGS">-O3</var>
+                <var name="CFLAGS">-O3</var>
+                <var name="USE">openmp -threads</var>
+            </emergeenv>
+        </case>
+    
+    
+        <case id="openblas-icc-threads">
+            <pkg>sci-libs/openblas-0.2.2</pkg>
+            <emergeenv>
+                <var name="FC">ifort</var>
+                <var name="CC">icc</var>
+                <var name="FFLAGS">-O3</var>
+                <var name="CFLAGS">-O3</var>
+                <var name="USE">-openmp threads</var>
+            </emergeenv>
+        </case>
+    
+        <case id="openblas-icc-openmp">
+            <pkg>sci-libs/openblas-0.2.2</pkg>
+            <emergeenv>
+                <var name="FC">ifort</var>
+                <var name="CC">icc</var>
+                <var name="FFLAGS">-O3</var>
+                <var name="CFLAGS">-O3</var>
+                <var name="USE">openmp -threads</var>
+            </emergeenv>
+        </case>
+    
+    
+        <case id="openblas-clang-threads">
+            <pkg>sci-libs/openblas-0.2.2</pkg>
+            <emergeenv>
+                <var name="FC">clang</var>
+                <var name="CC">clang</var>
+                <var name="FFLAGS">-O3</var>
+                <var name="CFLAGS">-O3</var>
+                <var name="USE">-openmp threads</var>
+            </emergeenv>
+        </case>
+    
+        <case id="openblas-clang-openmp">
+            <pkg>sci-libs/openblas-0.2.2</pkg>
+            <emergeenv>
+                <var name="FC">clang</var>
+                <var name="CC">clang</var>
+                <var name="FFLAGS">-O3</var>
+                <var name="CFLAGS">-O3</var>
+                <var name="USE">openmp -threads</var>
+            </emergeenv>
+        </case>
+    
+    
+        <case id="openblas-ekopath-threads">
+            <pkg>sci-libs/openblas-0.2.2</pkg>
+            <emergeenv>
+                <var name="FC">pathf90</var>
+                <var name="CC">pathcc</var>
+                <var name="FFLAGS">-O3</var>
+                <var name="CFLAGS">-O3</var>
+                <var name="USE">-openmp threads</var>
+            </emergeenv>
+        </case>
+    
+        <case id="openblas-ekopath-openmp">
+            <pkg>sci-libs/openblas-0.2.2</pkg>
+            <emergeenv>
+                <var name="FC">pathf90</var>
+                <var name="CC">pathcc</var>
+                <var name="FFLAGS">-O3</var>
+                <var name="CFLAGS">-O3</var>
+                <var name="USE">openmp -threads</var>
+            </emergeenv>
+        </case>
 
-    <test id="openblas-icc-threads">
-        <pkg>sci-libs/openblas-0.2.2</pkg>
-        <emergeenv>
-            <var name="FC">ifort</var>
-            <var name="CC">icc</var>
-            <var name="FFLAGS">-O3</var>
-            <var name="CFLAGS">-O3</var>
-            <var name="USE">-openmp threads</var>
-        </emergeenv>
-    </test>
-
-    <test id="openblas-icc-openmp">
-        <pkg>sci-libs/openblas-0.2.2</pkg>
-        <emergeenv>
-            <var name="FC">ifort</var>
-            <var name="CC">icc</var>
-            <var name="FFLAGS">-O3</var>
-            <var name="CFLAGS">-O3</var>
-            <var name="USE">openmp -threads</var>
-        </emergeenv>
-    </test>
-
-
-    <test id="openblas-clang-threads">
-        <pkg>sci-libs/openblas-0.2.2</pkg>
-        <emergeenv>
-            <var name="FC">clang</var>
-            <var name="CC">clang</var>
-            <var name="FFLAGS">-O3</var>
-            <var name="CFLAGS">-O3</var>
-            <var name="USE">-openmp threads</var>
-        </emergeenv>
-    </test>
-
-    <test id="openblas-clang-openmp">
-        <pkg>sci-libs/openblas-0.2.2</pkg>
-        <emergeenv>
-            <var name="FC">clang</var>
-            <var name="CC">clang</var>
-            <var name="FFLAGS">-O3</var>
-            <var name="CFLAGS">-O3</var>
-            <var name="USE">openmp -threads</var>
-        </emergeenv>
-    </test>
-
-
-    <test id="openblas-ekopath-threads">
-        <pkg>sci-libs/openblas-0.2.2</pkg>
-        <emergeenv>
-            <var name="FC">pathf90</var>
-            <var name="CC">pathcc</var>
-            <var name="FFLAGS">-O3</var>
-            <var name="CFLAGS">-O3</var>
-            <var name="USE">-openmp threads</var>
-        </emergeenv>
-    </test>
-
-    <test id="openblas-ekopath-openmp">
-        <pkg>sci-libs/openblas-0.2.2</pkg>
-        <emergeenv>
-            <var name="FC">pathf90</var>
-            <var name="CC">pathcc</var>
-            <var name="FFLAGS">-O3</var>
-            <var name="CFLAGS">-O3</var>
-            <var name="USE">openmp -threads</var>
-        </emergeenv>
-    </test>
-
-</tests>
+    </testcases>
+</numbench>
