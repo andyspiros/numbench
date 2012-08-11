@@ -1,150 +1,146 @@
-.TH NUMBENCH "1" "March 2012" "Gentoo" "User Commands"
-.SH NAME
-numbench \- Benchmarking tool for Gentoo
-.SH SYNOPSIS
-.B numbench
-module conffile [\fIoptions\fR]
+.Dd August 11, 2012
+.Dt NUMBENCH 1
+.Os
+.Sh NAME
+.Nm numbench
+.Nd Benchmarking tool for Gentoo
+.Sh SYNOPSIS
+.Nm numbench
+.Fl conffile
+.Op Ar options ...
+.Nm
+.Op Ar -h , --help
 
-.B numbench
-module [\fI-h|--help\fR]
-
-.SH DESCRIPTION
-.PP
+.Sh DESCRIPTION
+.Pp
 numbench is a tool for compiling and benchmarking numerical
 libraries. It is useful to find out the implementations of common
 libraries that run faster on the machine and are more accurate.
 The script makes use of the portage features in order to download,
 compile, install and test the packages.
 
-.SS Modules
-.IX Subsection "Modules"
-.PP
-The following modules are available:
+.Ss Configuration file
+.Ix Subsection "Configuration file"
 
-.RS
-.B blas
-\- Test BLAS implementations
+.Pp
+The configuration file is a XML document that contains the information
+about the tests that have to be performed. In particular, it is stated
+which module must be called, its arguments (usually the operations the
+will be performed) and which test cases are to be run. By "test cases",
+we mean the packages that contain the software that must be benchmarked
+and the configuration the package must be compiled and run with.
 
-.B cblas
-\- Test CBLAS implementations
+Like every XML document, the configuration file must have a root element
+which is called "numbench". Within the root element, two elements must
+be present: "operations", which defines the module name and its arguments,
+and "testcases", which defines the test cases. The element "testcases"
+contains many "case" elements which describe one particular test case.
 
-.B lapack
-\- Test LAPACK implementations
+The "operations" tag contains an attribute called "module" that specifies
+the module (e.g. "blas", "lapack"). The content of this tag lists the
+arguments that will be passed to that module during its initialization.
 
-.B scalapack
-\- Test the ScaLAPACK libary
+The following is an example of a correctly written "operations" tag for
+the module "cblas" where some operations for vectors and matrices
+computations are listed:
 
-.B blas_accuracy
-\- Test BLAS implementations for accuracy
+  <operations module="cblas">
+    axpy matrix_vector matrix_matrix
+  </operations>
 
-.B lapack_accuracy
-\- Test LAPACK implementations for accuracy
 
-.B fftw
-\- Test the FFTW libary
+Each test case has many configuration options which are specified in the
+elements within the tag "case". The tag "case" must contain an attribute
+"id" which specifies an unique identification string for the test case.
+Only alphanumeric characters are allowed.
 
-.B metis
-\- Test the METIS tools
-.RE
+The only required tag is the package name that goes in the content of the
+subelement "pkg". Optionally, a description of the test case can be written
+within the subelement "descr"; currently, this describtion, even if present,
+is ignored; in future, it could be possible to display this informative
+string in the report.
 
-.PP
-More information about each module is available through the command:
-.B numbench module --help
+As every package can install many implementations of the software that is
+being benchmarked, the user has faculty to tell numbench to skip some of
+them. This can be achieved using the subelement "skip". By default, the
+content of this subelement is interpreted as glob pattern, allowing one
+to use wildcards "*" and "?". If the element has the attribute "type" equal
+to "regexp", the content will be interpreted as regular expression. One can
+add as many "skip" tags as desired. If the name of an implementation matches
+a glob pattern or a regular expression given in a "skip" tag, that
+implementation will be skipped, avoiding waste of computational
+resources and making the plots more clear.
 
-.SS Configuration file
-.IX Subsection "Configuration file"
+For each test case the user can specify up to four different environments:
 
-.PP
-In order to run a test, a configuration file has to be provided.
-The configuration file is an XML document: the main tag has the name
-.I tests
-and it contains one ore more test case definitions within tags
-.I test
-. Each test has to specify an id within the corresponding argument and a
-package in a format understandable by Portage within the tag
-.I pkg.
-This package is supposed to contain (at least) an implementation that can
-be tested by numbench.
+\fBdependenv\fR: this environment is used by portage when emerging
+dependencies of the package
 
-.PP
-Within each
-.I test
-tag up to four different environments can be tested. These are dependenv,
-emergeenv, compileenv and runenv. In order to specify an environment,
-create a tag with the same name, and add in this tag as many variable
-definitions as you desire. To define a variable it sufficient to create
-a tag
-.I var
-with the variable name in the argument "name" and the value as tag text.
+\fBemergeenv\fR: this environment is used by portage when emerging the
+package itself
 
-.PP
-The following example shows a minimal configuration file for blas
-implementations, where the test "reference" is defined; the package
-sci-libs/blas-reference-20120215-r1 is required and an emergeenv environment
-with the variable FFLAGS equal to "-O3 -funroll-all-loops"
-is defined:
+\fBcompileenv\fR: this environment is used by numbench while compiling the
+benchmarking program (not every module makes use of this environment)
 
-  <tests>
-    <test id="reference">
-      <pkg>sci-libs/blas-reference-20120215-r1</pkg>
-      <emergeenv>
-        <var name="FFLAGS">-O3 -funroll-all-loops</var>
-  	  </emergeenv>
-    </test>
-  </tests>
+\fBrunenv\fR: this environment is used by numbench when running the
+benchmarking program
 
-.PP
-The "dependenv" environment is used while emerging the dependencies of the
-package; the environment named "emergeenv" is used while emerging the package
-itself; "compileenv" is used when compiling the test program (if any) and
-"runenv" represents the environment within which the test program is run. The
-environments can also been specified through external files: if the argument
-"script" is given, its value must be the path of a script that exports the
-desired environment variables; at the end of the execution the environment is
-read and used. If the argument "file" is given, it must be the path of a text
-file containing key:value pairs, one on each line. If the argument "append" is
-given and its value is 1, the variables specified override the variables of
-the environment numbench is running in and this resulting environment is
-used.
+In order to specify the variables defined in one of these environments,
+place a subelement with the corresponding name inside the test case tag;
+within this subelement, place as many "var" tag as needed: each "var" tag
+must have an attribute called "name" (with the name of the variable) and a
+content, which will be the value of the variable. Example:
 
-.PP
-If the package installs more than one implementation, one or more of them can
-be skipped in order to reduce the required time. In order to skip one or more
-implementations, many tags "skip" can be created within a single "test" tag.
-The text value of these tags is intepreted as glob pattern. Regular expressions
-can be used: in this case it sufficient to add the argument "type" with value
-"regexp" to the "skip" tag.
+  <emergeenv>
+    <var name="CC">gcc-4.6.2</var>
+    <var name="CFLAGS">-O2 -funroll-loops</var>
+  </emergeenv>
+  
+There are other ways to define environments. If the environment contains
+many variables, it could be cleaner to put the definitions in a separate ASCII
+file as key=value pairs, one on each line, and linking to it. For this, use
+the attribute "file", whose value is the path to the file containing the
+variables. For example, we could write the file "myenv.txt":
 
-.PP
-An useful feature of numbench is the ability of changing the implementation of
-a library used by a tested software. For example, most lapack implementations
-internally use a blas implementation just like other libraries or programs. You
-could decide to test the reference-lapack implementation with two different
-underlying blas implementations. In order to do that it is sufficient to create
-within the "test" tag a tag named "required", with an argument named "name"
-whose value is the generic name of the library (e.g. "blas"), and a text
-value corresponding to the specific name of the library to use (e.g. "eigen").
-The required implementation must be installed in the main system.
+  CC=gcc-4.6.2
+  CFLAGS=-O2 -funroll-loops
 
-.PP
-Examples of configuration files are available under /usr/share/numbench/samples
-and cover a wide range of possible test cases.
+And then write the following in the configuration file:
 
-.SS Logs
+  <emergeenv file="myenv.txt"></emergeenv>
 
-.PP
-A complete set of log is saved during the execution of the script. The script
-itself will print at the beginning the directory where the logs are saved.
-In the directory you will find the file main.log, which contains everything
-that is written to the terminal and a directory for each test which is defined
-in the configuration file. Each of them contains the log of the emerge process
-(if any) and a directory for each implementation found, which in turn contains
-a log for the pkg-config process, one for the compilation of the test suite,
-one that checks whether the linking is correct and finally the test suit
-execution log.
+The only drawback of this method is the fact that the file is static.
+Instead, it is possible to write a more general script which is executed
+and whose final environment is taken. Say, for example, that we have a script
+called "myscript.sh", which exports the variables CC and CFLAGS according to
+the most recent compiler that is available on the system; then, we can use the
+attribute "script":
 
-.PP
-The logs are present only if the related process has been performed. For
-instance, no log is available for the emerge process if the package was already
-compiled. Please refer to the main.log file to see which processes have been
-skipped.
+  <emergeenv script="myscript.sh"></emergeenv>.
+  
+These three ways of defining variables can be mixed:
+
+  <compileenv file="mystaticfile.txt" script="mydynamicscript.sh">
+    <var name="CFLAGS">-O3 -fopenmp</var>
+  </compileenv>
+
+In this case, the specifications present in the static file override the
+variables defined through the script, while the variables defined in the
+XML document override both.
+
+Still, one could want to use her/his current environment for one or more of
+the steps. In this case, the attribute "append" with value "1" must be used:
+
+  <runenv append="1"></runenv>.
+  
+This is the weakest way for setting variables: they are overriden by other
+variables specified in scripts, files or subtags.
+
+
+
+
+
+
+
+
+
