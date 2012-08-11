@@ -20,28 +20,23 @@
 
 import os, sys, signal
 import benchchildren
+import modules
 
 # Set the signal handler
 def close(*args):
     benchchildren.terminate()
-    Print._level = 0
-    Print()
-    Print(80 * '-')
-    Print("INTERRUPT TRIGGERED")
-    Print("Exiting")
+    print
+    print 80 * '-'
+    print "INTERRUPT TRIGGERED"
+    print "Exiting"
     exit(0)
 signal.signal(signal.SIGINT, close)
-
-
-def print_usage():
-    print "Usage: numbench [blas|cblas|lapack|scalapack|fftw|metis|" \
-          "blas_accuracy|lapack_accuracy] file args"
 
 
 def print_help():
     print "Usage: numbench conffile [options]"
     print "       numbench [ -h | --help ]"
-    print "       numbench module [ -h | --help ]"
+#    print "       numbench module [ -h | --help ]"
     print
     print "Options:"
     print "   [ -h | --help ] - Displays an help message."
@@ -55,30 +50,25 @@ def print_help():
     print "       resulting images. Available are png, svg, eps, ps, pdf."
     print "       Default is svg."
     print
+
+    modnames = modules.getModulesNames()
+
     print "Modules:"
-    print "   blas - Test BLAS implementations"
-    print "   cblas - Test CBLAS implementations"
-    print "   lapack - Test LAPACK implementations"
-    print "   lapacke - Test LAPACK implementations"
-    print "   scalapack - Test the ScaLAPACK library"
-    #print "   blas_accuracy - Test BLAS implementations for accuracy"
-    #print "   lapack_accuracy - Test LAPACK implementations for accuracy"
-    print "   fftw - Test the FFTW library"
-    #print "   metis - Test the METIS tools"
+    for m in modnames:
+        M = modules.loadModule(m)
+        print "   %s - %s" % (m, M.descr)
+#    print "   blas - Test BLAS implementations"
+#    print "   cblas - Test CBLAS implementations"
+#    print "   lapack - Test LAPACK implementations"
+#    print "   lapacke - Test LAPACK implementations"
+#    print "   scalapack - Test the ScaLAPACK library"
+#    #print "   blas_accuracy - Test BLAS implementations for accuracy"
+#    #print "   lapack_accuracy - Test LAPACK implementations for accuracy"
+#    print "   fftw - Test the FFTW library"
+#    #print "   metis - Test the METIS tools"
     print
     print "More information about a module is available through the command:"
     print "  numbench module --help"
-
-
-def loadModule(modulename):
-    tmp = __import__('numbench.modules.' + modulename, fromlist=['Module'])
-#    try:
-#        tmp = __import__('numbench.modules.'+modulename, fromlist = ['Module'])
-#    except ImportError as e:
-#        sys.stderr.write('Module ' + modulename + ' not found')
-#        exit(1)
-
-    return tmp
 
 
 
@@ -88,13 +78,6 @@ def loadModule(modulename):
 if len(sys.argv) < 2 or sys.argv[1] in ('-h', '--help'):
     print_help()
     exit(0)
-
-# If requested, print the module help
-# TODO: print module's help
-#if sys.argv[2] in ('-h', '--help'):
-#    tmp = loadModule(sys.argv[1])
-#    tmp.Module.printHelp()
-#    exit(0)
 
 
 ## BEGIN THE TRUE SCRIPT
@@ -117,7 +100,7 @@ cfg.parseArguments()
 # Start configuration parser
 if not os.path.exists(cfg.inputfile):
     sys.stderr.write("File not found: " + cfg.inputfile)
-    print_usage()
+    print_help()
     exit(1)
 parser = Parser(cfg.inputfile)
 
@@ -135,7 +118,7 @@ cfg.tests = parser.getTestCases()
 Print = benchprint.initializePrint()
 
 # Import the module
-cfg.module = loadModule(cfg.modulename).Module(cfg.moduleargs)
+cfg.module = modules.loadModule(cfg.modulename, cfg.moduleargs)
 
 
 ## Write summary
