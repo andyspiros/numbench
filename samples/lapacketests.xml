@@ -1,23 +1,28 @@
-<tests>
+<numbench>
 
-    <test id="reference-openblas">
-        <pkg>sci-libs/lapacke-reference-3.4.1</pkg>
-        <emergeenv>
-            <var name="FFLAGS">-O3</var>
-	    <var name="ACCEPT_KEYWORDS">**</var>
-        </emergeenv>
-        <required name="blas">openblas-threads</required>
-	<runenv>
-	    <var name="LD_DEBUG">all</var>
-	</runenv>
-    </test>
+    <operations module="lapacke">lu_decomp svd_decomp qr_decomp</operations>
 
-    <test id="mkl">
-        <pkg>sci-libs/mkl-10.3.7.256</pkg>
-        <skip>mkl32*</skip>
-        <skip>*int64*</skip>
-        <skip>*openmp</skip>
-        <skip>*dynamic*</skip>
-    </test>
+    <testcases>
 
-</tests>
+        <case id="reference-openblas">
+            <pkg>sci-libs/lapacke-reference-3.4.1</pkg>
+            <emergeenv>
+                <var name="FFLAGS">-O3</var>
+                <var name="ACCEPT_KEYWORDS">**</var>
+            </emergeenv>
+            <runenv>
+                <var name="LD_DEBUG">all</var>
+            </runenv>
+        </case>
+
+        <case id="mkl">
+            <pkg>sci-libs/mkl-10.3.7.256</pkg>
+            <skip>mkl32*</skip>
+            <skip>*int64*</skip>
+            <skip>*openmp</skip>
+            <skip>*dynamic*</skip>
+        </case>
+
+    </testcases>
+
+</numbench>

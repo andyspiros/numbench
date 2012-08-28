@@ -1,38 +1,44 @@
-<tests>
+<numbench>
 
-    <test id="reference">
-        <pkg>sci-libs/blas-reference-20120423</pkg>
-        <emergeenv>
-            <var name="FFLAGS">-O3</var>
-        </emergeenv>
-    </test>
+    <operations module="blas">axpy matrix_vector matrix_matrix aat</operations>
 
-    <test id="atlas">
-        <pkg>sci-libs/atlas-3.10.0</pkg>
-        <emergeenv>
-            <var name="USE">threads</var>
-        </emergeenv>
-    </test>
+    <testcases>
 
-    <test id="eigen">
-        <pkg>dev-cpp/eigen-3.1.1-r1</pkg>
-        <emergeenv>
-            <var name="CXXFLAGS">-O3</var>
-        </emergeenv>
-    </test>
+        <case id="reference">
+            <pkg>sci-libs/blas-reference-20120423</pkg>
+            <emergeenv>
+                <var name="FFLAGS">-O3</var>
+            </emergeenv>
+        </case>
 
-    <test id="openblas">
-        <pkg>sci-libs/openblas-0.2.2</pkg>
-        <emergeenv>
-            <var name="FFLAGS">-O3</var>
-            <var name="CFLAGS">-O3</var>
-            <var name="USE">-openmp threads</var>
-        </emergeenv>
-    </test>
+        <case id="atlas">
+            <pkg>sci-libs/atlas-3.10.0</pkg>
+            <emergeenv>
+                <var name="USE">threads</var>
+            </emergeenv>
+        </case>
 
-    <test id="mkl">
-        <pkg>sci-libs/mkl-10.3.7.256</pkg>
-        <skip>mkl32*</skip>
-    </test>
+        <case id="eigen">
+            <pkg>dev-cpp/eigen-3.1.1-r1</pkg>
+            <emergeenv>
+                <var name="CXXFLAGS">-O3</var>
+            </emergeenv>
+        </case>
 
-</tests>
+        <case id="openblas">
+            <pkg>sci-libs/openblas-0.2.3</pkg>
+            <emergeenv>
+                <var name="FFLAGS">-O3</var>
+                <var name="CFLAGS">-O3</var>
+                <var name="USE">-openmp threads</var>
+            </emergeenv>
+        </case>
+
+        <case id="mkl">
+            <pkg>sci-libs/mkl-10.3.7.256</pkg>
+            <skip>mkl32*</skip>
+        </case>
+
+    </testcases>
+
+</numbench>

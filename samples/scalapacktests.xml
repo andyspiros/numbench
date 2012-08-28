@@ -1,17 +1,28 @@
-<tests>
+<numbench>
 
-    <test id="reference-O3">
-        <pkg>sci-libs/scalapack-2.0.1</pkg>
-        <emergeenv>
-            <var name="FFLAGS">-O3</var>
-        </emergeenv>
-    </test>
+    <operations module="scalapack">
+      axpy
+      matrix_vector
+      cholesky
+      svd_decomp
+    </operations>
 
-    <test id="reference-O1">
-        <pkg>sci-libs/scalapack-2.0.1</pkg>
-        <emergeenv>
-            <var name="FFLAGS">-O1</var>
-        </emergeenv>
-    </test>
+    <testcases>
 
-</tests>
+        <case id="reference-O3">
+            <pkg>sci-libs/scalapack-2.0.2</pkg>
+            <emergeenv>
+                <var name="FFLAGS">-O3</var>
+            </emergeenv>
+        </case>
+
+        <case id="reference-O1">
+            <pkg>sci-libs/scalapack-2.0.2</pkg>
+            <emergeenv>
+                <var name="FFLAGS">-O1</var>
+            </emergeenv>
+        </case>
+
+    </testcases>
+
+</numbench>
