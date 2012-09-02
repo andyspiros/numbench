@@ -34,23 +34,20 @@ signal.signal(signal.SIGINT, close)
 
 
 def print_help():
-    print "Usage: numbench conffile [options]"
-    print "       numbench [ -h | --help ]"
-#    print "       numbench module [ -h | --help ]"
-    print
-    print "Options:"
-    print "   [ -h | --help ] - Displays an help message."
-    print
-    print "   [ -d | --directory] dir - Stores the data in the given directory."
-    print "       If not given, a directory in ~/.numbench is chosen."
-    print
-    print "   [ -c | --clean] - Removes the temporary data."
-    print
-    print "   [ -i | --imageformat] format - Selects the given format for the"
-    print "       resulting images. Available are png, svg, eps, ps, pdf."
-    print "       Default is svg."
-    print
+    print """\
+Usage: numbench conffile [options]
+       numbench [ -h | --help ]
 
+Options:
+   - h, - -help                       Displays an help message.
+   - d, - -directory < dir > Stores the data in the given directory.  If
+                                      not given, a directory in ~/.numbench
+                                      is chosen.
+   - c, - -clean                      Removes the temporary data at the end.
+   - i, - -imageformat < format > Selects the given format for the resulting
+                                      images. Available are png, svg, eps, ps,
+                                      pdf. Default is svg.
+"""
     modnames = modules.getModulesNames()
 
     print "Modules:"
@@ -90,7 +87,7 @@ cfg.parseArguments()
 
 # Start configuration parser
 if not os.path.exists(cfg.inputfile):
-    sys.stderr.write("File not found: " + cfg.inputfile)
+    print "File not found: %s\n\n" % cfg.inputfile
     print_help()
     exit(1)
 parser = Parser(cfg.inputfile)
