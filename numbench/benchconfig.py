@@ -29,6 +29,7 @@ imageformat = None
 curdir = None
 scriptdir = None
 btldir = None
+accudir = None
 libdir = None
 
 # Storage directories
@@ -88,17 +89,16 @@ def parseArguments():
 
 
 def setDirs():
-    global curdir, scriptdir, btldir, libdir, basedir
+    global curdir, scriptdir, btldir, accudir, libdir, basedir
     global testsdir, rootsdir, pkgsdir, reportdir, logdir
 
 
     # Script directories
     curdir = os.path.abspath('.')
     scriptdir = os.path.dirname(os.path.realpath(__file__))
-    if os.environ.has_key('BTLDIR'):
-        btldir = os.environ['BTLDIR']
-    else:
-        btldir = '/usr/include/numbench/btl'
+
+    btldir = os.environ.get('BTLDIR', '/usr/include/numbench/btl')
+    accudir = os.environ.get('ACCUDIR', '/usr/include/numbench/accuracy')
 
     # Library directory (lib vs. lib32 vs. lib64)
     libdir = sp.Popen \
