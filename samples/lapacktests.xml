@@ -14,12 +14,11 @@
 
     <testcases>
 
-        <case id="reference-openblas">
+        <case id="reference">
             <pkg>sci-libs/lapack-reference-3.4.1</pkg>
             <emergeenv>
                 <var name="FFLAGS">-O3</var>
             </emergeenv>
-            <required name="blas">openblas</required>
         </case>
 
         <case id="atlas">
@@ -39,7 +38,7 @@
         <case id="acml">
             <pkg>sci-libs/acml-5.1.0</pkg>
         </case>
-    
+
     </testcases>
 
 </numbench>
