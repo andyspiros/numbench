@@ -20,7 +20,7 @@ import numbench.utils.btl as btl
 from numbench.benchprint import Print
 
 def reportConf(*args):
-    return {'type':'semilogx', 'xlabel':'size', 'ylabel':'MFlops'}
+    return {'xscale':'log', 'xlabel':'size', 'ylabel':'MFlops'}
 
 
 def runTest(self, test, btlconfig):

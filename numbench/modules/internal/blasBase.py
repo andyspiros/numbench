@@ -22,7 +22,7 @@ from os.path import join as pjoin
 
 
 avail1 = ('axpy', 'axpby', 'rot')
-avail2 = ('matrix_vector','atv','symv', 'ger', 'syr2', 'trisolve_vector')
+avail2 = ('matrix_vector', 'atv', 'symv', 'ger', 'syr2', 'trisolve_vector')
 avail3 = ('matrix_matrix', 'aat', 'trisolve_matrix', 'trmm')
 availableTests = avail1 + avail2 + avail3
 defaultTests = ('axpy', 'matrix_vector', 'trisolve_vector', 'matrix_matrix')
@@ -47,7 +47,7 @@ def init(self, args):
             continue
         passargs.append(i)
 
-    self.tests = btl.selectTests(availableTests, passargs+tests)
+    self.tests = btl.selectTests(availableTests, passargs + tests)
     if len(self.tests) == 0:
         self.tests = defaultTests
 
@@ -59,19 +59,17 @@ def getImplementations(self, test):
 def runTest(self, test, implementation):
     # Set up btlconfig
     btlconfig = dict (
-      source = 'libs/BLAS/main.cpp',
-      exe = pjoin(test['testdir'], implementation, "test"),
-      logdir = pjoin(test['logdir'], implementation),
-      testdir = pjoin(test['testdir'], implementation),
-      btlincludes = ('libs/BLAS',),
-      defines = ("CBLASNAME="+self.libname, self.libname.upper()+"_INTERFACE"),
-      flags = alt.getFlags(test, self.libname, implementation),
-      tests = self.tests
+      source='libs/BLAS/main.cpp',
+      exe=pjoin(test['testdir'], implementation, "test"),
+      logdir=pjoin(test['logdir'], implementation),
+      testdir=pjoin(test['testdir'], implementation),
+      btlincludes=('libs/BLAS',),
+      defines=("CBLASNAME=" + self.libname, self.libname.upper() + "_INTERFACE"),
+      flags=alt.getFlags(test, self.libname, implementation),
+      tests=self.tests
     )
 
     return btlBase.runTest(self, test, btlconfig)
 
 getTests = btlBase.getTests
-reportConf = btlBase.reportConf
-
 reportConf = btlBase.reportConf
