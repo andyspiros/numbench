@@ -28,24 +28,12 @@ from benchprint import Print
 
 class Plotter:
     def __init__(self, conf):
-        # Set plot function
+        # Store configuration
         self.conf = conf
-        if not conf.has_key('type'):
-            self.plotf = plt.plot
-        elif type(conf['type']) == type(''):
-            try:
-                self.plotf = plt.__dict__[conf['type']]
-            except:
-                print >> sys.stderr, \
-                  'Plot function "', conf['type'], '" not found. Using plot'
-                self.plotf = plt.plot
-                return
-        else:
-            self.plot = conf['type']
 
         # Labels
-        self.xlabel = conf.has_key('xlabel') and conf['xlabel'] or ''
-        self.ylabel = conf.has_key('ylabel') and conf['ylabel'] or ''
+        self.xlabel = conf.get('xlabel', '')
+        self.ylabel = conf.get('ylabel', '')
 
         # Initialize markers
         markers = ('-', '--', 'v', '^', 'o', 's', 'p', 'h', '*', '+', 'x', 'D')
@@ -54,16 +42,23 @@ class Plotter:
         self.curstyle = 0
 
         # Open figure
-        plt.figure(figsize=(12, 9), dpi=300)
+        self.figure = plt.figure(figsize=(12, 9), dpi=300)
 
 
-    def addPlot(self, x, y, label):
+    def addPlot(self, X, label):
         style = self.linestyles[self.curstyle]
         self.curstyle = (self.curstyle + 1) % len(self.linestyles)
-        self.plotf(x, y, style, label=label, hold=True)
+        if X.shape[1] == 2:
+            plt.plot(X[:, 0], X[:, 1], style, label=label, hold=True)
+        elif X.shape[1] == 3:
+            x, y, e = X[:, 0], X[:, 1], X[:, 2]
+            plt.errorbar(x, y, e, fmt=style, label=label, hold=True)
 
     def savePlot(self, fname):
-        plt.legend(loc='best')
+        axes = self.figure.get_axes()
+        axes.set_xscale(self.conf.get('xscale', 'linear'))
+        axes.set_yscale(self.conf.get('yscale', 'linear'))
+        plt.legend(loc='best', prop={'size':'x-small'})
         plt.xlabel(self.xlabel)
         plt.ylabel(self.ylabel)
         plt.grid(True)
@@ -96,14 +91,16 @@ def saveReport():
         p = Plotter(cfg.module.reportConf())
 
         for tid, test in cfg.tests.items():
-            if test.has_key('implementations'):
-                for impl in test['implementations']:
+            longlabel = len(test.get('implementations')) > 1
+            for impl in test.get('implementations', []):
 
-                    implres = test['results'][impl]
-                    if implres and implres.has_key(operation):
-                        resultsFile = implres[operation]
-                        x, y = np.loadtxt(resultsFile, unpack=True)
-                        p.addPlot(x, y, tid + '/' + impl)
+                # Add line to the plot
+                implres = test['results'][impl]
+                if implres and implres.has_key(operation):
+                    resultsFile = implres[operation]
+                    X = np.loadtxt(resultsFile, unpack=False)
+                    label = tid + '/' + impl if longlabel else tid
+                    p.addPlot(X, label)
 
         imgpath = pjoin('images', operation + '.' + cfg.imageformat)
         fname = pjoin(cfg.reportdir, imgpath)
