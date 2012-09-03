@@ -42,7 +42,7 @@ class Plotter:
         self.curstyle = 0
 
         # Open figure
-        self.figure = plt.figure(figsize=(12, 9), dpi=300)
+        plt.figure(figsize=(12, 9), dpi=300)
 
 
     def addPlot(self, X, label):
@@ -55,7 +55,7 @@ class Plotter:
             plt.errorbar(x, y, e, fmt=style, label=label, hold=True)
 
     def savePlot(self, fname):
-        axes = self.figure.get_axes()
+        axes = plt.axes()
         axes.set_xscale(self.conf.get('xscale', 'linear'))
         axes.set_yscale(self.conf.get('yscale', 'linear'))
         plt.legend(loc='best', prop={'size':'x-small'})
@@ -91,6 +91,9 @@ def saveReport():
         p = Plotter(cfg.module.reportConf())
 
         for tid, test in cfg.tests.items():
+
+            print "RESULTS: ", test['results']
+
             longlabel = len(test.get('implementations')) > 1
             for impl in test.get('implementations', []):
 
