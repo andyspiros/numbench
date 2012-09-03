@@ -92,8 +92,6 @@ def saveReport():
 
         for tid, test in cfg.tests.items():
 
-            print "RESULTS: ", test['results']
-
             longlabel = len(test.get('implementations')) > 1
             for impl in test.get('implementations', []):
 
