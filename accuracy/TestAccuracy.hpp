@@ -5,6 +5,8 @@
 #include <cmath>
 #include <vector>
 #include <iostream>
+#include <fstream>
+#include <cstdio>
 
 #include "utilities/Timer.hpp"
 
@@ -31,28 +33,49 @@ std::vector<int> getLogSizes(
     return sizes;
 }
 
+template<typename value_t> void writeToFile(
+        const std::vector<int>& sizes,
+        const std::vector<value_t>& means,
+        const std::vector<value_t>& stds,
+        const std::string& filename
+    )
+{
+    std::ofstream fs(filename.c_str());
+    fs.precision(10);
+    const int N = sizes.size();
 
-template<
-    template<class> class Action,
-    typename value_t
->
-std::pair<value_t, value_t> testAccuracy(
+    for(int i = 0; i < N; ++i)
+        fs << sizes[i] << " " << means[i] << " " << stds[i] << "\n";
+
+    fs.close();
+}
+
+
+template< template<class> class Action, typename value_t >
+void testAccuracy(
         const int& minsize = 4,
         const int& maxsize = 1000,
-        const unsigned& N = 100u)
+        const unsigned& N = 100u
+    )
 {
-    std::vector<int> sizes = getLogSizes(minsize, maxsize, N);
+    const std::string filename = Action<value_t>::fileName();
+    std::cout << "Beginning operation on file " << filename << std::endl;
+
+    const std::vector<int> sizes = getLogSizes(minsize, maxsize, N);
+    std::vector<value_t> means(N), stds(N);
+
     Timer t;
 
-    for (std::vector<int>::const_iterator i = sizes.begin(), e = sizes.end();
-         i != e; ++i) {
+    for (int i = 0; i < N; ++i) {
 
-        int size = *i;
-        std::cout << " -- Size: " << size << "  -  " << std::flush;
+        int size = sizes[i];
+        std::printf(" -- Size %6i  -  ", size);
+        std::cout << std::flush;
 
-        t.start();
         int N = 0;
         double e, emean = 0., e2mean = 0.;
+
+        t.start();
         do {
             Action<value_t> action(size, N);
             action.compute();
@@ -61,15 +84,20 @@ std::pair<value_t, value_t> testAccuracy(
             e2mean += e*e;
         } while(++N < 100 && t.elapsed() < 1. || N < 4);
 
-        std::cout << N << " samples  -  " << t.elapsed() << " seconds  -  ";
+        std::printf("%3i samples  -  %6f seconds  -  ", N, t.elapsed());
 
         emean /= N;
         e2mean /= N;
         e2mean = std::sqrt(e2mean - emean*emean);
 
-        std::cout << emean << " +/- " << e2mean << std::endl;
-
+        std::printf("%3e +/- %3e", emean, e2mean);
+        std::cout << std::endl;
+        means[i] = emean;
+        stds[i] = e2mean;
     }
+
+    std::cout << "Writing results to file " << filename << "\n" << std::endl;
+    writeToFile(sizes, means, stds, filename);
 }
 
 #endif // TESTACCURACY_HPP

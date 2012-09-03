@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <iostream>
+#include <string>
 #include "LinearCongruential.hpp"
 
 extern "C" {
@@ -44,7 +45,11 @@ public:
         return dnrm2_(&size, &b[0], &ONE)/dnrm2_(&size, &bcopy[0], &ONE);
     }
 
-//private:
+    static std::string fileName() {
+        return "accuracy_general_solve.dat";
+    }
+
+private:
     const int size;
     rangen_t rg;
     storage_t A, Acopy, x, b, bcopy;

@@ -1,5 +1,5 @@
 from os.path import dirname, join as pjoin
-import os, subprocess as sp
+import os, re, subprocess as sp
 
 from numbench import benchchildren, benchconfig as cfg
 from numbench.utils import alternatives as alt, benchutils as bu
@@ -24,7 +24,6 @@ def compileExe(test, libname, implementation):
     test['compileenv']['LIBRARY_PATH'] = libenvc
 
     libenvr = libenv + test['runenv'].get('LD_LIBRARY_PATH', '')
-    print "\n\nLIBENV: ", libenvr, "\n\n"
     test['runenv']['LD_LIBRARY_PATH'] = libenvr
 
     # Set compile-time environment
@@ -66,6 +65,7 @@ def compileExe(test, libname, implementation):
 
 def runExe(test, implementation, exe, args):
     logdir = pjoin(test['logdir'], implementation)
+    testdir = pjoin(test['testdir'], implementation)
 
     # Check linking
     logfs = file(pjoin(logdir, 'accuracyLinking.log'), 'w')
@@ -87,7 +87,6 @@ def runExe(test, implementation, exe, args):
 
     # Open pipe
     try:
-        testdir = pjoin(test['testdir'], implementation)
         proc = sp.Popen(args, bufsize=1, stdout=sp.PIPE, stderr=errfs, \
                         env=test['runenv'], cwd=testdir)
         benchchildren.append(proc)
@@ -96,11 +95,9 @@ def runExe(test, implementation, exe, args):
         Print('Command line: ' + ' '.join(args))
         return -1, None
 
-    result = {}
-
     # Interpret output
     Print('Begin execution')
-    # TODO: interpret output, store results,...
+    result = interpretOutput(proc.stdout, logfs, testdir)
     proc.wait()
     Print("Execution finished with return code " + str(proc.returncode))
 
@@ -111,10 +108,58 @@ def runExe(test, implementation, exe, args):
     if errp == 0:
         os.unlink(errfname)
 
-
     # Close, return
     logfs.close()
     return proc.returncode, result
+
+
+def interpretOutput(stdout, logfs, testdir):
+    result = {}
+
+    operationre = 'Beginning operation on file (accuracy_(.*).dat)'
+    while True:
+        operation = None
+        while operation is None:
+            line = stdout.readline()
+            if not line:
+                break
+
+            try:
+                resfile, operation = re.match(operationre, line).groups()
+                logfs.write(line)
+            except:
+                pass
+
+        # Check is program is terminated
+        if operation is None:
+            break
+
+        result[operation] = pjoin(testdir, resfile)
+        Print(operation + " -> " + resfile)
+
+
+        # Many different sizes for each operation test
+        Print.down()
+
+        while True:
+            outline = stdout.readline()
+
+            if not outline:
+                Print.up()
+                Print('Execution error')
+                return None
+
+            logfs.write(outline)
+            logfs.flush()
+
+            if not outline.startswith(' -- Size'):
+                break
+
+            Print(outline[4:].strip())
+
+        Print.up()
+
+    return result
 
 
 def runTest(self, test, implementation):
