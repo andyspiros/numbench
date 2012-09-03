@@ -118,7 +118,7 @@ def runExe(test, implementation, exe, args):
 
 
 def runTest(self, test, implementation):
-    retcode, exe = compileExe(test, self.libname, implementation)
+    exe = compileExe(test, self.libname, implementation)[1]
     runExe(test, implementation, exe, self.tests)
 
 def reportConf(*args):
