@@ -108,7 +108,6 @@ def runExe(test, implementation, exe, args):
     if errp == 0:
         os.unlink(errfname)
 
-    print "RESULT IN ACCURACY:", result
     # Close, return
     logfs.close()
     return proc.returncode, result
@@ -168,4 +167,4 @@ def runTest(self, test, implementation):
     return runExe(test, implementation, exe, self.tests)[1]
 
 def reportConf(*args):
-    return {'type':'plot', 'xlabel':'size', 'ylabel':'Error'}
+    return {'xscale':'log', 'yscale':'log', 'xlabel':'size', 'ylabel':'Error'}
