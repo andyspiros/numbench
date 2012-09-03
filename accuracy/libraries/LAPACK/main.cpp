@@ -19,5 +19,5 @@ int main(int argc, char **argv)
     }
 
     if (do_gesv)
-        testAccuracy<ActionGESV, double>(4, 3000, 20);
+        testAccuracy<ActionGESV, double>(4, 2000, 20);
 }
