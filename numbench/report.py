@@ -92,7 +92,7 @@ def saveReport():
 
         for tid, test in cfg.tests.items():
 
-            longlabel = len(test.get('implementations')) > 1
+            longlabel = len(test.get('implementations', [])) > 1
             for impl in test.get('implementations', []):
 
                 # Add line to the plot
