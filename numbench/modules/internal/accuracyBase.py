@@ -163,7 +163,12 @@ def interpretOutput(stdout, logfs, testdir):
 
 
 def runTest(self, test, implementation):
-    exe = compileExe(test, self.libname, implementation)[1]
+    retcode, exe = compileExe(test, self.libname, implementation)
+    if retcode == 0:
+        Print('Compilation succeeded')
+    else:
+        Print('Compilation failed')
+        return None
     return runExe(test, implementation, exe, self.tests)[1]
 
 def reportConf(*args):
