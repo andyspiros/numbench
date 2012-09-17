@@ -78,8 +78,7 @@ void testAccuracy(
         t.start();
         do {
             Action<value_t> action(size, N);
-            action.compute();
-            e = action.getResidual();
+            e = action.compute();
             emean += e;
             e2mean += e*e;
         } while(++N < 100 && t.elapsed() < 1. || N < 4);
