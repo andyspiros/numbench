@@ -83,7 +83,7 @@ def saveReport():
     bu.mkdir(cfg.reportdir)
     bu.mkdir(pjoin(cfg.reportdir, 'images'))
     htmlfname = pjoin(cfg.reportdir, 'index.html')
-    html = HTMLreport(htmlfname)
+    html = HTMLreport(htmlfname, cfg.reportTitle)
 
     for operation in cfg.module.getTests():
 

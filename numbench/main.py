@@ -97,6 +97,7 @@ parser = Parser(cfg.inputfile)
 # Get module name and arguments
 cfg.modulename = parser.getModuleName()
 cfg.moduleargs = parser.getModuleArguments()
+cfg.reportTitle = parser.getReportTitle()
 
 # Check whether the given module exists
 if not cfg.modulename in modules.getAllModulesNames():

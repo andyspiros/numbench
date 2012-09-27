@@ -16,10 +16,17 @@ class Parser:
     def getModuleArguments(self):
         opTag = self._dom.getElementsByTagName('operations')[0]
         try:
-            args = shlex.split(opTag.firstChild.data)
+            args = tuple(shlex.split(opTag.firstChild.data))
         except AttributeError:
             args = ()
         return args
+
+    def getReportTitle(self):
+        titleTag = self._dom.getElementsByTagName('title')
+        if len(titleTag) != 1:
+            return "Benchmarks report"
+        else:
+            return titleTag[0].firstChild.data
 
     def getTestCases(self):
         testNodes = self._dom.getElementsByTagName('case')

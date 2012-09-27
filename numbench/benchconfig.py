@@ -44,6 +44,7 @@ copyreport = None
 module = None
 modulename = None
 moduleargs = None
+reportTitle = None
 
 # Other
 isroot = not os.getuid()

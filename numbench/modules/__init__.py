@@ -49,9 +49,9 @@ def loadModule(modname, args=None):
     if not modname in getModulesNames():
         raise ModuleNotFoundException("module " + modname + " not found")
 
-    # Get the arguments string
-    args = "" if args is None else args
-    args = args if type(args) == type('') else ' '.join(args)
+    # Get the arguments tuple
+    args = () if args is None else args
+    args = tuple(args.split(' ')) if type(args) == type('') else tuple(args)
 
     # Load the module
     tmp = __import__('numbench.modules.' + modname, fromlist=["Module"])
