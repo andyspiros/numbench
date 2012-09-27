@@ -38,6 +38,7 @@ rootsdir = None
 pkgsdir = None
 reportdir = None
 logdir = None
+copyreport = None
 
 # Module
 module = None
@@ -50,7 +51,7 @@ tests = None
 
 
 def parseArguments():
-    global arguments, inputfile, clean, imageformat, basedir
+    global arguments, inputfile, clean, imageformat, basedir, copyreport
 
     arguments = []
     clean = False
@@ -80,6 +81,11 @@ def parseArguments():
 
         if a in ('-i', '--imageformat'):
             imageformat = sys.argv[i + 1]
+            skipargs += 1
+            continue
+        
+        if a in ('-r', '--copy-report'):
+            copyreport = sys.argv[i + 1]
             skipargs += 1
             continue
 

@@ -39,14 +39,16 @@ Usage: numbench conffile [options]
        numbench [ -h | --help ]
 
 Options:
-   - h, - -help                       Displays an help message.
-   - d, - -directory < dir > Stores the data in the given directory.  If
+   -h, --help                       Displays an help message.
+   -d, --directory <dir>            Store the data in the given directory.  If
                                       not given, a directory in ~/.numbench
                                       is chosen.
-   - c, - -clean                      Removes the temporary data at the end.
-   - i, - -imageformat < format > Selects the given format for the resulting
+   -c, --clean                      Remove the temporary data at the end.
+   -i, --imageformat <format>       Select the given format for the resulting
                                       images. Available are png, svg, eps, ps,
                                       pdf. Default is svg.
+   -r, --copy-report <URI>          Transfer the report directory to the given
+                                      path. Local paths are currently supported. 
 """
     modnames = modules.getModulesNames()
 
@@ -71,7 +73,7 @@ if len(sys.argv) < 2 or sys.argv[1] in ('-h', '--help'):
 ## BEGIN THE TRUE SCRIPT
 
 # Import the packages
-import re
+import re, shutil
 from fnmatch import fnmatch
 from os.path import join as pjoin
 
@@ -251,6 +253,10 @@ report.saveReport()
 if cfg.clean:
     bu.rmdir(cfg.testsdir)
     bu.rmdir(cfg.rootsdir)
+    
+# Copy results
+if cfg.copyreport:
+    shutil.copytree(cfg.reportdir, cfg.copyreport, True)
 
 
 # TODO: reintroduce the instructions feature (and remove "exit)
