@@ -33,6 +33,9 @@ public:
 
     static const int ZERO;
     static const int ONE;
+    static const Scalar fONE;
+    static const char NoTrans;
+    static const char Trans;
 
 public:
     static std::string name()
@@ -78,11 +81,20 @@ public:
      * LEVEL 2 BLAS *
      ****************/
 
-    static void matrixVector(const char& trans, const int& M, const int& N,
+    static void matrixVector(const bool& trans, const int& M, const int& N,
             const Scalar& alpha, const Scalar* A, const Scalar* x,
             const Scalar& beta, Scalar* y)
     {
-        FORTFUNC(gemv)(&trans, &M, &N, &alpha, A, &M, x, &ONE, &beta, y, &ONE);
+        const int LDA = trans ? N : M;
+        const char tA = trans ? Trans : NoTrans;
+        FORTFUNC(gemv)(&tA, &M, &N, &alpha, A, &LDA, x, &ONE, &beta, y, &ONE);
+    }
+
+    static void symmetricMatrixVector(const char& uplo, const int& N,
+            const Scalar& alpha, const Scalar* A, const Scalar* x,
+            const Scalar& beta, Scalar* y)
+    {
+        FORTFUNC(symv)(&uplo, &N, &alpha, A, &N, x, &ONE, &beta, y, &ONE);
     }
 
     static void triangularSolveVector(const char& uplo, const char& diag,
@@ -96,10 +108,59 @@ public:
     {
         FORTFUNC(ger)(&M, &N, &alpha, x, &ONE, y, &ONE, A, &M);
     }
+
+    static void rank2update(const char& uplo, const int& N, const Scalar& alpha,
+            const Scalar* x, const Scalar* y, Scalar* A)
+    {
+        FORTFUNC(syr2)(&uplo, &N, &alpha, x, &ONE, y, &ONE, A, &N);
+    }
+
+
+
+    /****************
+     * LEVEL 3 BLAS *
+     ****************/
+
+    static void matrixMatrix(const bool& transA, const bool& transB,
+            const int& M, const int& N, const int& K,
+            const Scalar& alpha, const Scalar* A, const Scalar* B,
+            const Scalar& beta, Scalar* C)
+    {
+        int LDA = M, LDB = K;
+        char tA = NoTrans, tB = NoTrans;
+
+        if (transA) {
+            LDA = K;
+            tA = Trans;
+        }
+        if (transB) {
+            LDB = N;
+            tB = Trans;
+        }
+
+        const int LDB = transB ? N : K;
+        FORTFUNC(gemm)(&tA, &tB, &M, &N, &K, &alpha, A, &LDA, B, &LDB,
+                       &beta, C, &M);
+    }
+
+    static void triangularMatrixMatrix(const char& uplo,
+            const int& M, const int& N, const Scalar* A, Scalar* B)
+    {
+        FORTFUNC(trmm)("L", &uplo, "N", "N", &M, &N, &fONE, A, &M, B, &M);
+    }
+
+    static void triangularSolveMatrix(const char& uplo,
+            const int& M, const int& N, const Scalar* A, Scalar *B)
+    {
+        FORTFUNC(trsm)("L", &uplo, "N", "N", &M, &N, &fONE, A, &M, B, &M);
+    }
 };
 
 const int NumericInterface<NI_SCALAR>::ZERO = 0;
 const int NumericInterface<NI_SCALAR>::ONE = 1;
+const NI_SCALAR NumericInterface<NI_SCALAR>::fONE = 1.;
+const char NumericInterface<NI_SCALAR>::NoTrans = 'N';
+const char NumericInterface<NI_SCALAR>::Trans = 'T';
 
 
 

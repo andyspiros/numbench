@@ -45,14 +45,36 @@ extern "C" {
      * LEVEL 2 BLAS *
      ****************/
 
-    void sgemv_(const char*, const int*, const int*, const float*, const float*, const int*, const float*, const int*, const float*, const float*, const int*);
-    void dgemv_(const char*, const int*, const int*, const double*, const double*, const int*, const double*, const int*, const double*, const double*, const int*);
+    void sgemv_(const char*, const int*, const int*, const float*, const float*, const int*, const float*, const int*, const float*, float*, const int*);
+    void dgemv_(const char*, const int*, const int*, const double*, const double*, const int*, const double*, const int*, const double*, double*, const int*);
+
+    void ssymv_(const char*, const int*, const float*, const float*, const int*, const float*, const int*, const float*, float*, const int*);
+    void dsymv_(const char*, const int*, const double*, const double*, const int*, const double*, const int*, const double*, double*, const int*);
 
     void strsv_(const char*, const char*, const char*, const int*, const float*, const int*, float*, const int*);
     void dtrsv_(const char*, const char*, const char*, const int*, const double*, const int*, double*, const int*);
 
-    void sger_(const int*, const int*, const float*, const float*, const int*, const float*, const int*, const float*, const int*);
-    void dger_(const int*, const int*, const double*, const double*, const int*, const double*, const int*, const double*, const int*);
+    void sger_(const int*, const int*, const float*, const float*, const int*, const float*, const int*, float*, const int*);
+    void dger_(const int*, const int*, const double*, const double*, const int*, const double*, const int*, double*, const int*);
+
+    void ssyr2_(const char*, const int*, const float*, const float*, const int*, const float*, const int*, float*, const int*);
+    void dsyr2_(const char*, const int*, const double*, const double*, const int*, const double*, const int*, double*, const int*);
+
+
+
+
+    /****************
+     * LEVEL 3 BLAS *
+     ****************/
+
+    void sgemm_(const char*, const char*, const int*, const int*, const int*, const float*, const float*, const int*, const float*, const int*, const float*, float*, const int*);
+    void dgemm_(const char*, const char*, const int*, const int*, const int*, const double*, const double*, const int*, const double*, const int*, const double*, double*, const int*);
+
+    void strmm_(const char*, const char*, const char*, const char*, const int*, const int*, const float*, const float*, const int*, float*, const int*);
+    void dtrmm_(const char*, const char*, const char*, const char*, const int*, const int*, const double*, const double*, const int*, double*, const int*);
+
+    void strsm_(const char*, const char*, const char*, const char*, const int*, const int*, const float*, const float*, const int*, float*, const int*);
+    void dtrsm_(const char*, const char*, const char*, const char*, const int*, const int*, const double*, const double*, const int*, double*, const int*);
 }
 
 
