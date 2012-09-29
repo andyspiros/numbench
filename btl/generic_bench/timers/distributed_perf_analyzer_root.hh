@@ -62,7 +62,7 @@ public:
     for (int i = 1; i < tries; ++i) {
       Action _action(size);
       if (!silent)
-        std::cout << " " << _action.nb_op_base()*_nb_calc/(m_time_action*1e6) << " " << std::flush;
+        std::cout << " " << _action.fpo()*_nb_calc/(m_time_action*1e6) << " " << std::flush;
       _action.initialize();
       m_time_action = std::min(m_time_action, time_calculate(_action));
     }
@@ -74,10 +74,9 @@ public:
     if (do_check > 0) {
       action.initialize();
       action.calculate();
-      action.check_result();
     }
 
-    return action.nb_op_base()/(time_action*1e6);
+    return action.fpo()/(time_action*1e6);
   }
 
   BTL_DONT_INLINE double time_calculate(Action & action)

@@ -1,7 +1,7 @@
 //=====================================================
 // File   :  intel_bench_fixed_size.hh
 // Author :  L. Plagne <laurent.plagne@edf.fr)>        
-// Copyright (C) EDF R&D,  mar déc 3 18:59:37 CET 2002
+// Copyright (C) EDF R&D,  mar dï¿½c 3 18:59:37 CET 2002
 //=====================================================
 // 
 // This program is free software; you can redistribute it and/or
@@ -55,11 +55,9 @@ double bench_fixed_size(int size, unsigned long long  & nb_calc,unsigned long lo
   
   time_action=time_action/(double(nb_calc));
   
-  action.check_result();
-  
   time_action=time_action-time_baseline;
 
-  return action.nb_op_base()/(time_action*1000000.0);
+  return action.fpo()/(time_action*1000000.0);
 
 }
 

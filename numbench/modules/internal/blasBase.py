@@ -21,11 +21,12 @@ import btlBase
 from os.path import join as pjoin
 
 
-avail1 = ('axpy', 'axpby', 'rot')
-avail2 = ('matrix_vector', 'atv', 'symv', 'ger', 'syr2', 'trisolve_vector')
-avail3 = ('matrix_matrix', 'aat', 'trisolve_matrix', 'trmm')
+avail1 = ('axpy', 'rot')
+avail2 = ('MatrixVector', 'MatrixTVector', 'SymMatrixVector',
+          'Rank1Update', 'Rank2Update', 'TriSolveVector')
+avail3 = ('MatrixMatrix', 'MatrixTMatrix', 'TriMatrixMatrix', 'TriSolveMatrix')
 availableTests = avail1 + avail2 + avail3
-defaultTests = ('axpy', 'matrix_vector', 'trisolve_vector', 'matrix_matrix')
+defaultTests = ('axpy', 'MatrixVector', 'TriSolveVector', 'MatrixMatrix')
 
 
 def init(self, args):

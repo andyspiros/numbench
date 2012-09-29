@@ -55,9 +55,9 @@ public:
     {
       Action _action(size);
       if (!silent) {
-        if (_action.nb_op_base()*_nb_calc < 0)
-	  std::cout << " { op*calc = " << _action.nb_op_base()*_nb_calc << " } " << std::flush;
-        std::cout << " " << _action.nb_op_base()*_nb_calc/(m_time_action*1e6) << " ";
+        if (_action.fpo()*_nb_calc < 0)
+	  std::cout << " { op*calc = " << _action.fpo()*_nb_calc << " } " << std::flush;
+        std::cout << " " << _action.fpo()*_nb_calc/(m_time_action*1e6) << " ";
       }
       _action.initialize();
       m_time_action = std::min(m_time_action, time_calculate(_action));
@@ -70,9 +70,8 @@ public:
     {
       action.initialize();
       action.calculate();
-      action.check_result();
     }
-    return action.nb_op_base()/(time_action*1e6);
+    return action.fpo()/(time_action*1e6);
   }
 
   BTL_DONT_INLINE double time_calculate(Action & action)

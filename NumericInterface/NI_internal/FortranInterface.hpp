@@ -81,7 +81,7 @@ public:
      * LEVEL 2 BLAS *
      ****************/
 
-    static void matrixVector(const bool& trans, const int& M, const int& N,
+    static void MatrixVector(const bool& trans, const int& M, const int& N,
             const Scalar& alpha, const Scalar* A, const Scalar* x,
             const Scalar& beta, Scalar* y)
     {
@@ -90,26 +90,32 @@ public:
         FORTFUNC(gemv)(&tA, &M, &N, &alpha, A, &LDA, x, &ONE, &beta, y, &ONE);
     }
 
-    static void symmetricMatrixVector(const char& uplo, const int& N,
+    static void SymMatrixVector(const char& uplo, const int& N,
             const Scalar& alpha, const Scalar* A, const Scalar* x,
             const Scalar& beta, Scalar* y)
     {
         FORTFUNC(symv)(&uplo, &N, &alpha, A, &N, x, &ONE, &beta, y, &ONE);
     }
 
-    static void triangularSolveVector(const char& uplo, const char& diag,
-            const int& N, const Scalar* A, Scalar* x)
+    static void TriMatrixVector(const char& uplo, const int& N,
+            const Scalar* A, Scalar* x)
     {
-        FORTFUNC(trsv)(&uplo, "N", &diag, &N, A, &N, x, &ONE);
+        FORTFUNC(trmv)(&uplo, "N", "N", &N, A, &N, x, &ONE);
     }
 
-    static void rank1update(const int& M, const int& N, const Scalar& alpha,
+    static void TriSolveVector(const char& uplo,
+            const int& N, const Scalar* A, Scalar* x)
+    {
+        FORTFUNC(trsv)(&uplo, "N", "N", &N, A, &N, x, &ONE);
+    }
+
+    static void Rank1Update(const int& M, const int& N, const Scalar& alpha,
             const Scalar* x, const Scalar* y, Scalar* A)
     {
         FORTFUNC(ger)(&M, &N, &alpha, x, &ONE, y, &ONE, A, &M);
     }
 
-    static void rank2update(const char& uplo, const int& N, const Scalar& alpha,
+    static void Rank2Update(const char& uplo, const int& N, const Scalar& alpha,
             const Scalar* x, const Scalar* y, Scalar* A)
     {
         FORTFUNC(syr2)(&uplo, &N, &alpha, x, &ONE, y, &ONE, A, &N);
@@ -138,7 +144,6 @@ public:
             tB = Trans;
         }
 
-        const int LDB = transB ? N : K;
         FORTFUNC(gemm)(&tA, &tB, &M, &N, &K, &alpha, A, &LDA, B, &LDB,
                        &beta, C, &M);
     }

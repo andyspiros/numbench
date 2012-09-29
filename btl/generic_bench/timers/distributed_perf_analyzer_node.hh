@@ -66,7 +66,6 @@ public:
     if (do_check > 0) {
       action.initialize();
       action.calculate();
-      action.check_result();
     }
 
     /* Return a void value */

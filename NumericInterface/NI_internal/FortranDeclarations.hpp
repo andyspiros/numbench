@@ -51,6 +51,9 @@ extern "C" {
     void ssymv_(const char*, const int*, const float*, const float*, const int*, const float*, const int*, const float*, float*, const int*);
     void dsymv_(const char*, const int*, const double*, const double*, const int*, const double*, const int*, const double*, double*, const int*);
 
+    void strmv_(const char*, const char*, const char*, const int*, const float*, const int*, float*, const int*);
+    void dtrmv_(const char*, const char*, const char*, const int*, const double*, const int*, double*, const int*);
+
     void strsv_(const char*, const char*, const char*, const int*, const float*, const int*, float*, const int*);
     void dtrsv_(const char*, const char*, const char*, const int*, const double*, const int*, double*, const int*);
 
