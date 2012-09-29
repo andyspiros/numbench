@@ -24,6 +24,10 @@
 
 #define FORTFUNC(F) CAT(CAT(NI_SCALARPREFIX, F), _)
 
+#ifndef NI_NAME
+#  define NI_NAME CAT(CAT(FortranInterface,$),NI_SCALAR)
+#endif
+
 
 template<>
 class NumericInterface<NI_SCALAR>
@@ -40,9 +44,7 @@ public:
 public:
     static std::string name()
     {
-        std::string name = "FortranInterface<";
-        name += MAKE_STRING(NI_SCALAR);
-        name += ">";
+        std::string name = MAKE_STRING(NI_NAME);
         return name;
     }
 

@@ -50,7 +50,7 @@ public:
     }
 
     double fpo() {
-        return 2*double(_size);
+        return 6*double(_size);
     }
 
     inline void initialize(){

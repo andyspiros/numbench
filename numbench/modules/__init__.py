@@ -51,6 +51,7 @@ def loadModule(modname, args=None):
 
     # Get the arguments string
     args = "" if args is None else args
+    args = tuple(args) if type(args) == type([]) else args
     args = args if type(args) == type(()) else tuple(args.split(' '))
 
     # Load the module

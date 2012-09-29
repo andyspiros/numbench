@@ -23,7 +23,8 @@ from os.path import join as pjoin, dirname
 import os, re, shlex, subprocess as sp
 
 # BTL global flags
-btlincludes = ('actions','generic_bench','generic_bench/utils','libs/STL')
+btlincludes = ('actions', 'generic_bench', 'generic_bench/utils',
+               'NumericInterface')
 btllibraries = ('rt',)
 btldefines = ('NDEBUG',)
 

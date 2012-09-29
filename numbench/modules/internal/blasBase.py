@@ -65,7 +65,7 @@ def runTest(self, test, implementation):
       logdir=pjoin(test['logdir'], implementation),
       testdir=pjoin(test['testdir'], implementation),
       btlincludes=('libs/BLAS',),
-      defines=("CBLASNAME=" + self.libname, self.libname.upper() + "_INTERFACE"),
+      defines = ("NI_NAME=" + self.libname, "NI_" + self.libname.upper()),
       flags=alt.getFlags(test, self.libname, implementation),
       tests=self.tests
     )
