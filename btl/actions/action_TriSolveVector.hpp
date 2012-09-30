@@ -37,10 +37,14 @@ public:
     // Constructor
     Action_TriSolveVector(int size)
     : _size(size), lc(10),
-      A(lc.fillVector<Scalar>(size*size)), x(lc.fillVector<Scalar>(size)),
+      A(lc.fillVector<Scalar>(size*size)), b(lc.fillVector<Scalar>(size)),
       x_work(size)
     {
         MESSAGE("Action_TriSolveVector Constructor");
+
+        // Adding size to the diagonal of A to make it invertible
+        for (int i = 0; i < size; ++i)
+            A[i+size*i] += size;
     }
 
     // Action name
@@ -54,7 +58,7 @@ public:
     }
 
     inline void initialize(){
-          std::copy(x.begin(), x.end(), x_work.begin());
+          std::copy(b.begin(), b.end(), x_work.begin());
     }
 
     inline void calculate() {
@@ -65,15 +69,15 @@ public:
         initialize();
         calculate();
         Interface::TriMatrixVector('U', _size, &A[0], &x_work[0]);
-        Interface::axpy(_size, -1., &x[0], &x_work[0]);
+        Interface::axpy(_size, -1., &b[0], &x_work[0]);
         return Interface::norm(_size, &x_work[0]);
     }
 
-private:
+//private:
     const int _size;
     LinearCongruential<> lc;
 
-    const vector_t A, x;
+    vector_t A, b;
     vector_t x_work;
 
 };

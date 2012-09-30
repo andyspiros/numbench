@@ -40,11 +40,65 @@ const int CblasRight = 142;
 
 // Cblas functions
 extern "C" {
-    void cblas_sgemv(int, int, int, int, float, const float*, int,
-                     const float*, int, float, float*, int);
 
-    void cblas_dgemv(int, int, int, int, double, const double*, int,
-                     const double*, int, double, double*, int);
+
+
+/****************
+ * LEVEL 1 BLAS *
+ ****************/
+
+    void cblas_srot(int, float*, int, float*, int, float, float);
+    void cblas_drot(int, double*, int, double*, int, double, double);
+
+    void cblas_saxpy(int, float, const float*, int, float*, int);
+    void cblas_daxpy(int, double, const double*, int, double*, int);
+
+    float cblas_sdot(int, const float*, int, const float*, int);
+    double cblas_ddot(int, const double*, int, const double*, int);
+
+    float cblas_snrm2(int, const float*, int);
+    double cblas_dnrm2(int, const double*, int);
+
+
+
+
+    /****************
+     * LEVEL 2 BLAS *
+     ****************/
+
+    void cblas_sgemv(int, int, int, int, float, const float*, int, const float*, int, float, float*, int);
+    void cblas_dgemv(int, int, int, int, double, const double*, int, const double*, int, double, double*, int);
+
+    void cblas_ssymv(int, int, int, float, const float*, int, const float*, int, float, float*, int);
+    void cblas_dsymv(int, int, int, double, const double*, int, const double*, int, double, double*, int);
+
+    void cblas_strmv(int, int, int, int, int, const float*, int, float*, int);
+    void cblas_dtrmv(int, int, int, int, int, const double*, int, double*, int);
+
+    void cblas_strsv(int, int, int, int, int, const float*, int, float*, int);
+    void cblas_dtrsv(int, int, int, int, int, const double*, int, double*, int);
+
+    void cblas_sger(int, int, int, float, const float*, int, const float*, int, float*, int);
+    void cblas_dger(int, int, int, double, const double*, int, const double*, int, double*, int);
+
+    void cblas_ssyr2(int, int, int, float, const float*, int, const float*, int, float*, int);
+    void cblas_dsyr2(int, int, int, double, const double*, int, const double*, int, double*, int);
+
+
+
+
+    /****************
+     * LEVEL 3 BLAS *
+     ****************/
+
+    void cblas_sgemm(int, int, int, int, int, int, float, const float*, int, const float*, int, float, float*, int);
+    void cblas_dgemm(int, int, int, int, int, int, double, const double*, int, const double*, int, double, double*, int);
+
+    void cblas_strmm(int, int, int, int, int, int, int, float, const float*, int, float*, int);
+    void cblas_dtrmm(int, int, int, int, int, int, int, double, const double*, int, double*, int);
+
+    void cblas_strsm(int, int, int, int, int, int, int, float, const float*, int, float*, int);
+    void cblas_dtrsm(int, int, int, int, int, int, int, double, const double*, int, double*, int);
 
 }
 

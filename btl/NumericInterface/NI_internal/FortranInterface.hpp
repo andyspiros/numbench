@@ -129,7 +129,7 @@ public:
      * LEVEL 3 BLAS *
      ****************/
 
-    static void matrixMatrix(const bool& transA, const bool& transB,
+    static void MatrixMatrix(const bool& transA, const bool& transB,
             const int& M, const int& N, const int& K,
             const Scalar& alpha, const Scalar* A, const Scalar* B,
             const Scalar& beta, Scalar* C)
@@ -150,13 +150,13 @@ public:
                        &beta, C, &M);
     }
 
-    static void triangularMatrixMatrix(const char& uplo,
+    static void TriMatrixMatrix(const char& uplo,
             const int& M, const int& N, const Scalar* A, Scalar* B)
     {
         FORTFUNC(trmm)("L", &uplo, "N", "N", &M, &N, &fONE, A, &M, B, &M);
     }
 
-    static void triangularSolveMatrix(const char& uplo,
+    static void TriSolveMatrix(const char& uplo,
             const int& M, const int& N, const Scalar* A, Scalar *B)
     {
         FORTFUNC(trsm)("L", &uplo, "N", "N", &M, &N, &fONE, A, &M, B, &M);
@@ -168,13 +168,3 @@ const int NumericInterface<NI_SCALAR>::ONE = 1;
 const NI_SCALAR NumericInterface<NI_SCALAR>::fONE = 1.;
 const char NumericInterface<NI_SCALAR>::NoTrans = 'N';
 const char NumericInterface<NI_SCALAR>::Trans = 'T';
-
-
-
-
-
-
-
-
-
-
