@@ -57,7 +57,7 @@ int main(int argv, char **argc)
     for (int i = 1; i < argv; ++i) {
       std::string arg = argc[i];
 
-      if (arg == "axpy") do_axpy = true;
+           if (arg == "axpy") do_axpy = true;
       else if (arg == "rot") do_rot = true;
 
       else if (arg == "MatrixVector") do_MatrixVector = true;
@@ -70,7 +70,7 @@ int main(int argv, char **argc)
       else if (arg == "MatrixMatrix") do_MatrixMatrix = true;
       else if (arg == "MatrixTMatrix") do_MatrixTMatrix = true;
       else if (arg == "TriMatrixMatrix") do_TriMatrixMatrix = true;
-      else if (arg == "TrisolveMatrix") do_TriSolveMatrix = true;
+      else if (arg == "TriSolveMatrix") do_TriSolveMatrix = true;
 
       // Check switch -N
       else if (arg[0] == '-' && arg[1] == 'N') {
@@ -99,16 +99,14 @@ int main(int argv, char **argc)
     if (do_TriSolveVector)
     bench<Action_TriSolveVector<Interface> >(MIN_MM,MAX_MM, N);
 
-    /*
-    if (matrix_matrix)
-    bench<Action_matrix_matrix_product<Interface> >(MIN_MM,MAX_MM, N);
-    if (aat)
-    bench<Action_aat_product<Interface> >(MIN_MM,MAX_MM, N);
-    if (trisolve_matrix)
-    bench<Action_trisolve_matrix<Interface> >(MIN_MM,MAX_MM, N);
-    if (trmm)
-    bench<Action_trmm<Interface> >(MIN_MM,MAX_MM, N);
-    */
+    if (do_MatrixMatrix)
+    bench<Action_MatrixMatrix<Interface> >(MIN_MM,MAX_MM, N);
+    if (do_MatrixTMatrix)
+    bench<Action_MatrixTMatrix<Interface> >(MIN_MM,MAX_MM, N);
+    if (do_TriMatrixMatrix)
+    bench<Action_TriMatrixMatrix<Interface> >(MIN_MM,MAX_MM, N);
+    if (do_TriSolveMatrix)
+    bench<Action_TriSolveMatrix<Interface> >(MIN_MM,MAX_MM, N);
 
 
   return 0;

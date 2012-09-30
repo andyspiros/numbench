@@ -38,7 +38,7 @@ public:
     Action_MatrixVector(int size)
     : _size(size), lc(10),
       A(lc.fillVector<Scalar>(size*size)), x(lc.fillVector<Scalar>(size)),
-      A_work(size*size), x_work(size), y_work(size)
+      y(size), y_work(size)
     {
         MESSAGE("Action_MatrixVector Constructor");
     }
@@ -54,12 +54,11 @@ public:
     }
 
     inline void initialize(){
-          std::copy(A.begin(), A.end(), A_work.begin());
-          std::copy(x.begin(), x.end(), x_work.begin());
+          std::copy(y.begin(), y.end(), y_work.begin());
     }
 
     inline void calculate() {
-        Interface::MatrixVector(false, _size, _size, 1., &A_work[0], &x_work[0],
+        Interface::MatrixVector(false, _size, _size, 1., &A[0], &x[0],
                                 0., &y_work[0]);
     }
 
@@ -71,8 +70,8 @@ private:
     const int _size;
     LinearCongruential<> lc;
 
-    const vector_t A, x;
-    vector_t A_work, x_work, y_work;
+    const vector_t A, x, y;
+    vector_t y_work;
 
 };
 

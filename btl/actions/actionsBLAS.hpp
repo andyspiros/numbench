@@ -8,9 +8,7 @@
 #include "action_Rank1Update.hpp"
 #include "action_Rank2Update.hpp"
 
-/*
 #include "action_MatrixMatrix.hpp"
 #include "action_MatrixTMatrix.hpp"
 #include "action_TriMatrixMatrix.hpp"
 #include "action_TriSolveMatrix.hpp"
-*/

@@ -15,71 +15,64 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-#ifndef ACTION_TRISOLVEVECTOR
-#define ACTION_TRISOLVEVECTOR
+#ifndef ACTION_MATRIXTMATRIX
+#define ACTION_MATRIXTMATRIX
 
 #include "LinearCongruential.hpp"
 #include <vector>
 #include <algorithm>
 
 template<class Interface>
-class Action_TriSolveVector {
+class Action_MatrixTMatrix {
 
     typedef typename Interface::Scalar Scalar;
     typedef std::vector<Scalar> vector_t;
 
 private:
     // Invalidate copy constructor
-    Action_TriSolveVector(const Action_TriSolveVector&);
+    Action_MatrixTMatrix(const Action_MatrixTMatrix&);
 
 public:
 
     // Constructor
-    Action_TriSolveVector(int size)
+    Action_MatrixTMatrix(int size)
     : _size(size), lc(10),
-      A(lc.fillVector<Scalar>(size*size)), b(lc.fillVector<Scalar>(size)),
-      x_work(size)
+      A(lc.fillVector<Scalar>(size*size)), B(lc.fillVector<Scalar>(size*size)),
+      C(size*size), C_work(size*size)
     {
-        MESSAGE("Action_TriSolveVector Constructor");
-
-        // Adding size to the diagonal of A to ensure it is invertible
-        for (int i = 0; i < size; ++i)
-            A[i+size*i] += size;
+        MESSAGE("Action_MatrixTMatrix Constructor");
     }
 
     // Action name
     static std::string name()
     {
-        return "TriSolveVector_" + Interface::name();
+        return "MatrixTMatrix_" + Interface::name();
     }
 
     double fpo() {
-        return double(_size)*double(_size) - 2*double(_size);
+        return double(_size)*double(_size)*(2*double(_size) - 1);
     }
 
     inline void initialize(){
-          std::copy(b.begin(), b.end(), x_work.begin());
+          std::copy(C.begin(), C.end(), C_work.begin());
     }
 
     inline void calculate() {
-        Interface::TriSolveVector('U', _size, &A[0], &x_work[0]);
+        Interface::MatrixMatrix(true, false, _size, _size, _size,
+                                1., &A[0], &B[0], 0., &C_work[0]);
     }
 
     Scalar getResidual() {
-        initialize();
-        calculate();
-        Interface::TriMatrixVector('U', _size, &A[0], &x_work[0]);
-        Interface::axpy(_size, -1., &b[0], &x_work[0]);
-        return Interface::norm(_size, &x_work[0]);
+        return 0.;
     }
 
-//private:
+private:
     const int _size;
     LinearCongruential<> lc;
 
-    vector_t A, b;
-    vector_t x_work;
+    const vector_t A, B, C;
+    vector_t C_work;
 
 };
 
-#endif // ACTION_TRISOLVEVECTOR
+#endif // ACTION_MATRIXTMATRIX
