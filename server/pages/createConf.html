@@ -1,0 +1,46 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>Numbench</title>
+
+<link rel="stylesheet" href="style.css" />
+
+<script type="text/javascript" src="confSkip.js"></script>
+<script type="text/javascript" src="confEnv.js"></script>
+<script type="text/javascript" src="confCase.js"></script>
+<script type="text/javascript" src="confSend.js"></script>
+
+</head>
+<body onload="initialize()">
+
+  <h1>Configuration generator</h1>
+  
+  <table style="margin: 50px auto 100px auto">
+    <tbody>
+      <tr>
+        <td>File name:</td>
+        <td><input id="fName" size="60" /></td>
+        
+        <td style="padding-left:100px">Module:</td>
+        <td><select id="moduleName"></select></td>
+      </tr>
+      
+      <tr>
+        <td>Benchmark title:</td>
+        <td><input id="benchTitle" size="60" /></td>
+        
+        <td style="padding-left:100px">Module arguments:</td>
+        <td><input id="moduleArgs" size="80" /></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+
+  <ul id="casesList">
+    <button id="addCaseButton" onclick="addCase()">Add new case</button>
+  </ul>
+
+</body>
+</html>

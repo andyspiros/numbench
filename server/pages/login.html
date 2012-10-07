@@ -1,0 +1,40 @@
+<html>
+<head>
+<title>Numbench: login</title>
+<style type="text/css">
+.loginBox {
+    max-width: 600px;
+    margin: auto;
+    border: 4px double black;
+    text-align: center;
+}
+
+.loginBox h2 {
+    text-align: center;
+    font-size: large;
+    background-color: blue;
+    color: white;
+    margin: 3px;
+}
+
+.loginBox .loginForm {
+    display: inline-block;
+    margin: auto;
+}
+</style>
+</head>
+<body>
+  <div class="loginBox">
+    <h2>Numbench requires that the user authenticates</h2>
+    <div class="loginForm">
+      <form action="login" method="POST">
+        <table>
+          <tr><td>User name:</td><td><input name="username" /></td></tr>
+          <tr><td>Password:</td><td><input type="password" name="password" /></td></tr>
+          <tr><td>&nbsp;</td><td><input type="submit" value="Login" /></td></tr>
+        </table>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

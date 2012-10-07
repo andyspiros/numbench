@@ -1,0 +1,56 @@
+ul#casesList {
+    width: 800px;
+    list-style-type: none;
+    margin: auto;
+    padding: 0px;
+    /*background-color: #CCCCCC;*/
+}
+
+ul#casesList li.case {
+    margin: 40px 0px;
+    padding: 5px;
+    background-color: #CCFFFF;
+    border: 2px dashed black;
+}
+
+.caseIDdiv {
+    float: right;
+}
+
+
+/* Environment tables */
+
+.environmentContainer {
+	margin-top: 1em;
+	margin-bottom: 1.5em;
+}
+
+table.environment {
+	border: 1px solid black;
+	margin: auto;
+	background-color: #A5CECE;
+}
+
+table.environment thead {
+    font-weight: bold;
+    text-align: center;
+}
+
+table.environment thead tr td {
+    width: 20em;
+}
+
+table.environment tbody tr td {
+	border: 1px solid black;
+    background-color: #EEEEEE;
+    height: 1.5em;
+    cursor: pointer;
+}
+
+/* Skip list */
+.skipList {
+	margin: 0px;
+}
+
+.skipList li {
+}
