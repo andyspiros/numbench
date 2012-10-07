@@ -1,13 +1,13 @@
 <numbench>
 
-    <operations module="cblas">axpy matrix_vector matrix_matrix aat</operations>
+    <operations module="cblas">axpy MatrixVector MatrixTVector MatrixMatrix MatrixTMatrix TriSolveVector TriSolveMatrix</operations>
 
     <testcases>
 
         <case id="reference">
             <pkg>sci-libs/cblas-reference-20110218</pkg>
             <emergeenv>
-                <var name="FFLAGS">-O3</var>
+                <var name="FFLAGS">-Ofast</var>
             </emergeenv>
         </case>
 
@@ -18,22 +18,22 @@
             </emergeenv>
         </case>
 
-        <case id="openblas1">
+        <case id="openblas">
             <pkg>sci-libs/openblas-0.2.3</pkg>
             <emergeenv>
                 <var name="FFLAGS">-O3</var>
                 <var name="CFLAGS">-O3</var>
                 <var name="USE">incblas</var>
             </emergeenv>
-            <runenv>
-                <var name="OPENBLAS_NUM_THREADS">1</var>
-            </runenv>
         </case>
 
         <case id="mkl">
             <pkg>sci-libs/mkl-10.3.7.256</pkg>
             <skip>mkl32*</skip>
             <skip>*int64*</skip>
+            <skip>mkl64-dynamic</skip>
+            <skip>mkl64-gfortran</skip>
+            <skip>mkl64-intel</skip>
         </case>
 
     </testcases>

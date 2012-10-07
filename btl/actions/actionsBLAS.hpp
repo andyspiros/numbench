@@ -1,14 +1,31 @@
-#include "action_axpy.hpp"
-#include "action_rot.hpp"
+//=====================================================
+// Copyright (C) 2012 Andrea Arteaga <andyspiros@gmail.com>
+//=====================================================
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+//
+#include "BLAS/action_axpy.hpp"
+#include "BLAS/action_rot.hpp"
 
-#include "action_MatrixVector.hpp"
-#include "action_MatrixTVector.hpp"
-#include "action_SymMatrixVector.hpp"
-#include "action_TriSolveVector.hpp"
-#include "action_Rank1Update.hpp"
-#include "action_Rank2Update.hpp"
+#include "BLAS/action_MatrixVector.hpp"
+#include "BLAS/action_MatrixTVector.hpp"
+#include "BLAS/action_SymMatrixVector.hpp"
+#include "BLAS/action_TriSolveVector.hpp"
+#include "BLAS/action_Rank1Update.hpp"
+#include "BLAS/action_Rank2Update.hpp"
 
-#include "action_MatrixMatrix.hpp"
-#include "action_MatrixTMatrix.hpp"
-#include "action_TriMatrixMatrix.hpp"
-#include "action_TriSolveMatrix.hpp"
+#include "BLAS/action_MatrixMatrix.hpp"
+#include "BLAS/action_MatrixTMatrix.hpp"
+#include "BLAS/action_TriMatrixMatrix.hpp"
+#include "BLAS/action_TriSolveMatrix.hpp"

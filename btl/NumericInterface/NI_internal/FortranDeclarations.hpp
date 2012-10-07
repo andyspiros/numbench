@@ -79,6 +79,20 @@ extern "C" {
     void strsm_(const char*, const char*, const char*, const char*, const int*, const int*, const float*, const float*, const int*, float*, const int*);
     void dtrsm_(const char*, const char*, const char*, const char*, const int*, const int*, const double*, const double*, const int*, double*, const int*);
 
+
+
+
+    /******************
+     * LAPACK SOLVERS *
+     ******************/
+
+    void sgesv(const int&, const int&, float*, const int&, int*, float*, const int&, int&);
+    void dgesv(const int&, const int&, double*, const int&, int*, double*, const int&, int&);
+
+
+
+    FORTFUNC(gesv)(&N, &ONE, A, &N, ipiv, b, &N, &info);
+
 }
 
 

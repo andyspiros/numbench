@@ -1,42 +1,21 @@
 <numbench>
 
-    <operations module="blas">axpy matrix_vector matrix_matrix aat</operations>
+    <operations module="blas">axpy MatrixVector MatrixTVector MatrixMatrix MatrixTMatrix TriSolveVector TriSolveMatrix</operations>
 
     <testcases>
 
-        <case id="reference">
+        <case id="reference-Os">
             <pkg>sci-libs/blas-reference-20120423</pkg>
             <emergeenv>
-                <var name="FFLAGS">-O3</var>
+                <var name="FFLAGS">-Os</var>
             </emergeenv>
         </case>
 
-        <case id="atlas">
-            <pkg>sci-libs/atlas-3.10.0</pkg>
+        <case id="reference-Ofast">
+            <pkg>sci-libs/blas-reference-20120423</pkg>
             <emergeenv>
-                <var name="USE">threads</var>
+                <var name="FFLAGS">-Ofast</var>
             </emergeenv>
-        </case>
-
-        <case id="eigen">
-            <pkg>dev-cpp/eigen-3.1.1-r1</pkg>
-            <emergeenv>
-                <var name="CXXFLAGS">-O3</var>
-            </emergeenv>
-        </case>
-
-        <case id="openblas">
-            <pkg>sci-libs/openblas-0.2.3</pkg>
-            <emergeenv>
-                <var name="FFLAGS">-O3</var>
-                <var name="CFLAGS">-O3</var>
-                <var name="USE">-openmp threads</var>
-            </emergeenv>
-        </case>
-
-        <case id="mkl">
-            <pkg>sci-libs/mkl-10.3.7.256</pkg>
-            <skip>mkl32*</skip>
         </case>
 
     </testcases>

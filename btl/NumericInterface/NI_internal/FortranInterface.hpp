@@ -161,6 +161,18 @@ public:
     {
         FORTFUNC(trsm)("L", &uplo, "N", "N", &M, &N, &fONE, A, &M, B, &M);
     }
+
+
+
+    /******************
+     * LAPACK SOLVERS *
+     ******************/
+
+    static void GeneralSolve(const int& N, Scalar *A, Scalar *b, int *ipiv)
+    {
+        int info;
+        FORTFUNC(gesv)(&N, &ONE, A, &N, ipiv, b, &N, &info);
+    }
 };
 
 const int NumericInterface<NI_SCALAR>::ZERO = 0;
