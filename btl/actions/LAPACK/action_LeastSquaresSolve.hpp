@@ -15,38 +15,38 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-#ifndef ACTION_GENERALSOLVE
-#define ACTION_GENERALSOLVE
+#ifndef ACTION_LEASTSQUARESSOLVE
+#define ACTION_LEASTSQUARESSOLVE
 
 #include "LinearCongruential.hpp"
 #include <vector>
 #include <algorithm>
 
 template<class Interface>
-class Action_GeneralSolve {
+class Action_LeastSquaresSolve {
 
     typedef typename Interface::Scalar Scalar;
     typedef std::vector<Scalar> vector_t;
 
 private:
     // Invalidate copy constructor
-    Action_GeneralSolve(const Action_GeneralSolve&);
+    Action_LeastSquaresSolve(const Action_LeastSquaresSolve&);
 
 public:
 
     // Constructor
-    Action_GeneralSolve(int size)
+    Action_LeastSquaresSolve(int size)
     : _size(size), lc(10),
       A(lc.fillVector<Scalar>(size*size)), b(lc.fillVector<Scalar>(size)),
-      A_work(size*size), x_work(size), b_res(size), ipiv(size)
+      A_work(size*size), x_work(size), b_res(size)
     {
-        MESSAGE("Action_GeneralSolve Constructor");
+        MESSAGE("Action_LeastSquaresSolve Constructor");
     }
 
     // Action name
     static std::string name()
     {
-        return "GeneralSolve_" + Interface::name();
+        return "LeastSquaresSolve_" + Interface::name();
     }
 
     double fpo() {
@@ -59,7 +59,7 @@ public:
     }
 
     inline void calculate() {
-        Interface::GeneralSolve(_size, &A_work[0], &x_work[0], &ipiv[0]);
+        Interface::LeastSquaresSolve(_size, &A_work[0], &x_work[0]);
     }
 
     Scalar getResidual() {
@@ -68,7 +68,8 @@ public:
         std::copy(b.begin(), b.end(), b_res.begin());
         Interface::MatrixVector(false, _size, _size, -1., &A[0], &x_work[0],
                                 1., &b_res[0]);
-        return Interface::norm(_size, &b_res[0]);
+        const Scalar Anorm = Interface::norm(_size*_size, &A[0]);
+        return Interface::norm(_size, &b_res[0])/Anorm;
     }
 
 private:
@@ -77,8 +78,7 @@ private:
 
     const vector_t A, b;
     vector_t A_work, x_work, b_res;
-    std::vector<int> ipiv;
 
 };
 
-#endif // ACTION_GENERALSOLVE
+#endif // ACTION_LEASTSQUARESSOLVE

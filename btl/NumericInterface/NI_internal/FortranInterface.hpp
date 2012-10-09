@@ -28,6 +28,7 @@
 #  define NI_NAME CAT(CAT(FortranInterface,$),NI_SCALAR)
 #endif
 
+#include <vector>
 
 template<>
 class NumericInterface<NI_SCALAR>
@@ -172,6 +173,18 @@ public:
     {
         int info;
         FORTFUNC(gesv)(&N, &ONE, A, &N, ipiv, b, &N, &info);
+    }
+
+    static void LeastSquaresSolve(const int& N, Scalar *A, Scalar *b)
+    {
+        int lw, info;
+        const int mONE = -1;
+        Scalar lworks;
+
+        FORTFUNC(gels)("N", &N, &N, &ONE, A, &N, b, &N, &lworks, &mONE, &info);
+        lw = static_cast<int>(lworks);
+        std::vector<Scalar> work(lw);
+        FORTFUNC(gels)("N", &N, &N, &ONE, A, &N, b, &N, &work[0], &lw, &info);
     }
 };
 

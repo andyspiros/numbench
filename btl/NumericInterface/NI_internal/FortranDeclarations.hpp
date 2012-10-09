@@ -86,12 +86,12 @@ extern "C" {
      * LAPACK SOLVERS *
      ******************/
 
-    void sgesv(const int&, const int&, float*, const int&, int*, float*, const int&, int&);
-    void dgesv(const int&, const int&, double*, const int&, int*, double*, const int&, int&);
+    void sgesv_(const int*, const int*, float*, const int*, int*, float*, const int*, int*);
+    void dgesv_(const int*, const int*, double*, const int*, int*, double*, const int*, int*);
 
+    void sgels_(const char*, const int*, const int*, const int*, float*, const int*, float*, const int*, float*, const int*, int*);
+    void dgels_(const char*, const int*, const int*, const int*, double*, const int*, double*, const int*, double*, const int*, int*);
 
-
-    FORTFUNC(gesv)(&N, &ONE, A, &N, ipiv, b, &N, &info);
 
 }
 
