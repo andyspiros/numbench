@@ -71,7 +71,7 @@ private:
     const int _size;
     LinearCongruential<> lc;
 
-    const vector_t A;
+    vector_t A;
     vector_t A_work, eye_work;;
     std::vector<int> ipiv;
 

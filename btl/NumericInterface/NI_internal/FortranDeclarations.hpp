@@ -105,6 +105,9 @@ extern "C" {
     void spotrf_(const char*, const int*, float*, const int*, int*);
     void dpotrf_(const char*, const int*, double*, const int*, int*);
 
+    void sgeqp3_(const int*, const int*, float*, const int*, int*, float*, float*, const int*, int*);
+    void dgeqp3_(const int*, const int*, double*, const int*, int*, double*, double*, const int*, int*);
+
 
 }
 

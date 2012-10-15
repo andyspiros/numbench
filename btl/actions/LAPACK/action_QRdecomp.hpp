@@ -15,42 +15,38 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-#ifndef ACTION_LUDECOMP
-#define ACTION_LUDECOMP
+#ifndef ACTION_QRDECOMP
+#define ACTION_QRDECOMP
 
 #include "LinearCongruential.hpp"
 #include <vector>
 #include <algorithm>
 
 template<class Interface>
-class Action_LUdecomp{
+class Action_QRdecomp{
 
     typedef typename Interface::Scalar Scalar;
     typedef std::vector<Scalar> vector_t;
 
 private:
     // Invalidate copy constructor
-    Action_LUdecomp(const Action_LUdecomp&);
+    Action_QRdecomp(const Action_QRdecomp&);
 
 public:
 
     // Constructor
-    Action_LUdecomp(int size)
+    Action_QRdecomp(int size)
     : _size(size), lc(10),
       A(lc.fillVector<Scalar>(size*size)), A_work(size*size),
-      eye_work(size*size), ipiv(size)
+      tau_work(size), jpiv(size, 0), jpiv_work(size)
     {
-        MESSAGE("Action_LUdecomp Constructor");
-
-        // Make sure A is invertible
-        for (int i = 0; i < size; ++i)
-            A[i+i*size] += 1.2*size;
+        MESSAGE("Action_QRdecomp Constructor");
     }
 
     // Action name
     static std::string name()
     {
-        return "LUdecomp_" + Interface::name();
+        return "QRdecomp_" + Interface::name();
     }
 
     double fpo() {
@@ -62,41 +58,24 @@ public:
     }
 
     inline void calculate() {
-        Interface::LUdecomp(_size, &A_work[0], &ipiv[0]);
+        // It is crucial that jpiv_work is filled with zero
+        std::copy(jpiv.begin(), jpiv.end(), jpiv_work.begin());
+
+        Interface::QRdecomp(_size, &A_work[0], &jpiv_work[0], &tau_work[0]);
     }
 
     Scalar getResidual() {
-        initialize();
-        calculate();
-
-        // Initialize identity
-        for (int r = 0; r < _size; ++r)
-            for (int c = 0; c < _size; ++c)
-                eye_work[r+_size*c] = (r == c);
-
-        Interface::TriMatrixMatrix('u', _size, _size, &A_work[0], &eye_work[0]);
-
-        // FIXME: hard-coded unitary diagonal
-        for (int r = 0; r < _size; ++r)
-            A_work[r+_size*r] = 1.;
-
-        Interface::TriMatrixMatrix('l', _size, _size, &A_work[0], &eye_work[0]);
-
-        Interface::axpy(_size*_size, -1., &A[0], &eye_work[0]);
-        Scalar n = Interface::norm(_size*_size, &eye_work[0]);
-        n /= Interface::norm(_size*_size, &A[0]);
-        return n;
     }
 
 private:
     const int _size;
     LinearCongruential<> lc;
 
-    vector_t A;
-    vector_t A_work, eye_work;;
-    std::vector<int> ipiv;
+    const vector_t A;
+    vector_t A_work, tau_work;
+    std::vector<int> jpiv, jpiv_work;
 
 };
 
-#endif // ACTION_LUDECOMP
+#endif // ACTION_QRDECOMP
 

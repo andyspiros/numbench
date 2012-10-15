@@ -206,6 +206,20 @@ public:
         FORTFUNC(potrf)(&uplo, &N, A, &N, &info);
         if (info != 0) std::cerr << "Error: " << info << std::endl;
     }
+
+    static void QRdecomp(const int& N, Scalar* A, int* jpiv, Scalar* tau)
+    {
+        int lw, info;
+        const int mONE = -1;
+        Scalar lworks;
+
+        FORTFUNC(geqp3)(&N, &N, A, &N, jpiv, tau, &lworks, &mONE, &info);
+        lw = static_cast<int>(lworks);
+        std::vector<Scalar> work(lw);
+        FORTFUNC(geqp3)(&N, &N, A, &N, jpiv, tau, &work[0], &lw, &info);
+
+        if (info != 0) std::cerr << "Error: " << info << std::endl;
+    }
 };
 
 const int NumericInterface<NI_SCALAR>::ZERO = 0;

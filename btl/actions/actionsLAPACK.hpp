@@ -20,3 +20,4 @@
 
 #include "LAPACK/action_LUdecomp.hpp"
 #include "LAPACK/action_Choleskydecomp.hpp"
+#include "LAPACK/action_QRdecomp.hpp"
