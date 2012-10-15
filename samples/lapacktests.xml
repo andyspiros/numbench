@@ -1,42 +1,23 @@
 <numbench>
 
-    <operations module="lapack">
-      general_solve
-      least_squares
-      lu_decomp
-      cholesky
-      qr_decomp
-      svd_decomp
-      syev
-      stev
-      symm_ev
-    </operations>
+    <operations module="lapack">GeneralSolve LeastSquaresSolve LUdecomp Choleskydecomp QRdecomp</operations>
 
     <testcases>
 
         <case id="reference">
             <pkg>sci-libs/lapack-reference-3.4.1</pkg>
-            <emergeenv>
-                <var name="FFLAGS">-O3</var>
-            </emergeenv>
+        </case>
+
+        <case id="mkl">
+            <pkg>sci-libs/mkl-11.0.0.079</pkg>
+	    <skip>mkl32*</skip>
+	    <skip>*int64*</skip>
+	    <skip>*gfortran*</skip>
         </case>
 
         <case id="atlas">
             <pkg>sci-libs/atlas-3.10.0</pkg>
-            <emergeenv>
-                <var name="USE">-threads openmp</var>
-            </emergeenv>
-        </case>
-
-        <case id="mkl">
-            <pkg>sci-libs/mkl-10.3.7.256</pkg>
-            <skip>mkl32*</skip>
-            <skip>*gfortran*</skip>
-            <skip>*int64*</skip>
-        </case>
-
-        <case id="acml">
-            <pkg>sci-libs/acml-5.1.0</pkg>
+	    <skip>atlas</skip>
         </case>
 
     </testcases>

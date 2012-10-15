@@ -21,9 +21,9 @@ import btlBase
 from os.path import join as pjoin
 
 
-availableTests = ('general_solve', 'least_squares', 'lu_decomp', 'cholesky', \
-                  'qr_decomp', 'svd_decomp', 'syev', 'stev', 'symm_ev')
-defaultTests = ('lu_decomp', 'cholesky', 'qr_decomp', 'svd_decomp', 'syev')
+availableTests = ('GeneralSolve', 'LeastSquaresSolve',
+                  'LUdecomp', 'Choleskydecomp', 'QRdecomp')
+defaultTests = ('GeneralSolve', 'LUdecomp', 'Choleskydecomp')
 
 
 def init(self, args):
@@ -43,8 +43,8 @@ def runTest(self, test, implementation):
       exe = pjoin(test['testdir'], implementation, 'test'),
       logdir = pjoin(test['logdir'], implementation),
       testdir = pjoin(test['testdir'], implementation),
-      btlincludes = ('libs/BLAS', 'libs/LAPACK'),
-      defines = ('LAPACKNAME='+self.libname, self.libname.upper()+"_INTERFACE"),
+      btlincludes = ('libs/LAPACK',),
+      defines = ("NI_NAME=" + self.libname, "NI_" + self.libname.upper()),
       flags = alt.getFlags(test, self.libname, implementation),
       tests = self.tests
     )

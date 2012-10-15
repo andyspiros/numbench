@@ -16,6 +16,9 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
 
+#include <string>
+#include <iostream>
+
 // Include the numeric interface
 #ifdef NI_BLAS
 #  define NI_FORTRAN
@@ -32,8 +35,6 @@ typedef NumericInterface<double> Interface;
 // Include the operations
 #include "actionsBLAS.hpp"
 
-#include <string>
-#include <iostream>
 
 using namespace std;
 
@@ -109,6 +110,6 @@ int main(int argv, char **argc)
     bench<Action_TriSolveMatrix<Interface> >(MIN_MM,MAX_MM, N);
 
 
-  return 0;
+    return 0;
 }
 

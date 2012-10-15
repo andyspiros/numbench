@@ -32,15 +32,12 @@ testdescr = {
 'TriSolveMatrix': 'Triangular system solution with n right hand side vectors',
 
 # LAPACK(e)
-'general_solve': 'Solution of a generic linear system of equations',
-'least_squares': 'Least squares solution',
-'lu_decomp': 'LU-decomposition',
-'cholesky': 'Cholesky decomposition',
-'svd_decomp': 'SVD-decomposition',
-'qr_decomp': 'QR-decomposition',
-'syev': 'Diagonalization of a symmetric matrix',
-'stev': 'Diagonalization of a tridiagonal matrix',
-'symm_ev': 'Symmetric Eigenvalue computation',
+'GeneralSolve': 'Solution of a generic linear system of equations',
+'LeastSquaresSolve': 'Least squares solution',
+'LUdecomp': 'LU-decomposition',
+'Choleskydecomp': 'Cholesky decomposition',
+'QRdecomp': 'QR-decomposition',
+'SVDdecomp': 'SVD-decomposition',
 
 # FFTW
 'FFTW_1D_Forward_Measure': 'FFTW 1D Forward (Measure)',

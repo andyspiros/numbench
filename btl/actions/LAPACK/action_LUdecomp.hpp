@@ -76,7 +76,7 @@ public:
 
         Interface::TriMatrixMatrix('u', _size, _size, &A_work[0], &eye_work[0]);
 
-        // FIXME: hard-coded unitary diagonal
+        // Hard-coded unitary diagonal
         for (int r = 0; r < _size; ++r)
             A_work[r+_size*r] = 1.;
 

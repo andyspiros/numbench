@@ -1,5 +1,5 @@
 //=====================================================
-// Copyright (C) 2011 Andrea Arteaga <andyspiros@gmail.com>
+// Copyright (C) 2012 Andrea Arteaga <andyspiros@gmail.com>
 //=====================================================
 //
 // This program is free software; you can redistribute it and/or
@@ -15,81 +15,74 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //
-#include <btl.hh>
-#include <bench.hh>
-#include <action_general_solve.hh>
-#include <action_least_squares.hh>
-#include <action_lu_decomp.hh>
-#include <action_cholesky.hh>
-#include <action_qr_decomp.hh>
-#include <action_svd_decomp.hh>
-#include <action_syev.hh>
-#include <action_stev.hh>
-#include <action_symm_ev.hh>
-#include <lapack_interface.hh>
 
 #include <string>
-#include <cstdlib>
+#include <iostream>
+
+// Include the numeric interface
+#ifdef NI_LAPACK
+#  define NI_FORTRAN
+#endif
+
+#include "NumericInterface.hpp"
+
+typedef NumericInterface<double> Interface;
+
+// Include the BTL
+#include "utilities.h"
+#include "bench.hh"
+
+// Include the operations
+#include "actionsLAPACK.hpp"
+
+
+using namespace std;
 
 BTL_MAIN;
 
-int main(int argc, char **argv)
+int main(int argv, char **argc)
 {
     bool
-    general_solve=false, least_squares=false, lu_decomp=false, cholesky=false,
-        qr_decomp=false, svd_decomp=false, syev=false, stev=false,
-        symm_ev=false;
+    do_GeneralSolve=false, do_LeastSquaresSolve=false,
+
+    do_LUdecomp=false, do_Choleskydecomp=false, do_QRdecomp=false
+    ;
+
     int N = 100;
 
 
-    for (int i = 1; i < argc; ++i) {
-        std::string arg = argv[i];
-        if (arg == "general_solve") general_solve = true;
-        else if (arg == "least_squares") least_squares = true;
-        else if (arg == "lu_decomp") lu_decomp = true;
-        else if (arg == "cholesky") cholesky = true;
-        else if (arg == "qr_decomp") qr_decomp = true;
-        else if (arg == "svd_decomp") svd_decomp = true;
-        else if (arg == "syev") syev = true;
-        else if (arg == "stev") stev = true;
-        else if (arg == "symm_ev") symm_ev = true;
+    for (int i = 1; i < argv; ++i) {
+      std::string arg = argc[i];
 
-        // Check switch -N
-        else if (arg[0] == '-' && arg[1] == 'N') {
-            if (arg[2] != '\0')
-                N = atoi(arg.c_str()+2);
-            else
-                N = atoi(argv[++i]);
-        }
+           if (arg == "GeneralSolve") do_GeneralSolve = true;
+      else if (arg == "LeastSquaresSolve") do_LeastSquaresSolve = true;
+
+      else if (arg == "LUdecomp") do_LUdecomp= true;
+      else if (arg == "Choleskydecomp") do_Choleskydecomp= true;
+      else if (arg == "QRdecomp") do_QRdecomp= true;
+
+      // Check switch -N
+      else if (arg[0] == '-' && arg[1] == 'N') {
+          if (arg[2] != '\0')
+              N = atoi(arg.c_str()+2);
+          else
+              N = atoi(argc[++i]);
+      }
     }
 
+    if (do_GeneralSolve)
+    bench<Action_GeneralSolve<Interface> >(MIN_MM,MAX_MM, N);
+    if (do_LeastSquaresSolve)
+    bench<Action_LeastSquaresSolve<Interface> >(MIN_MM,MAX_MM, N);
 
-    if (general_solve)
-    bench<Action_general_solve<lapack_interface<REAL_TYPE> > >(MIN_MM,MAX_MM,N);
+    if(do_LUdecomp)
+    bench<Action_LUdecomp<Interface> >(MIN_MM,MAX_MM, N);
+    if(do_Choleskydecomp)
+    bench<Action_Choleskydecomp<Interface> >(MIN_MM,MAX_MM, N);
+    if(do_QRdecomp)
+    bench<Action_QRdecomp<Interface> >(MIN_MM,MAX_MM, N);
 
-    if (least_squares)
-    bench<Action_least_squares<lapack_interface<REAL_TYPE> > >(MIN_MM,MAX_MM,N);
-
-    if (lu_decomp)
-    bench<Action_lu_decomp<lapack_interface<REAL_TYPE> > >(MIN_MM,MAX_MM,N);
-
-    if (cholesky)
-    bench<Action_cholesky<lapack_interface<REAL_TYPE> > >(MIN_MM,MAX_MM,N);
-
-    if (qr_decomp)
-    bench<Action_qr_decomp<lapack_interface<REAL_TYPE> > >(MIN_MM,MAX_MM,N);
-
-    if (svd_decomp)
-    bench<Action_svd_decomp<lapack_interface<REAL_TYPE> > >(MIN_MM,750,N);
-
-    if (syev)
-    bench<Action_syev<lapack_interface<REAL_TYPE> > >(MIN_MM,750,N);
-
-    if (stev)
-    bench<Action_stev<lapack_interface<REAL_TYPE> > >(MIN_MM,1000,N);
-
-    if (symm_ev)
-    bench<Action_symm_ev<lapack_interface<REAL_TYPE> > >(MIN_MM,MAX_MM,N);
 
     return 0;
 }
+
