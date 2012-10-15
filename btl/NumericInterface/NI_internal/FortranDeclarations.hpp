@@ -93,6 +93,19 @@ extern "C" {
     void dgels_(const char*, const int*, const int*, const int*, double*, const int*, double*, const int*, double*, const int*, int*);
 
 
+
+
+    /*************************
+     * LAPACK FACTORIZATIONS *
+     *************************/
+
+    void sgetrf_(const int*, const int*, float*, const int*, int*, int*);
+    void dgetrf_(const int*, const int*, double*, const int*, int*, int*);
+
+    void spotrf_(const char*, const int*, float*, const int*, int*);
+    void dpotrf_(const char*, const int*, double*, const int*, int*);
+
+
 }
 
 

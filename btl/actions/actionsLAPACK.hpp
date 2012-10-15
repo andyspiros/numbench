@@ -17,3 +17,6 @@
 //
 #include "LAPACK/action_GeneralSolve.hpp"
 #include "LAPACK/action_LeastSquaresSolve.hpp"
+
+#include "LAPACK/action_LUdecomp.hpp"
+#include "LAPACK/action_Choleskydecomp.hpp"

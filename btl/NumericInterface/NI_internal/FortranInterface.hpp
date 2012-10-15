@@ -186,6 +186,26 @@ public:
         std::vector<Scalar> work(lw);
         FORTFUNC(gels)("N", &N, &N, &ONE, A, &N, b, &N, &work[0], &lw, &info);
     }
+
+
+
+    /******************
+     * LAPACK SOLVERS *
+     ******************/
+
+    static void LUdecomp(const int& N, Scalar* A, int* ipiv)
+    {
+        int info;
+        FORTFUNC(getrf)(&N, &N, A, &N, ipiv, &info);
+        if (info != 0) std::cerr << "Error: " << info << std::endl;
+    }
+
+    static void Choleskydecomp(const char& uplo, const int& N, Scalar* A)
+    {
+        int info;
+        FORTFUNC(potrf)(&uplo, &N, A, &N, &info);
+        if (info != 0) std::cerr << "Error: " << info << std::endl;
+    }
 };
 
 const int NumericInterface<NI_SCALAR>::ZERO = 0;
