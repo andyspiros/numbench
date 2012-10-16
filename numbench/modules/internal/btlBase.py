@@ -24,9 +24,13 @@ def reportConf(*args):
 
 
 def runTest(self, test, btlconfig):
+    fnameprefix = btlconfig.get('fnameprefix', 'bench')
+
+    fname = lambda j : fnameprefix + '_' + j + '_' + self.libname + '.dat'
+
     # Check if results already exist
-    tmpres = dict( \
-      [(i, pjoin(btlconfig['testdir'], 'bench_'+i+'_'+self.libname+'.dat')) \
+    tmpres = dict(\
+      [(i, pjoin(btlconfig['testdir'], fname(i))) \
       for i in btlconfig['tests']])
 
     if all([exists(i) for i in tmpres.values()]):

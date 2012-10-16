@@ -25,7 +25,8 @@ modnames = [
   'lapack',
   'lapacke',
   'scalapack',
-  'fftw'
+  'fftw',
+  'lapackAccuracy'
 ]
 
 
