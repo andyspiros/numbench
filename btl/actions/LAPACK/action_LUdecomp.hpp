@@ -35,8 +35,8 @@ private:
 public:
 
     // Constructor
-    Action_LUdecomp(int size)
-    : _size(size), lc(10),
+    Action_LUdecomp(int size, int seed=10)
+    : _size(size), lc(seed),
       A(lc.fillVector<Scalar>(size*size)), A_work(size*size),
       eye_work(size*size), ipiv(size)
     {

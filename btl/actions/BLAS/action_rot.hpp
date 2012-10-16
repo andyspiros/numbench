@@ -35,8 +35,8 @@ private:
 public:
 
     // Constructor
-    Action_rot(int size)
-    : _size(size), lc(10),
+    Action_rot(int size, int seed=10)
+    : _size(size), lc(seed),
       x(lc.fillVector<Scalar>(size)), y(lc.fillVector<Scalar>(size)),
       x_work(size), y_work(size)
     {

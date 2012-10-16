@@ -35,8 +35,8 @@ private:
 public:
 
     // Constructor
-    Action_Choleskydecomp(int size)
-    : _size(size), lc(10),
+    Action_Choleskydecomp(int size, int seed=10)
+    : _size(size), lc(seed),
       A(lc.fillVector<Scalar>(size*size)), A_work(size*size)
     {
         MESSAGE("Action_Choleskydecomp Constructor");

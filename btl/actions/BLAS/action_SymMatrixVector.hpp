@@ -35,8 +35,8 @@ private:
 public:
 
     // Constructor
-    Action_SymMatrixVector(int size)
-    : _size(size), lc(10),
+    Action_SymMatrixVector(int size, int seed=10)
+    : _size(size), lc(seed),
       A(lc.fillVector<Scalar>(size*size)), x(lc.fillVector<Scalar>(size)),
       y(size), y_work(size)
     {

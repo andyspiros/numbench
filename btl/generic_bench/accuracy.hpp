@@ -46,11 +46,10 @@ void bench_accuracy (int size_min, int size_max, int nb_point,
 
     // Loop on sizes
     for (int i = nb_point-1; i >= 0; --i) {
-        if (!silent)
-          std::cout << " " << "size = " << sizes[i] << ", " << std::flush;
+        const int size = sizes[i];
 
-        // Initialize action with given size
-        Action action(sizes[i]);
+        if (!silent)
+          std::cout << " " << "size = " << size << ", " << std::flush;
 
         int repetitions = 0;
         double average = 0., stddev = 0., e;
@@ -58,17 +57,20 @@ void bench_accuracy (int size_min, int size_max, int nb_point,
         // Perform time loop and store average and standard deviation
         timer.start();
         do {
+            // Initialize action with given size and new seed
+            Action action(size,  15+repetitions);
             e = action.getResidual();
 
             average += e;
             stddev += e*e;
             ++repetitions;
 
-        } while(timer.elapsed() < 1.);
+        } while(timer.elapsed() < 1. || repetitions < 4);
 
         // Compute average and standard deviation
+        // (sometimes strange things happen)
         average /= repetitions;
-        stddev = std::sqrt(stddev/repetitions - average*average);
+        stddev = std::sqrt(std::fabs(stddev/repetitions - average*average));
 
         errors[i] = average;
         devs[i] = stddev;
@@ -76,15 +78,17 @@ void bench_accuracy (int size_min, int size_max, int nb_point,
         // Output
         if (!silent)
             std::cout << "average = " << average << ",  stddev = " << stddev
-                      << std::endl;
+                      << " (" << repetitions << " samples)" << std::endl;
     }
 
     // Dump the result
     if (!silent) {
         std::ofstream outfile(filename.c_str());
 
+        // Don't dump the stddev for now
         for (int i = 0; i < nb_point; ++i)
-            outfile << sizes[i] << " " << errors[i] << " " << devs[i] << "\n";
+            //outfile << sizes[i] << " " << errors[i] << " " << devs[i] << "\n";
+            outfile << sizes[i] << " " << errors[i] << "\n";
 
         outfile.close();
 

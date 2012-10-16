@@ -35,8 +35,8 @@ private:
 public:
 
     // Constructor
-    Action_TriSolveMatrix(int size)
-    : _size(size), lc(10),
+    Action_TriSolveMatrix(int size, int seed=10)
+    : _size(size), lc(seed),
       A(lc.fillVector<Scalar>(size*size)), B(lc.fillVector<Scalar>(size*size)),
       X_work(size*size)
     {
