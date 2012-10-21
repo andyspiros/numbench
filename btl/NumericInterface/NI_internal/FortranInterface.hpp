@@ -189,9 +189,9 @@ public:
 
 
 
-    /******************
-     * LAPACK SOLVERS *
-     ******************/
+    /*************************
+     * LAPACK decompositions *
+     *************************/
 
     static void LUdecomp(const int& N, Scalar* A, int* ipiv)
     {

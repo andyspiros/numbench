@@ -22,6 +22,7 @@
 #endif
 
 #define CBLASFUNC(F) CAT(cblas_, CAT(NI_SCALARPREFIX, F))
+#define LAPACKEFUNC(F) CAT(LAPACKE_, CAT(NI_SCALARPREFIX, F))
 
 #ifndef NI_NAME
 #  define NI_NAME CAT(CAT(CInterface,$),NI_SCALAR)
@@ -194,5 +195,42 @@ public:
 
         CBLASFUNC(trsm)(CblasColMajor, CblasLeft, uplo_, CblasNoTrans,
                 CblasNonUnit, M, N, 1., A, M, B, M);
+    }
+
+
+
+    /*******************
+     * LAPACKE SOLVERS *
+     *******************/
+
+    static void GeneralSolve(const int& N, Scalar *A, Scalar *b, int *ipiv)
+    {
+        LAPACKEFUNC(gesv)(CblasColMajor, N, 1, A, N, ipiv, b, N);
+    }
+
+    static void LeastSquaresSolve(const int& N, Scalar *A, Scalar *b)
+    {
+        LAPACKEFUNC(gels)(CblasColMajor, 'N', N, N, 1, A, N, b, N);
+    }
+
+
+
+    /**************************
+     * LAPACKE decompositions *
+     **************************/
+
+    static void LUdecomp(const int& N, Scalar* A, int* ipiv)
+    {
+        LAPACKEFUNC(getrf)(CblasColMajor, N, N, A, N, ipiv);
+    }
+
+    static void Choleskydecomp(const char& uplo, const int& N, Scalar* A)
+    {
+        LAPACKEFUNC(potrf)(CblasColMajor, uplo, N, A, N);
+    }
+
+    static void QRdecomp(const int& N, Scalar* A, int* jpiv, Scalar* tau)
+    {
+        LAPACKEFUNC(geqp3)(CblasColMajor, N, N, A, N, jpiv, tau);
     }
 };

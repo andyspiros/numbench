@@ -100,6 +100,34 @@ extern "C" {
     void cblas_strsm(int, int, int, int, int, int, int, float, const float*, int, float*, int);
     void cblas_dtrsm(int, int, int, int, int, int, int, double, const double*, int, double*, int);
 
+
+
+
+    /*******************
+     * LAPACKE SOLVERS *
+     *******************/
+
+    void LAPACKE_sgesv(int, int, int, float*, int*, int*, float*, int);
+    void LAPACKE_dgesv(int, int, int, double*, int*, int*, double*, int);
+
+    void LAPACKE_sgels(int, char, int, int, int, float*, int, float*, int);
+    void LAPACKE_dgels(int, char, int, int, int, double*, int, double*, int);
+
+
+
+    /**************************
+     * LAPACK* decompositions *
+     **************************/
+
+    void LAPACKE_sgetrf(int, int, int, float*, int, int*);
+    void LAPACKE_dgetrf(int, int, int, double*, int, int*);
+
+    void LAPACKE_spotrf(int, char, int, float*, int, int*);
+    void LAPACKE_dpotrf(int, char, int, double*, int, int*);
+
+    void LAPACKE_sgeqp3(int, int, int, float*, int, int*, float*);
+    void LAPACKE_dgeqp3(int, int, int, double*, int, int*, double*);
+
 }
 
 
