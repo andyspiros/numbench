@@ -1,2 +1,0 @@
-metis sci-libs/metis-4.0.1-r1 CFLAGS="-march=native"
-metis-O3 sci-libs/metis-4.0.1-r1 CFLAGS="-march=native -O3"
