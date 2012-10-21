@@ -55,6 +55,9 @@ class MyRequestHandler(SimpleHTTPRequestHandler):
         sd = self.Session().d
         print 'Session dictionary:', sd
         if 'login' not in sd and not self.path.startswith('/login'):
+            print "You must login!"
+            print " * in dict:", 'login' not in sd
+            print " * path:", not self.path.startswith('/login')
             sd['requested'] = self.path
             
             self.send_response(301)
@@ -64,11 +67,12 @@ class MyRequestHandler(SimpleHTTPRequestHandler):
             self.end_headers()
             return False
         
+        print "Login already done"
         return True
 
 
     def do_GET(self):
-        print "Requested path", self.path
+        print "\nRequested path", self.path
         
         if not self.checkLogin():
             return
