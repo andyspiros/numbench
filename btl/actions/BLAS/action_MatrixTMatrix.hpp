@@ -35,8 +35,8 @@ private:
 public:
 
     // Constructor
-    Action_MatrixTMatrix(int size)
-    : _size(size), lc(10),
+    Action_MatrixTMatrix(int size, int seed=10)
+    : _size(size), lc(seed),
       A(lc.fillVector<Scalar>(size*size)), B(lc.fillVector<Scalar>(size*size)),
       C(size*size), C_work(size*size)
     {

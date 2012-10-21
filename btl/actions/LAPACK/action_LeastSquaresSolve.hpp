@@ -35,8 +35,8 @@ private:
 public:
 
     // Constructor
-    Action_LeastSquaresSolve(int size)
-    : _size(size), lc(10),
+    Action_LeastSquaresSolve(int size, int seed=10)
+    : _size(size), lc(seed),
       A(lc.fillVector<Scalar>(size*size)), b(lc.fillVector<Scalar>(size)),
       A_work(size*size), x_work(size), b_res(size)
     {

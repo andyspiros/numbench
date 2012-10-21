@@ -35,8 +35,8 @@ private:
 public:
 
     // Constructor
-    Action_axpy(int size)
-    : _size(size), lc(10),
+    Action_axpy(int size, int seed=10)
+    : _size(size), lc(seed),
       x(lc.fillVector<Scalar>(size)),
       x_work(size), y_work(size)
     {

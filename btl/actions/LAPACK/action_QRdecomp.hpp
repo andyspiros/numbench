@@ -35,10 +35,11 @@ private:
 public:
 
     // Constructor
-    Action_QRdecomp(int size)
-    : _size(size), lc(10),
+    Action_QRdecomp(int size, int seed=10)
+    : _size(size), lc(seed),
       A(lc.fillVector<Scalar>(size*size)), A_work(size*size),
-      tau_work(size), jpiv(size, 0), jpiv_work(size)
+      tau_work(size), jpiv(size, 0), jpiv_work(size),
+      Q_work(size*size), H_work(size*size), v_work(size), eye_work(size*size)
     {
         MESSAGE("Action_QRdecomp Constructor");
     }
@@ -72,7 +73,7 @@ private:
     LinearCongruential<> lc;
 
     const vector_t A;
-    vector_t A_work, tau_work;
+    vector_t A_work, tau_work, Q_work, H_work, v_work, eye_work;
     std::vector<int> jpiv, jpiv_work;
 
 };
